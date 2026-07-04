@@ -18,6 +18,17 @@ TRUNCATE TABLE dev.pharmacy_reviews CASCADE;
 TRUNCATE TABLE dev.nurse_requests CASCADE;
 TRUNCATE TABLE dev.notifications CASCADE;
 TRUNCATE TABLE dev.password_resets CASCADE;
+-- Drop and recreate password_resets to remove old user_id column
+DROP TABLE IF EXISTS dev.password_resets CASCADE;
+CREATE TABLE dev.password_resets (
+    reset_id BIGSERIAL PRIMARY KEY,
+    email VARCHAR(255),
+    entity_type VARCHAR(255),
+    otp_code VARCHAR(255),
+    expires_at TIMESTAMP,
+    is_used BOOLEAN DEFAULT false,
+    created_at TIMESTAMP DEFAULT NOW()
+);
 TRUNCATE TABLE dev.medicines CASCADE;
 TRUNCATE TABLE dev.medicine_categories CASCADE;
 TRUNCATE TABLE dev.nurse_services CASCADE;
@@ -40,7 +51,6 @@ ALTER SEQUENCE dev.nurse_reviews_review_id_seq RESTART WITH 1;
 ALTER SEQUENCE dev.notifications_notification_id_seq RESTART WITH 1;
 ALTER SEQUENCE dev.admin_activity_logs_log_id_seq RESTART WITH 1;
 ALTER SEQUENCE dev.inventory_logs_log_id_seq RESTART WITH 1;
-ALTER SEQUENCE dev.password_resets_reset_id_seq RESTART WITH 1;
 
 -- ─── STEP 3: INSERT MOCK DATA ───────────────────────────────────
 
