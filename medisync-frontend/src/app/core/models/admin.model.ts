@@ -23,7 +23,7 @@ export interface AdminReport {
 
 export interface AdminActivityLog {
   logId: number;
-  admin: User;
+  admin: User | null;
   action: string;
   entityType: string;
   entityId: number;

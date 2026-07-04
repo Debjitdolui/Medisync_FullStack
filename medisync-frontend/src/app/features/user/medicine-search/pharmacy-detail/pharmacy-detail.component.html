@@ -7,7 +7,7 @@
           <i class="ti ti-building-hospital"></i>
         </div>
         <div class="pharmacy-meta">
-          <h2>{{ pharmacy?.pharmacyName }}</h2>
+          <h2>{{ pharmacy.pharmacyName }}</h2>
           <div class="header-badges">
             <span class="rating-badge">
               <i class="ti ti-star-filled"></i>
@@ -65,21 +65,21 @@
           <i class="ti ti-map-pin"></i>
           <div>
             <span class="cell-label">Address</span>
-            <span class="cell-value">{{ pharmacy?.address }}, {{ pharmacy?.city }}, {{ pharmacy?.state }} - {{ pharmacy?.pincode }}</span>
+            <span class="cell-value">{{ pharmacy.address }}, {{ pharmacy.city }}, {{ pharmacy.state }} - {{ pharmacy.pincode }}</span>
           </div>
         </div>
         <div class="detail-cell">
           <i class="ti ti-phone"></i>
           <div>
             <span class="cell-label">Contact</span>
-            <span class="cell-value">{{ pharmacy?.phone }}</span>
+            <span class="cell-value">{{ pharmacy.phone }}</span>
           </div>
         </div>
         <div class="detail-cell">
           <i class="ti ti-user"></i>
           <div>
             <span class="cell-label">Owner</span>
-            <span class="cell-value">{{ pharmacy?.ownerName }}</span>
+            <span class="cell-value">{{ pharmacy.ownerName }}</span>
           </div>
         </div>
       </div>
@@ -102,7 +102,7 @@
         <i class="ti ti-navigation"></i>
         <span>Get Directions</span>
       </a>
-      <a class="action-btn call" [href]="'tel:' + pharmacy?.phone">
+      <a class="action-btn call" [href]="'tel:' + pharmacy.phone">
         <i class="ti ti-phone"></i>
         <span>Call Pharmacy</span>
       </a>
