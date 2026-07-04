@@ -31,9 +31,29 @@ public class AdminController {
         return ResponseEntity.ok(adminService.approvePharmacy(id, status, auth.getName()));
     }
 
+    @PutMapping("/pharmacies/{id}/block")
+    public ResponseEntity<?> blockPharmacy(Authentication auth, @PathVariable Long id) {
+        return ResponseEntity.ok(adminService.blockPharmacy(id, auth.getName()));
+    }
+
+    @PutMapping("/pharmacies/{id}/unblock")
+    public ResponseEntity<?> unblockPharmacy(Authentication auth, @PathVariable Long id) {
+        return ResponseEntity.ok(adminService.unblockPharmacy(id, auth.getName()));
+    }
+
     @PutMapping("/nurses/{id}/approve")
     public ResponseEntity<?> approveNurse(Authentication auth, @PathVariable Long id, @RequestParam String status) {
         return ResponseEntity.ok(adminService.approveNurse(id, status, auth.getName()));
+    }
+
+    @PutMapping("/nurses/{id}/block")
+    public ResponseEntity<?> blockNurse(Authentication auth, @PathVariable Long id) {
+        return ResponseEntity.ok(adminService.blockNurse(id, auth.getName()));
+    }
+
+    @PutMapping("/nurses/{id}/unblock")
+    public ResponseEntity<?> unblockNurse(Authentication auth, @PathVariable Long id) {
+        return ResponseEntity.ok(adminService.unblockNurse(id, auth.getName()));
     }
 
     @GetMapping("/users")

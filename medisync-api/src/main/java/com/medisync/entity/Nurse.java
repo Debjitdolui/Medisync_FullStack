@@ -48,6 +48,9 @@ public class Nurse {
     @Column(name = "approval_status", columnDefinition = "varchar(255) default 'pending'")
     private String approvalStatus = "pending";
 
+    @Column(name = "is_blocked")
+    private Boolean isBlocked = false;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

@@ -45,6 +45,14 @@ export class AdminService {
     return this.http.put<Pharmacy>(`${this.apiUrl}/pharmacies/${id}/approve?status=${status}`, {});
   }
 
+  blockPharmacy(id: number): Observable<Pharmacy> {
+    return this.http.put<Pharmacy>(`${this.apiUrl}/pharmacies/${id}/block`, {});
+  }
+
+  unblockPharmacy(id: number): Observable<Pharmacy> {
+    return this.http.put<Pharmacy>(`${this.apiUrl}/pharmacies/${id}/unblock`, {});
+  }
+
   getAllNurses(pageRequest?: PageRequest): Observable<Page<Nurse>> {
     const params = this.buildPageParams(pageRequest || { page: 0, size: 20 });
     return this.http.get<Page<Nurse>>(`${this.apiUrl}/nurses`, { params });
@@ -52,6 +60,14 @@ export class AdminService {
 
   approveNurse(id: number, status: 'approved' | 'rejected'): Observable<Nurse> {
     return this.http.put<Nurse>(`${this.apiUrl}/nurses/${id}/approve?status=${status}`, {});
+  }
+
+  blockNurse(id: number): Observable<Nurse> {
+    return this.http.put<Nurse>(`${this.apiUrl}/nurses/${id}/block`, {});
+  }
+
+  unblockNurse(id: number): Observable<Nurse> {
+    return this.http.put<Nurse>(`${this.apiUrl}/nurses/${id}/unblock`, {});
   }
 
   private buildPageParams(pageRequest: PageRequest): HttpParams {

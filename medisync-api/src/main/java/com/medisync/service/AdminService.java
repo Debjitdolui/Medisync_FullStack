@@ -131,6 +131,59 @@ public class AdminService {
         return reports;
     }
 
+    // ─── Block/Unblock Pharmacy ─────────────────────────────────────────────────
+
+    public Pharmacy blockPharmacy(Long pharmacyId, String adminEmail) {
+        Pharmacy pharmacy = pharmacyRepository.findById(pharmacyId)
+                .orElseThrow(() -> new RuntimeException("Pharmacy not found"));
+        pharmacy.setIsBlocked(true);
+        pharmacyRepository.save(pharmacy);
+        logActivity(adminEmail, "BLOCK_PHARMACY", "Pharmacy", pharmacyId, "Blocked pharmacy " + pharmacy.getPharmacyName());
+        notificationService.notifyPharmacy(pharmacy.getEmail(), "ACCOUNT_BLOCKED",
+                "Account Blocked",
+                "Your pharmacy '" + pharmacy.getPharmacyName() + "' has been blocked due to suspicious activity. Contact support for details.");
+        return pharmacy;
+    }
+
+    public Pharmacy unblockPharmacy(Long pharmacyId, String adminEmail) {
+        Pharmacy pharmacy = pharmacyRepository.findById(pharmacyId)
+                .orElseThrow(() -> new RuntimeException("Pharmacy not found"));
+        pharmacy.setIsBlocked(false);
+        pharmacyRepository.save(pharmacy);
+        logActivity(adminEmail, "UNBLOCK_PHARMACY", "Pharmacy", pharmacyId, "Unblocked pharmacy " + pharmacy.getPharmacyName());
+        notificationService.notifyPharmacy(pharmacy.getEmail(), "ACCOUNT_UNBLOCKED",
+                "Account Unblocked",
+                "Your pharmacy '" + pharmacy.getPharmacyName() + "' has been unblocked. You can now login and manage your inventory.");
+        return pharmacy;
+    }
+
+    // ─── Block/Unblock Nurse ─────────────────────────────────────────────────────
+
+    public Nurse blockNurse(Long nurseId, String adminEmail) {
+        Nurse nurse = nurseRepository.findById(nurseId)
+                .orElseThrow(() -> new RuntimeException("Nurse not found"));
+        nurse.setIsBlocked(true);
+        nurse.setAvailabilityStatus("offline");
+        nurseRepository.save(nurse);
+        logActivity(adminEmail, "BLOCK_NURSE", "Nurse", nurseId, "Blocked nurse " + nurse.getFullName());
+        notificationService.notifyNurse(nurse.getEmail(), "ACCOUNT_BLOCKED",
+                "Account Blocked",
+                "Your nurse account has been blocked due to suspicious activity. Contact support for details.");
+        return nurse;
+    }
+
+    public Nurse unblockNurse(Long nurseId, String adminEmail) {
+        Nurse nurse = nurseRepository.findById(nurseId)
+                .orElseThrow(() -> new RuntimeException("Nurse not found"));
+        nurse.setIsBlocked(false);
+        nurseRepository.save(nurse);
+        logActivity(adminEmail, "UNBLOCK_NURSE", "Nurse", nurseId, "Unblocked nurse " + nurse.getFullName());
+        notificationService.notifyNurse(nurse.getEmail(), "ACCOUNT_UNBLOCKED",
+                "Account Unblocked",
+                "Your nurse account has been unblocked. You can now set your availability and accept requests.");
+        return nurse;
+    }
+
     private void logActivity(String adminEmail, String action, String entityType, Long entityId, String details) {
         User admin = userRepository.findByEmail(adminEmail)
                 .orElseThrow(() -> new RuntimeException("Admin not found"));

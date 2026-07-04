@@ -8,6 +8,7 @@ export interface Nurse {
   specialization: string;
   availabilityStatus: 'online' | 'offline';
   approvalStatus: 'pending' | 'approved' | 'rejected';
+  isBlocked?: boolean;
   createdAt: string;
   updatedAt: string;
 }

@@ -61,6 +61,8 @@ public class AuthService {
         if (pharmacy.isPresent()) {
             if (!encoder.matches(req.getPassword(), pharmacy.get().getPasswordHash()))
                 throw new RuntimeException("Invalid credentials");
+            if (Boolean.TRUE.equals(pharmacy.get().getIsBlocked()))
+                throw new RuntimeException("Account has been blocked. Contact support.");
             if (!"approved".equals(pharmacy.get().getApprovalStatus()))
                 throw new RuntimeException("Pharmacy account is pending admin approval");
 
@@ -73,6 +75,8 @@ public class AuthService {
         if (nurse.isPresent()) {
             if (!encoder.matches(req.getPassword(), nurse.get().getPasswordHash()))
                 throw new RuntimeException("Invalid credentials");
+            if (Boolean.TRUE.equals(nurse.get().getIsBlocked()))
+                throw new RuntimeException("Account has been blocked. Contact support.");
             if (!"approved".equals(nurse.get().getApprovalStatus()))
                 throw new RuntimeException("Nurse account is pending admin approval");
 
@@ -89,6 +93,8 @@ public class AuthService {
 
         if (!encoder.matches(req.getPassword(), pharmacy.getPasswordHash()))
             throw new RuntimeException("Invalid credentials");
+        if (Boolean.TRUE.equals(pharmacy.getIsBlocked()))
+            throw new RuntimeException("Account has been blocked. Contact support.");
         if (!"approved".equals(pharmacy.getApprovalStatus()))
             throw new RuntimeException("Pharmacy account is pending admin approval");
 
@@ -102,6 +108,8 @@ public class AuthService {
 
         if (!encoder.matches(req.getPassword(), nurse.getPasswordHash()))
             throw new RuntimeException("Invalid credentials");
+        if (Boolean.TRUE.equals(nurse.getIsBlocked()))
+            throw new RuntimeException("Account has been blocked. Contact support.");
         if (!"approved".equals(nurse.getApprovalStatus()))
             throw new RuntimeException("Nurse account is pending admin approval");
 

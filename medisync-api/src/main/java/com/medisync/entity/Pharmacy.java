@@ -60,6 +60,9 @@ public class Pharmacy {
     @Column(name = "approval_status")
     private String approvalStatus = "pending";
 
+    @Column(name = "is_blocked")
+    private Boolean isBlocked = false;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
