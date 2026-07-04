@@ -110,12 +110,13 @@ public class AuthService {
     }
 
     public String forgotPassword(ForgotPasswordRequest req) {
-        User user = userRepo.findByEmail(req.getEmail())
-                .orElseThrow(() -> new RuntimeException("Email not found"));
+        // Determine which entity type this email belongs to
+        String entityType = resolveEntityType(req.getEmail());
 
         String otp = String.format("%06d", new Random().nextInt(999999));
         PasswordReset reset = new PasswordReset();
-        reset.setUser(user);
+        reset.setEmail(req.getEmail());
+        reset.setEntityType(entityType);
         reset.setOtpCode(otp);
         reset.setExpiresAt(LocalDateTime.now().plusMinutes(10));
         reset.setIsUsed(false);
@@ -126,10 +127,7 @@ public class AuthService {
     }
 
     public String resetPassword(ResetPasswordRequest req) {
-        User user = userRepo.findByEmail(req.getEmail())
-                .orElseThrow(() -> new RuntimeException("Email not found"));
-
-        PasswordReset reset = resetRepo.findTopByUserUserIdAndIsUsedFalseOrderByCreatedAtDesc(user.getUserId())
+        PasswordReset reset = resetRepo.findTopByEmailAndIsUsedFalseOrderByCreatedAtDesc(req.getEmail())
                 .orElseThrow(() -> new RuntimeException("No OTP request found"));
 
         if (reset.getExpiresAt().isBefore(LocalDateTime.now()))
@@ -140,8 +138,41 @@ public class AuthService {
         reset.setIsUsed(true);
         resetRepo.save(reset);
 
-        user.setPasswordHash(encoder.encode(req.getNewPassword()));
-        userRepo.save(user);
+        // Update password in the correct table based on entity type
+        String newHash = encoder.encode(req.getNewPassword());
+        switch (reset.getEntityType()) {
+            case "user" -> {
+                var user = userRepo.findByEmail(req.getEmail())
+                        .orElseThrow(() -> new RuntimeException("User not found"));
+                user.setPasswordHash(newHash);
+                userRepo.save(user);
+            }
+            case "pharmacy" -> {
+                var pharmacy = pharmacyRepo.findByEmail(req.getEmail())
+                        .orElseThrow(() -> new RuntimeException("Pharmacy not found"));
+                pharmacy.setPasswordHash(newHash);
+                pharmacyRepo.save(pharmacy);
+            }
+            case "nurse" -> {
+                var nurse = nurseRepo.findByEmail(req.getEmail())
+                        .orElseThrow(() -> new RuntimeException("Nurse not found"));
+                nurse.setPasswordHash(newHash);
+                nurseRepo.save(nurse);
+            }
+            default -> throw new RuntimeException("Unknown entity type");
+        }
+
         return "Password reset successful";
+    }
+
+    /**
+     * Resolves which table the email belongs to: user, pharmacy, or nurse.
+     * Throws RuntimeException if email not found in any table.
+     */
+    private String resolveEntityType(String email) {
+        if (userRepo.findByEmail(email).isPresent()) return "user";
+        if (pharmacyRepo.findByEmail(email).isPresent()) return "pharmacy";
+        if (nurseRepo.findByEmail(email).isPresent()) return "nurse";
+        throw new RuntimeException("Email not found");
     }
 }

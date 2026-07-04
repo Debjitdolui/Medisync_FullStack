@@ -18,9 +18,11 @@ public class PasswordReset {
     @Column(name = "reset_id")
     private Long resetId;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    @Column(name = "email")
+    private String email;
+
+    @Column(name = "entity_type")
+    private String entityType; // "user", "pharmacy", "nurse"
 
     @Column(name = "otp_code")
     private String otpCode;
