@@ -56,4 +56,12 @@ export class PharmacyApprovalsComponent implements OnInit {
   reject(id: number): void {
     this.adminService.approvePharmacy(id, 'rejected').subscribe(() => this.loadPharmacies());
   }
+
+  block(id: number): void {
+    this.adminService.blockPharmacy(id).subscribe(() => this.loadPharmacies());
+  }
+
+  unblock(id: number): void {
+    this.adminService.unblockPharmacy(id).subscribe(() => this.loadPharmacies());
+  }
 }

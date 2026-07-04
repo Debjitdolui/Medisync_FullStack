@@ -56,4 +56,12 @@ export class NurseApprovalsComponent implements OnInit {
   reject(id: number): void {
     this.adminService.approveNurse(id, 'rejected').subscribe(() => this.loadNurses());
   }
+
+  block(id: number): void {
+    this.adminService.blockNurse(id).subscribe(() => this.loadNurses());
+  }
+
+  unblock(id: number): void {
+    this.adminService.unblockNurse(id).subscribe(() => this.loadNurses());
+  }
 }

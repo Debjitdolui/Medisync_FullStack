@@ -46,7 +46,16 @@
               <button class="btn-reject" *ngIf="p.approvalStatus === 'pending'" (click)="reject(p.pharmacyId)">
                 <i class="ti ti-x"></i> Reject
               </button>
-              <span class="no-action" *ngIf="p.approvalStatus !== 'pending'">—</span>
+              <button class="btn-block" *ngIf="p.approvalStatus === 'approved' && !p.isBlocked" (click)="block(p.pharmacyId)">
+                <i class="ti ti-ban"></i> Block
+              </button>
+              <button class="btn-unblock" *ngIf="p.isBlocked" (click)="unblock(p.pharmacyId)">
+                <i class="ti ti-lock-open"></i> Unblock
+              </button>
+              <span class="blocked-badge" *ngIf="p.isBlocked">
+                <i class="ti ti-ban"></i> Blocked
+              </span>
+              <span class="no-action" *ngIf="p.approvalStatus === 'rejected' && !p.isBlocked">—</span>
             </td>
           </tr>
           <tr *ngIf="filteredPharmacies.length === 0">

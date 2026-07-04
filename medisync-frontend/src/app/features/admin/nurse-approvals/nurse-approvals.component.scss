@@ -281,3 +281,53 @@ tr {
     font-size: 12px;
   }
 }
+
+
+.btn-block {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  background: #fef3c7;
+  color: #d97706;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.15s ease;
+
+  &:hover {
+    background: #d97706;
+    color: #fff;
+  }
+}
+
+.btn-unblock {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  background: #e0f2fe;
+  color: #0284c7;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.15s ease;
+
+  &:hover {
+    background: #0284c7;
+    color: #fff;
+  }
+}
+
+.blocked-badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: #dc2626;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
