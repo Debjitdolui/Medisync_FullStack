@@ -53,9 +53,34 @@ public class PrescriptionSearchService {
             int medicinesFound = foundNames.size();
             boolean hasAll = medicinesFound == lowerNames.size();
 
-            results.add(new PharmacySearchResult(
-                    pharmacy.getPharmacyId(), pharmacy.getPharmacyName(),
-                    totalPrice, distance, medicinesFound, lowerNames.size(), hasAll));
+            // Build medicine items list
+            List<PharmacySearchResult.MedicineItem> medicineItems = meds.stream()
+                    .map(m -> new PharmacySearchResult.MedicineItem(
+                            m.getMedicineId(),
+                            m.getMedicineName(),
+                            m.getManufacturer(),
+                            m.getPrice(),
+                            m.getStockQuantity(),
+                            m.getCategory() != null ? m.getCategory().getCategoryName() : null
+                    ))
+                    .collect(Collectors.toList());
+
+            PharmacySearchResult result = new PharmacySearchResult();
+            result.setPharmacyId(pharmacy.getPharmacyId());
+            result.setPharmacyName(pharmacy.getPharmacyName());
+            result.setAddress(pharmacy.getAddress());
+            result.setCity(pharmacy.getCity());
+            result.setPhone(pharmacy.getPhone());
+            result.setLatitude(pharmacy.getLatitude());
+            result.setLongitude(pharmacy.getLongitude());
+            result.setTotalPrice(totalPrice);
+            result.setDistanceKm(distance);
+            result.setMedicinesFound(medicinesFound);
+            result.setTotalSearched(lowerNames.size());
+            result.setHasAllMedicines(hasAll);
+            result.setMedicines(medicineItems);
+
+            results.add(result);
         }
 
         results.sort(Comparator.comparing(PharmacySearchResult::isHasAllMedicines).reversed()

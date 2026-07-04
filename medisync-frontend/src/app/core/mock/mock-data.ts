@@ -410,9 +410,9 @@ export const MOCK_NOTIFICATIONS: Notification[] = [
 
 // ============ SEARCH RESULTS ============
 export const MOCK_SEARCH_RESULTS: PrescriptionSearchResult[] = [
-  { pharmacyId: 1, pharmacyName: 'HealthPlus Pharmacy', totalPrice: 135.50, distanceKm: 1.2, medicinesFound: 3, totalSearched: 3, hasAllMedicines: true },
-  { pharmacyId: 2, pharmacyName: 'CareLife Pharmacy', totalPrice: 110.00, distanceKm: 1.8, medicinesFound: 2, totalSearched: 3, hasAllMedicines: false },
-  { pharmacyId: 3, pharmacyName: 'MediWell Pharmacy', totalPrice: 142.00, distanceKm: 2.5, medicinesFound: 3, totalSearched: 3, hasAllMedicines: true },
+  { pharmacyId: 1, pharmacyName: 'HealthPlus Pharmacy', address: '45 Park Street', city: 'Kolkata', phone: '9800000001', latitude: 22.517, longitude: 88.363, totalPrice: 135.50, distanceKm: 1.2, medicinesFound: 3, totalSearched: 3, hasAllMedicines: true, medicines: [] },
+  { pharmacyId: 2, pharmacyName: 'CareLife Pharmacy', address: '12 Salt Lake', city: 'Kolkata', phone: '9800000002', latitude: 22.572, longitude: 88.431, totalPrice: 110.00, distanceKm: 1.8, medicinesFound: 2, totalSearched: 3, hasAllMedicines: false, medicines: [] },
+  { pharmacyId: 3, pharmacyName: 'MediWell Pharmacy', address: '78 GT Road', city: 'Howrah', phone: '9800000003', latitude: 22.595, longitude: 88.263, totalPrice: 142.00, distanceKm: 2.5, medicinesFound: 3, totalSearched: 3, hasAllMedicines: true, medicines: [] },
 ];
 
 // ============ ADMIN DASHBOARD ============

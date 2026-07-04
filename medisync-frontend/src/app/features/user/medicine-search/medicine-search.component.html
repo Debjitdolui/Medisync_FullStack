@@ -15,7 +15,6 @@
         <div class="location-option gps-option" (click)="detectLocation()">
           <i class="ti ti-current-location"></i>
           <span>{{ isDetectingLocation ? 'Detecting...' : 'Use Current Location' }}</span>
-          <i class="ti ti-loader" *ngIf="isDetectingLocation"></i>
         </div>
         <div class="location-divider" *ngIf="savedAddresses.length > 0"></div>
         <div class="location-section-label" *ngIf="savedAddresses.length > 0">Saved Addresses</div>
@@ -54,7 +53,7 @@
         #searchInput
         type="text"
         class="tag-input"
-        placeholder="{{ selectedMedicines.length === 0 ? 'Type medicine name (e.g., Paracetamol)...' : 'Add more...' }}"
+        placeholder="{{ selectedMedicines.length === 0 ? 'Type medicine name (e.g., Paracetamol 500mg)...' : 'Add more...' }}"
         [(ngModel)]="inputValue"
         (input)="onInputChange()"
         (keydown.enter)="onEnter($event)"
@@ -101,7 +100,7 @@
 
       <div class="filter-group">
         <label>Distance</label>
-        <select [(ngModel)]="distanceFilter" name="distance" (change)="applyFilters()">
+        <select [(ngModel)]="distanceFilter" name="distance" (change)="onSearch()">
           <option value="">Any Distance</option>
           <option value="2">Within 2 km</option>
           <option value="5">Within 5 km</option>
@@ -111,41 +110,20 @@
       </div>
 
       <div class="filter-group">
-        <label>Category</label>
-        <select [(ngModel)]="categoryFilter" name="category" (change)="applyFilters()">
-          <option value="">All Categories</option>
-          <option value="Tablets">Tablets</option>
-          <option value="Syrups">Syrups</option>
-          <option value="Capsules">Capsules</option>
-          <option value="Injections">Injections</option>
-          <option value="Ointments">Ointments</option>
-        </select>
-      </div>
-
-      <div class="filter-group">
-        <label>Price Range (₹)</label>
-        <div class="price-inputs">
-          <input type="number" placeholder="Min" [(ngModel)]="priceMin" name="priceMin" (change)="applyFilters()">
-          <span class="price-sep">—</span>
-          <input type="number" placeholder="Max" [(ngModel)]="priceMax" name="priceMax" (change)="applyFilters()">
-        </div>
-      </div>
-
-      <div class="filter-group">
         <label>Sort By</label>
-        <select [(ngModel)]="sortBy" name="sortBy" (change)="applyFilters()">
-          <option value="recommended">Best Match</option>
+        <select [(ngModel)]="priceSort" name="sortBy" (change)="applyFilters()">
+          <option value="">Best Match</option>
           <option value="price-low">Price: Low → High</option>
           <option value="price-high">Price: High → Low</option>
-          <option value="rating">Rating: High → Low</option>
+          <option value="distance">Distance: Nearest</option>
         </select>
       </div>
 
       <div class="filter-group toggle-group">
         <label class="toggle-label">
-          <span>In Stock Only</span>
+          <span>All Medicines Available</span>
           <label class="toggle-switch">
-            <input type="checkbox" [(ngModel)]="inStockOnly" name="inStock" (change)="applyFilters()">
+            <input type="checkbox" [(ngModel)]="allAvailableOnly" name="allAvail" (change)="applyFilters()">
             <span class="toggle-slider"></span>
           </label>
         </label>
@@ -164,102 +142,100 @@
       <div class="empty-state" *ngIf="!hasSearched && !isLoading">
         <i class="ti ti-pill-off"></i>
         <h3>Search for Medicines</h3>
-        <p>Add medicines above and click Search to find availability and prices from nearby pharmacies.</p>
+        <p>Add one or more medicines above and click Search to find availability and prices from nearby pharmacies.</p>
       </div>
 
-      <!-- Prescription Results (multiple medicines) -->
-      <div *ngIf="hasSearched && !isLoading && isPrescriptionSearch">
+      <!-- Unified Results -->
+      <div *ngIf="hasSearched && !isLoading">
         <div class="results-header">
-          <h3>Prescription Results</h3>
-          <span class="results-count">{{ prescriptionResults.length }} pharmacies found for {{ selectedMedicines.length }} medicines</span>
+          <h3>Results</h3>
+          <span class="results-count">{{ filteredResults.length }} pharmacies found for {{ selectedMedicines.length }} medicine{{ selectedMedicines.length > 1 ? 's' : '' }}</span>
         </div>
-        <div class="prescription-results">
-          <div *ngFor="let result of prescriptionResults" class="prescription-card">
-            <div class="presc-top">
-              <div class="presc-pharmacy">
+
+        <!-- No Results -->
+        <div class="empty-state" *ngIf="filteredResults.length === 0">
+          <i class="ti ti-search-off"></i>
+          <h3>No pharmacies found</h3>
+          <p>Try adjusting your filters, checking the medicine name, or increasing the distance.</p>
+        </div>
+
+        <!-- Result Cards -->
+        <div class="results-list">
+          <div *ngFor="let result of paginatedResults" class="result-card">
+            <!-- Card Header -->
+            <div class="card-header" (click)="toggleExpand(result.pharmacyId)">
+              <div class="pharmacy-info-row">
                 <div class="pharmacy-avatar">
                   <i class="ti ti-building-hospital"></i>
                 </div>
-                <div>
-                  <h4>{{ result.pharmacyName }}</h4>
-                  <span class="presc-distance" *ngIf="result.distanceKm > 0"><i class="ti ti-map-pin"></i> {{ result.distanceKm.toFixed(1) }} km away</span>
-                  <span class="presc-distance" *ngIf="result.distanceKm === 0"><i class="ti ti-map-pin"></i> Distance N/A</span>
-                </div>
-              </div>
-              <div class="presc-price">₹{{ result.totalPrice }}</div>
-            </div>
-            <div class="presc-bottom">
-              <div class="availability-bar">
-                <div class="bar-fill" [style.width.%]="(result.medicinesFound / result.totalSearched) * 100"></div>
-              </div>
-              <div class="presc-meta">
-                <span class="found-count" [ngClass]="{'all-found': result.hasAllMedicines}">
-                  {{ result.medicinesFound }}/{{ result.totalSearched }} medicines available
-                </span>
-                <span class="all-badge" *ngIf="result.hasAllMedicines">
-                  <i class="ti ti-circle-check"></i> All Available
-                </span>
-              </div>
-            </div>
-            <div class="presc-actions">
-              <button class="btn-view-detail" (click)="openPharmacyDetailById(result.pharmacyId)">
-                <i class="ti ti-eye"></i> View Details
-              </button>
-              <a class="btn-directions" [href]="getDirectionsUrlById(result.pharmacyId)" target="_blank" (click)="$event.stopPropagation()">
-                <i class="ti ti-navigation"></i> Get Directions
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Single Medicine Results -->
-      <div *ngIf="hasSearched && !isLoading && !isPrescriptionSearch">
-        <div class="results-header">
-          <h3>Search Results</h3>
-          <span class="results-count">{{ filteredResults.length }} pharmacies found</span>
-        </div>
-        <div class="results-list">
-          <div *ngFor="let medicine of paginatedResults" class="result-card" (click)="openPharmacyDetail(medicine)">
-            <div class="result-left">
-              <div class="pharmacy-icon">
-                <i class="ti ti-pill"></i>
-              </div>
-              <div class="result-info">
-                <div class="result-name-row">
-                  <h4>{{ medicine.pharmacy.pharmacyName }}</h4>
-                  <div class="rating-badge">
-                    <i class="ti ti-star-filled"></i>
-                    <span>{{ getPharmacyRating(medicine.pharmacy.pharmacyId).average }}</span>
-                    <span class="rating-count">({{ getPharmacyRating(medicine.pharmacy.pharmacyId).total }})</span>
+                <div class="pharmacy-details">
+                  <div class="pharmacy-name-row">
+                    <h4>{{ result.pharmacyName }}</h4>
+                    <div class="rating-badge" *ngIf="getPharmacyRating(result.pharmacyId).total > 0">
+                      <i class="ti ti-star-filled"></i>
+                      {{ getPharmacyRating(result.pharmacyId).average }}
+                      <span>({{ getPharmacyRating(result.pharmacyId).total }})</span>
+                    </div>
+                  </div>
+                  <div class="pharmacy-meta-row">
+                    <span class="meta-distance" *ngIf="result.distanceKm > 0">
+                      <i class="ti ti-map-pin"></i> {{ result.distanceKm.toFixed(1) }} km
+                    </span>
+                    <span class="meta-address" *ngIf="result.address">
+                      {{ result.address }}, {{ result.city }}
+                    </span>
                   </div>
                 </div>
-                <p class="result-medicine">{{ medicine.medicineName }} — {{ medicine.manufacturer }}</p>
-                <div class="result-meta">
-                  <span class="meta-distance"><i class="ti ti-map-pin"></i> {{ getDistanceForMedicine(medicine) }}</span>
-                  <span class="meta-stock in-stock" *ngIf="medicine.stockQuantity > 0">
-                    <i class="ti ti-circle-check"></i> In Stock
+              </div>
+              <div class="card-right">
+                <span class="total-price">₹{{ result.totalPrice }}</span>
+                <div class="availability-info">
+                  <div class="availability-bar">
+                    <div class="bar-fill" [style.width.%]="(result.medicinesFound / result.totalSearched) * 100"></div>
+                  </div>
+                  <span class="found-label" [ngClass]="{'all-found': result.hasAllMedicines}">
+                    {{ result.medicinesFound }}/{{ result.totalSearched }}
+                    <i class="ti ti-circle-check" *ngIf="result.hasAllMedicines"></i>
                   </span>
-                  <span class="meta-stock out-stock" *ngIf="medicine.stockQuantity === 0">
-                    <i class="ti ti-circle-x"></i> Out of Stock
-                  </span>
-                  <span class="meta-category">{{ medicine.category.categoryName }}</span>
                 </div>
+                <i class="ti expand-icon" [ngClass]="expandedPharmacyId === result.pharmacyId ? 'ti-chevron-up' : 'ti-chevron-down'"></i>
               </div>
             </div>
-            <div class="result-right">
-              <span class="result-price">₹{{ medicine.price }}</span>
-              <span class="result-mrp" *ngIf="medicine.mrp && medicine.mrp > medicine.price">MRP ₹{{ medicine.mrp }}</span>
-              <span class="result-discount" *ngIf="getDiscount(medicine) > 0">{{ getDiscount(medicine) }}% OFF</span>
+
+            <!-- Expanded: Medicine List -->
+            <div class="card-body" *ngIf="expandedPharmacyId === result.pharmacyId">
+              <div class="medicines-table">
+                <div class="medicine-row header-row">
+                  <span>Medicine</span>
+                  <span>Manufacturer</span>
+                  <span>Price</span>
+                  <span>Stock</span>
+                </div>
+                <div class="medicine-row" *ngFor="let med of result.medicines">
+                  <span class="med-name">{{ med.medicineName }}</span>
+                  <span class="med-mfg">{{ med.manufacturer || '-' }}</span>
+                  <span class="med-price">₹{{ med.price }}</span>
+                  <span class="med-stock" [ngClass]="med.stockQuantity > 10 ? 'in-stock' : 'low-stock'">
+                    {{ med.stockQuantity }} units
+                  </span>
+                </div>
+              </div>
+
+              <!-- Actions -->
+              <div class="card-actions">
+                <a class="btn-directions" [href]="getDirectionsUrl(result)" target="_blank">
+                  <i class="ti ti-navigation"></i> Get Directions
+                </a>
+                <a class="btn-call" *ngIf="result.phone" [href]="'tel:' + result.phone">
+                  <i class="ti ti-phone"></i> Call
+                </a>
+              </div>
             </div>
           </div>
-          <div class="empty-state" *ngIf="filteredResults.length === 0">
-            <i class="ti ti-search-off"></i>
-            <h3>No results found</h3>
-            <p>Try adjusting your filters or search for a different medicine.</p>
-          </div>
         </div>
+
         <app-pagination
+          *ngIf="filteredResults.length > pageSize"
           [totalItems]="filteredResults.length"
           [pageSize]="pageSize"
           [currentPage]="currentPage"
@@ -269,15 +245,4 @@
       </div>
     </main>
   </div>
-
-  <!-- Pharmacy Detail Modal -->
-  <app-pharmacy-detail
-    *ngIf="showPharmacyDetail && selectedPharmacy"
-    [pharmacy]="selectedPharmacy"
-    [medicine]="selectedMedicine"
-    [rating]="selectedPharmacyRating"
-    [userLatitude]="userLatitude"
-    [userLongitude]="userLongitude"
-    (close)="closePharmacyDetail()">
-  </app-pharmacy-detail>
 </div>
