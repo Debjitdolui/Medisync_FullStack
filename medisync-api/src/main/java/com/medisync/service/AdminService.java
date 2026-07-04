@@ -18,6 +18,7 @@ public class AdminService {
     private final NurseRepository nurseRepository;
     private final MedicineRepository medicineRepository;
     private final AdminActivityLogRepository adminActivityLogRepository;
+    private final NotificationService notificationService;
 
     public List<Pharmacy> getAllPharmacies() {
         return pharmacyRepository.findAll();
@@ -41,6 +42,14 @@ public class AdminService {
         pharmacy.setApprovalStatus(status);
         pharmacyRepository.save(pharmacy);
         logActivity(adminEmail, "PHARMACY_" + status.toUpperCase(), "Pharmacy", pharmacyId, "Pharmacy " + pharmacy.getPharmacyName() + " " + status);
+
+        // Notify pharmacy about approval/rejection
+        String title = "approved".equals(status) ? "Pharmacy Approved!" : "Pharmacy Registration Rejected";
+        String message = "approved".equals(status)
+                ? "Congratulations! Your pharmacy '" + pharmacy.getPharmacyName() + "' has been approved. You can now manage your inventory."
+                : "Your pharmacy '" + pharmacy.getPharmacyName() + "' registration has been rejected. Please contact support for details.";
+        notificationService.notifyPharmacy(pharmacy.getEmail(), "APPROVAL_UPDATE", title, message);
+
         return pharmacy;
     }
 
@@ -50,6 +59,14 @@ public class AdminService {
         nurse.setApprovalStatus(status);
         nurseRepository.save(nurse);
         logActivity(adminEmail, "NURSE_" + status.toUpperCase(), "Nurse", nurseId, "Nurse " + nurse.getFullName() + " " + status);
+
+        // Notify nurse about approval/rejection
+        String title = "approved".equals(status) ? "Nurse Profile Approved!" : "Nurse Registration Rejected";
+        String message = "approved".equals(status)
+                ? "Congratulations! Your nurse profile has been approved. You can now set your availability and accept requests."
+                : "Your nurse registration has been rejected. Please contact support for details.";
+        notificationService.notifyNurse(nurse.getEmail(), "APPROVAL_UPDATE", title, message);
+
         return nurse;
     }
 

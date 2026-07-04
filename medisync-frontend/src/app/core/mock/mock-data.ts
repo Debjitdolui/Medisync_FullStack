@@ -378,7 +378,8 @@ export const MOCK_PHARMACY_REVIEWS: PharmacyReview[] = [
 export const MOCK_NOTIFICATIONS: Notification[] = [
   {
     notificationId: 1,
-    user: MOCK_CURRENT_USER,
+    recipientEmail: 'muskan@user.com',
+    recipientType: 'user',
     type: 'NURSE_REQUEST',
     title: 'Nurse booking confirmed',
     message: 'Your booking with Priya Sharma is confirmed for 15 May, 10:00 AM.',
@@ -387,7 +388,8 @@ export const MOCK_NOTIFICATIONS: Notification[] = [
   },
   {
     notificationId: 2,
-    user: MOCK_CURRENT_USER,
+    recipientEmail: 'muskan@user.com',
+    recipientType: 'user',
     type: 'SYSTEM',
     title: 'Payment successful',
     message: 'Your payment of ₹499.00 was successful.',
@@ -396,7 +398,8 @@ export const MOCK_NOTIFICATIONS: Notification[] = [
   },
   {
     notificationId: 3,
-    user: MOCK_CURRENT_USER,
+    recipientEmail: 'muskan@user.com',
+    recipientType: 'user',
     type: 'SYSTEM',
     title: 'Welcome to MediSync',
     message: 'Thank you for registering. Explore pharmacies and nursing services near you.',

@@ -21,6 +21,7 @@ public class ReviewService {
     private final PharmacyRepository pharmacyRepository;
     private final NurseRepository nurseRepository;
     private final NurseRequestRepository nurseRequestRepository;
+    private final NotificationService notificationService;
 
     public PharmacyReview addPharmacyReview(String userEmail, PharmacyReviewRequest req) {
         User user = userRepository.findByEmail(userEmail).orElseThrow(() -> new RuntimeException("User not found"));
@@ -30,7 +31,14 @@ public class ReviewService {
         review.setPharmacy(pharmacy);
         review.setRating(req.getRating());
         review.setReviewText(req.getReviewText());
-        return pharmacyReviewRepository.save(review);
+        PharmacyReview saved = pharmacyReviewRepository.save(review);
+
+        // Notify pharmacy about new review
+        notificationService.notifyPharmacy(pharmacy.getEmail(), "NEW_REVIEW",
+                "New Review Received (" + req.getRating() + "★)",
+                user.getUsername() + " left a " + req.getRating() + "-star review for " + pharmacy.getPharmacyName());
+
+        return saved;
     }
 
     public List<PharmacyReview> getPharmacyReviews(Long pharmacyId) {
@@ -51,7 +59,14 @@ public class ReviewService {
         review.setRequest(request);
         review.setRating(req.getRating());
         review.setReviewText(req.getReviewText());
-        return nurseReviewRepository.save(review);
+        NurseReview saved = nurseReviewRepository.save(review);
+
+        // Notify nurse about new review
+        notificationService.notifyNurse(nurse.getEmail(), "NEW_REVIEW",
+                "New Review Received (" + req.getRating() + "★)",
+                user.getUsername() + " left a " + req.getRating() + "-star review for your service.");
+
+        return saved;
     }
 
     public List<NurseReview> getNurseReviews(Long nurseId) {

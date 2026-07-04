@@ -19,6 +19,7 @@ public class NurseModuleService {
     private final NurseRequestRepository nurseRequestRepository;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final NotificationService notificationService;
 
     public Nurse register(NurseRegisterRequest req) {
         if (nurseRepository.existsByEmail(req.getEmail()))
@@ -71,7 +72,14 @@ public class NurseModuleService {
         request.setHealthIssue(dto.getHealthIssue());
         request.setRequestDate(dto.getRequestDate());
         request.setPreferredTime(dto.getPreferredTime());
-        return nurseRequestRepository.save(request);
+        NurseRequest saved = nurseRequestRepository.save(request);
+
+        // Notify the nurse about new booking request
+        notificationService.notifyNurse(nurse.getEmail(), "NEW_REQUEST",
+                "New Booking Request",
+                "You have a new " + service.getServiceName() + " request from " + patient.getUsername() + " for " + dto.getRequestDate());
+
+        return saved;
     }
 
     public List<NurseRequest> getPatientRequests(String email) {
@@ -90,6 +98,21 @@ public class NurseModuleService {
         NurseRequest request = nurseRequestRepository.findById(requestId)
                 .orElseThrow(() -> new RuntimeException("Request not found"));
         request.setRequestStatus(status);
-        return nurseRequestRepository.save(request);
+        NurseRequest saved = nurseRequestRepository.save(request);
+
+        // Notify the patient about status change
+        String patientEmail = request.getPatient().getEmail();
+        String nurseName = request.getNurse().getFullName();
+        String title = "Nurse Request " + status.substring(0, 1).toUpperCase() + status.substring(1);
+        String message = switch (status) {
+            case "accepted" -> "Your request has been accepted by " + nurseName + ". They will arrive on " + request.getRequestDate();
+            case "in_progress" -> nurseName + " is on the way for your " + request.getService().getServiceName();
+            case "completed" -> "Your " + request.getService().getServiceName() + " with " + nurseName + " is completed. Please leave a review!";
+            case "cancelled" -> "Your request with " + nurseName + " has been cancelled.";
+            default -> "Your nurse request status has been updated to: " + status;
+        };
+        notificationService.notifyUser(patientEmail, "REQUEST_UPDATE", title, message);
+
+        return saved;
     }
 }

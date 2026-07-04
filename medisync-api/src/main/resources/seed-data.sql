@@ -48,7 +48,6 @@ ALTER SEQUENCE dev.user_addresses_address_id_seq RESTART WITH 1;
 ALTER SEQUENCE dev.nurse_requests_request_id_seq RESTART WITH 1;
 ALTER SEQUENCE dev.pharmacy_reviews_review_id_seq RESTART WITH 1;
 ALTER SEQUENCE dev.nurse_reviews_review_id_seq RESTART WITH 1;
-ALTER SEQUENCE dev.notifications_notification_id_seq RESTART WITH 1;
 ALTER SEQUENCE dev.admin_activity_logs_log_id_seq RESTART WITH 1;
 ALTER SEQUENCE dev.inventory_logs_log_id_seq RESTART WITH 1;
 
@@ -183,16 +182,42 @@ INSERT INTO dev.nurse_reviews (user_id, nurse_id, request_id, rating, review_tex
 -- ═══════════════════════════════════════════════════════════════════
 -- NOTIFICATIONS
 -- ═══════════════════════════════════════════════════════════════════
-INSERT INTO dev.notifications (user_id, type, title, message, is_read, created_at) VALUES
-(2, 'REQUEST_UPDATE', 'Nurse Request Accepted', 'Your nurse request #3 has been accepted by Anubhab Roy.', false, NOW() - INTERVAL '8 days'),
-(2, 'SYSTEM', 'Welcome to MediSync', 'Thank you for joining MediSync! Explore medicines and book nurses.', true, NOW() - INTERVAL '60 days'),
-(2, 'REQUEST_UPDATE', 'Request Completed', 'Your nurse request #1 has been marked as completed.', true, NOW() - INTERVAL '28 days'),
-(3, 'REQUEST_UPDATE', 'Request Completed', 'Your nurse request #2 has been marked as completed.', true, NOW() - INTERVAL '23 days'),
-(3, 'SYSTEM', 'Rate Your Experience', 'Please rate your recent nurse visit with Muskan Sharma.', false, NOW() - INTERVAL '22 days'),
-(4, 'REQUEST_UPDATE', 'Nurse Request In Progress', 'Muskan Sharma is on the way for your post-surgery care.', false, NOW() - INTERVAL '5 days'),
-(5, 'REQUEST_UPDATE', 'Nurse Request Submitted', 'Your nurse request #5 has been submitted. Waiting for nurse confirmation.', false, NOW() - INTERVAL '3 days'),
-(1, 'ADMIN', 'New Pharmacy Registration', 'Aditya Apollo Pharmacy has submitted registration for approval.', false, NOW() - INTERVAL '10 days'),
-(1, 'ADMIN', 'New Nurse Registration', 'Subhajit Sen has submitted nurse registration for approval.', false, NOW() - INTERVAL '5 days');
+-- Drop and recreate notifications table with new schema
+DROP TABLE IF EXISTS dev.notifications CASCADE;
+CREATE TABLE dev.notifications (
+    notification_id BIGSERIAL PRIMARY KEY,
+    recipient_email VARCHAR(255),
+    recipient_type VARCHAR(255),
+    type VARCHAR(255),
+    title VARCHAR(255),
+    message TEXT,
+    is_read BOOLEAN DEFAULT false,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+INSERT INTO dev.notifications (recipient_email, recipient_type, type, title, message, is_read, created_at) VALUES
+-- User notifications
+('muskan@user.com', 'user', 'REQUEST_UPDATE', 'Nurse Request Accepted', 'Your nurse request #3 has been accepted by Anubhab Roy.', false, NOW() - INTERVAL '8 days'),
+('muskan@user.com', 'user', 'SYSTEM', 'Welcome to MediSync', 'Thank you for joining MediSync! Explore medicines and book nurses.', true, NOW() - INTERVAL '60 days'),
+('muskan@user.com', 'user', 'REQUEST_UPDATE', 'Request Completed', 'Your nurse request #1 has been marked as completed.', true, NOW() - INTERVAL '28 days'),
+('aditya@user.com', 'user', 'REQUEST_UPDATE', 'Request Completed', 'Your nurse request #2 has been marked as completed.', true, NOW() - INTERVAL '23 days'),
+('aditya@user.com', 'user', 'SYSTEM', 'Rate Your Experience', 'Please rate your recent nurse visit with Muskan Sharma.', false, NOW() - INTERVAL '22 days'),
+('anubhab@user.com', 'user', 'REQUEST_UPDATE', 'Nurse Request In Progress', 'Muskan Sharma is on the way for your post-surgery care.', false, NOW() - INTERVAL '5 days'),
+('abhijit@user.com', 'user', 'REQUEST_UPDATE', 'Nurse Request Submitted', 'Your nurse request #5 has been submitted. Waiting for nurse confirmation.', false, NOW() - INTERVAL '3 days'),
+-- Nurse notifications
+('muskan@nurse.com', 'nurse', 'NEW_REQUEST', 'New Booking Request', 'You have a new Post-Surgery Care request from anubhab for 2026-07-08', false, NOW() - INTERVAL '7 days'),
+('muskan@nurse.com', 'nurse', 'NEW_REVIEW', 'New Review Received (5★)', 'muskan left a 5-star review for your service.', false, NOW() - INTERVAL '27 days'),
+('muskan@nurse.com', 'nurse', 'APPROVAL_UPDATE', 'Nurse Profile Approved!', 'Congratulations! Your nurse profile has been approved. You can now set your availability and accept requests.', true, NOW() - INTERVAL '74 days'),
+('anubhab@nurse.com', 'nurse', 'NEW_REQUEST', 'New Booking Request', 'You have a new Wound Dressing request from abhijit for 2026-07-12', false, NOW() - INTERVAL '3 days'),
+('anubhab@nurse.com', 'nurse', 'NEW_REVIEW', 'New Review Received (5★)', 'anubhab left a 5-star review for your service.', true, NOW() - INTERVAL '7 days'),
+('anubhab@nurse.com', 'nurse', 'APPROVAL_UPDATE', 'Nurse Profile Approved!', 'Congratulations! Your nurse profile has been approved.', true, NOW() - INTERVAL '59 days'),
+-- Pharmacy notifications
+('kaniska@pharmacy.com', 'pharmacy', 'APPROVAL_UPDATE', 'Pharmacy Approved!', 'Congratulations! Your pharmacy Kaniska MedPlus has been approved. You can now manage your inventory.', true, NOW() - INTERVAL '79 days'),
+('kaniska@pharmacy.com', 'pharmacy', 'NEW_REVIEW', 'New Review Received (5★)', 'muskan left a 5-star review for Kaniska MedPlus', false, NOW() - INTERVAL '20 days'),
+('kaniska@pharmacy.com', 'pharmacy', 'NEW_REVIEW', 'New Review Received (4★)', 'aditya left a 4-star review for Kaniska MedPlus', false, NOW() - INTERVAL '15 days'),
+('subhajit@pharmacy.com', 'pharmacy', 'APPROVAL_UPDATE', 'Pharmacy Approved!', 'Congratulations! Your pharmacy Subhajit HealthKart has been approved.', true, NOW() - INTERVAL '69 days'),
+('subhajit@pharmacy.com', 'pharmacy', 'NEW_REVIEW', 'New Review Received (5★)', 'muskan left a 5-star review for Subhajit HealthKart', false, NOW() - INTERVAL '18 days'),
+('aditya@pharmacy.com', 'pharmacy', 'SYSTEM', 'Registration Submitted', 'Your pharmacy registration is under review. We will notify you once approved.', true, NOW() - INTERVAL '10 days');
 
 -- ═══════════════════════════════════════════════════════════════════
 -- ADMIN ACTIVITY LOGS

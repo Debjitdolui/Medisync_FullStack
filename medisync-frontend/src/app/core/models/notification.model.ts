@@ -1,8 +1,7 @@
-import { User } from './user.model';
-
 export interface Notification {
   notificationId: number;
-  user: User;
+  recipientEmail: string;
+  recipientType: string; // "user", "pharmacy", "nurse"
   type: string;
   title: string;
   message: string;

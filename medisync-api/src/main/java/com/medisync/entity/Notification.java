@@ -18,9 +18,11 @@ public class Notification {
     @Column(name = "notification_id")
     private Long notificationId;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    @Column(name = "recipient_email")
+    private String recipientEmail;
+
+    @Column(name = "recipient_type")
+    private String recipientType; // "user", "pharmacy", "nurse"
 
     @Column(name = "type")
     private String type;
