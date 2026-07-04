@@ -1,0 +1,30 @@
+.star-rating {
+  display: inline-flex;
+  gap: 2px;
+
+  &.sm .star i { font-size: 14px; }
+  &.md .star i { font-size: 20px; }
+  &.lg .star i { font-size: 28px; }
+}
+
+.star {
+  color: #e2e8f0;
+  transition: color 0.15s, transform 0.15s;
+  display: inline-flex;
+
+  &.filled {
+    color: #f59e0b;
+  }
+
+  &.half {
+    color: #fbbf24;
+  }
+
+  &.editable {
+    cursor: pointer;
+
+    &:hover {
+      transform: scale(1.15);
+    }
+  }
+}

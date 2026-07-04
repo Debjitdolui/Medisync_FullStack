@@ -1,0 +1,135 @@
+<div class="pharmacy-dashboard">
+  <!-- Welcome Section -->
+  <div class="welcome-section">
+    <div class="welcome-content">
+      <h1>Welcome back, <span class="highlight">{{ pharmacyName }}</span></h1>
+      <p class="welcome-sub">Here's your pharmacy overview for today</p>
+    </div>
+    <div class="welcome-date">
+      <i class="ti ti-calendar"></i>
+      <span>{{ today }}</span>
+    </div>
+  </div>
+
+  <!-- Metric Cards -->
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <div class="metric-icon cyan">
+        <i class="ti ti-pill"></i>
+      </div>
+      <div class="metric-info">
+        <span class="metric-value">{{ totalMedicines }}</span>
+        <span class="metric-label">Total Medicines</span>
+      </div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-icon green">
+        <i class="ti ti-packages"></i>
+      </div>
+      <div class="metric-info">
+        <span class="metric-value">{{ totalStock }}</span>
+        <span class="metric-label">Total Stock Units</span>
+      </div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-icon amber">
+        <i class="ti ti-alert-triangle"></i>
+      </div>
+      <div class="metric-info">
+        <span class="metric-value">{{ lowStockCount }}</span>
+        <span class="metric-label">Low Stock Alerts</span>
+      </div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-icon purple">
+        <i class="ti ti-star"></i>
+      </div>
+      <div class="metric-info">
+        <span class="metric-value">{{ averageRating }}</span>
+        <span class="metric-label">Avg Rating ({{ totalReviews }} reviews)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Grid -->
+  <div class="bottom-grid">
+    <!-- Recent Activity -->
+    <div class="panel-card">
+      <div class="panel-header">
+        <h3>Recent Activity</h3>
+      </div>
+      <div class="activity-list">
+        <div class="activity-item" *ngFor="let activity of recentActivity">
+          <div class="activity-icon" [ngClass]="activity.type">
+            <i class="ti {{ activity.icon }}"></i>
+          </div>
+          <div class="activity-details">
+            <span class="activity-text">{{ activity.text }}</span>
+            <span class="activity-time">{{ activity.time }}</span>
+          </div>
+        </div>
+        <div class="empty-state" *ngIf="recentActivity.length === 0">
+          <i class="ti ti-clipboard-list"></i>
+          <p>No recent activity</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="panel-card">
+      <div class="panel-header">
+        <h3>Quick Actions</h3>
+      </div>
+      <div class="quick-actions">
+        <button class="quick-action-btn" routerLink="/pharmacy/inventory">
+          <i class="ti ti-plus"></i>
+          <span>Add Medicine</span>
+        </button>
+        <button class="quick-action-btn" routerLink="/pharmacy/inventory">
+          <i class="ti ti-package"></i>
+          <span>Update Stock</span>
+        </button>
+        <button class="quick-action-btn" routerLink="/pharmacy/reviews">
+          <i class="ti ti-star"></i>
+          <span>View Reviews</span>
+        </button>
+        <button class="quick-action-btn" routerLink="/pharmacy/settings">
+          <i class="ti ti-settings"></i>
+          <span>Pharmacy Settings</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Low Stock Items Table -->
+  <div class="panel-card" *ngIf="lowStockMedicines.length > 0">
+    <div class="panel-header">
+      <h3>Low Stock Medicines</h3>
+      <a routerLink="/pharmacy/inventory" class="view-all-link">View All →</a>
+    </div>
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Medicine</th>
+            <th>Category</th>
+            <th>Stock</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let med of lowStockMedicines">
+            <td class="med-name">{{ med.medicineName }}</td>
+            <td>{{ med.category.categoryName }}</td>
+            <td>
+              <span class="stock-badge low">{{ med.stockQuantity }} units</span>
+            </td>
+            <td>
+              <span class="status-badge warning">Low Stock</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

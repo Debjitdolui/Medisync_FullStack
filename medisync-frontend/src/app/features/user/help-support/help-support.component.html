@@ -1,0 +1,68 @@
+<div class="support-page">
+  <div class="support-grid">
+    <!-- Left: Categories -->
+    <aside class="categories">
+      <h2>How can we help you?</h2>
+      <div class="category-list">
+        <div *ngFor="let cat of categories"
+             class="category-card"
+             [class.active]="selectedCategory === cat.title"
+             (click)="selectedCategory = cat.title">
+          <div class="cat-icon" [style.background]="cat.color + '15'">
+            <i class="ti {{ cat.icon }}" [style.color]="cat.color"></i>
+          </div>
+          <div class="cat-text">
+            <h4>{{ cat.title }}</h4>
+            <p>{{ cat.subtitle }}</p>
+          </div>
+          <i class="ti ti-chevron-right cat-arrow"></i>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Right: Contact + FAQs -->
+    <main class="support-main">
+      <!-- Contact Section -->
+      <section class="contact-section">
+        <h2>Still need help?</h2>
+        <p class="section-desc">We are here for you. Reach out to our support team.</p>
+
+        <div class="contact-cards">
+          <div class="contact-card">
+            <div class="contact-icon call"><i class="ti ti-phone"></i></div>
+            <div class="contact-info">
+              <h4>Call Support</h4>
+              <p>+91 xxxxx xxxxx</p>
+            </div>
+            <button class="contact-btn call">Call Now</button>
+          </div>
+
+          <div class="contact-card">
+            <div class="contact-icon email"><i class="ti ti-mail"></i></div>
+            <div class="contact-info">
+              <h4>Email Us</h4>
+              <p>support&#64;medisync.com</p>
+            </div>
+            <button class="contact-btn email">Send Email</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- FAQ Section -->
+      <section class="faq-section">
+        <h3>Faq Support</h3>
+        <div class="faq-list">
+          <div *ngFor="let faq of faqs; let i = index" class="faq-item" [class.open]="faq.open">
+            <button class="faq-question" (click)="toggleFaq(i)">
+              <span>{{ faq.question }}</span>
+              <i class="ti" [class.ti-chevron-down]="!faq.open" [class.ti-chevron-up]="faq.open"></i>
+            </button>
+            <div class="faq-answer" *ngIf="faq.open">
+              <p>{{ faq.answer }}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>

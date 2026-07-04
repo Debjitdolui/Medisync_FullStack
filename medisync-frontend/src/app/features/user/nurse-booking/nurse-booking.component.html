@@ -1,0 +1,174 @@
+<div class="nurse-booking">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1>Book a Nurse</h1>
+      <p>Verified and experienced nurses for home care services</p>
+    </div>
+  </div>
+
+  <!-- How it Works (Flow) -->
+  <section class="section how-section">
+    <div class="stepper">
+      <div class="stepper-item">
+        <div class="stepper-dot active"><i class="ti ti-list-check"></i></div>
+        <span>Select Service</span>
+      </div>
+      <div class="stepper-line"></div>
+      <div class="stepper-item">
+        <div class="stepper-dot" [class.active]="selectedService"><i class="ti ti-user-search"></i></div>
+        <span>Choose Nurse</span>
+      </div>
+      <div class="stepper-line"></div>
+      <div class="stepper-item">
+        <div class="stepper-dot"><i class="ti ti-clipboard-check"></i></div>
+        <span>Confirm Booking</span>
+      </div>
+      <div class="stepper-line"></div>
+      <div class="stepper-item">
+        <div class="stepper-dot"><i class="ti ti-home-heart"></i></div>
+        <span>Nurse Arrives</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Step 1: Select Service -->
+  <section class="section">
+    <div class="section-title">
+      <span class="step-badge">1</span>
+      <h2>Select a Service</h2>
+    </div>
+    <div class="services-row">
+      <div *ngFor="let service of services; let i = index"
+           class="service-card"
+           [class.active]="selectedService?.serviceId === service.serviceId"
+           (click)="selectService(service)">
+        <div class="service-icon" [ngClass]="'color-' + i">
+          <i class="ti {{ getServiceIcon(i) }}"></i>
+        </div>
+        <div class="service-text">
+          <h4>{{ service.serviceName }}</h4>
+          <p>{{ service.description }}</p>
+        </div>
+        <span class="service-price">₹{{ service.basePrice }}</span>
+        <div class="check-mark" *ngIf="selectedService?.serviceId === service.serviceId">
+          <i class="ti ti-circle-check-filled"></i>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Step 2: Available Nurses -->
+  <section class="section">
+    <div class="section-title">
+      <span class="step-badge">2</span>
+      <h2>Available Nurses</h2>
+      <span class="nurse-count" *ngIf="filteredNurses.length > 0">{{ filteredNurses.length }} found</span>
+    </div>
+
+    <div class="filter-hint" *ngIf="selectedService">
+      <i class="ti ti-filter"></i>
+      Showing nurses for <strong>{{ selectedService.serviceName }}</strong>
+      <button class="clear-filter" (click)="clearServiceFilter()">Show All</button>
+    </div>
+
+    <div class="nurses-grid">
+      <div *ngFor="let nurse of filteredNurses" class="nurse-card">
+        <div class="nurse-top">
+          <div class="nurse-avatar" [ngClass]="'avatar-' + (nurse.nurseId % 3)">
+            {{ nurse.fullName.charAt(0) }}
+          </div>
+          <div class="nurse-info">
+            <h4>{{ nurse.fullName }}</h4>
+            <span class="nurse-qualification">{{ nurse.qualification }}</span>
+          </div>
+          <div class="nurse-rating">
+            <i class="ti ti-star-filled"></i>
+            <span>{{ getNurseRating(nurse.nurseId).average }}</span>
+            <span class="rating-count">({{ getNurseRating(nurse.nurseId).total }})</span>
+          </div>
+        </div>
+        <div class="nurse-bottom">
+          <div class="nurse-tags">
+            <span class="tag specialization"><i class="ti ti-stethoscope"></i> {{ nurse.specialization }}</span>
+            <span class="tag distance"><i class="ti ti-map-pin"></i> {{ getDistance(nurse.nurseId) }} km</span>
+            <span class="tag available"><i class="ti ti-circle-check"></i> Available</span>
+          </div>
+          <button class="book-btn" (click)="openBooking(nurse)">
+            <i class="ti ti-calendar-plus"></i>
+            Book Now
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="filteredNurses.length === 0">
+      <i class="ti ti-nurse-off"></i>
+      <h3>No nurses available</h3>
+      <p *ngIf="selectedService">No nurses found for "{{ selectedService.serviceName }}". Try selecting a different service.</p>
+      <p *ngIf="!selectedService">No nurses are currently available. Please check back later.</p>
+    </div>
+  </section>
+</div>
+
+<!-- Booking Modal -->
+<div class="modal-overlay" *ngIf="showBookingModal" (click)="closeBooking()">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Confirm Booking</h3>
+      <button class="close-btn" (click)="closeBooking()"><i class="ti ti-x"></i></button>
+    </div>
+
+    <div *ngIf="!bookingSuccess" class="modal-body">
+      <!-- Nurse Summary -->
+      <div class="booking-summary">
+        <div class="summary-nurse">
+          <div class="summary-avatar">{{ selectedNurse?.fullName?.charAt(0) }}</div>
+          <div>
+            <span class="summary-name">{{ selectedNurse?.fullName }}</span>
+            <span class="summary-spec">{{ selectedNurse?.specialization }}</span>
+          </div>
+        </div>
+        <div class="summary-service">
+          <span class="summary-service-name">{{ selectedService?.serviceName || 'Home Injection' }}</span>
+          <span class="summary-price">₹{{ selectedService?.basePrice || 200 }}</span>
+        </div>
+      </div>
+
+      <!-- Booking Form -->
+      <div class="form-group">
+        <label class="form-label">Your Address *</label>
+        <input class="form-input" placeholder="Enter complete address for nurse visit" [(ngModel)]="bookingAddress">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Health Issue / Notes</label>
+        <textarea class="form-input textarea" placeholder="Describe your health concern or any special instructions" [(ngModel)]="bookingHealthIssue" rows="3"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Preferred Date *</label>
+          <input type="date" class="form-input" [(ngModel)]="bookingDate" [min]="minBookingDate">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Preferred Time</label>
+          <input class="form-input" placeholder="e.g., 10:00 AM - 12:00 PM" [(ngModel)]="bookingTime">
+        </div>
+      </div>
+
+      <button class="btn-confirm" (click)="confirmBooking()" [disabled]="isBooking || !bookingAddress || !bookingDate">
+        <i class="ti ti-check"></i>
+        {{ isBooking ? 'Booking...' : 'Confirm Booking' }}
+      </button>
+    </div>
+
+    <!-- Success State -->
+    <div *ngIf="bookingSuccess" class="modal-body success-body">
+      <div class="success-icon-wrapper">
+        <i class="ti ti-circle-check"></i>
+      </div>
+      <h3>Booking Confirmed!</h3>
+      <p>Your request has been sent to <strong>{{ selectedNurse?.fullName }}</strong>. You'll receive a confirmation shortly.</p>
+      <button class="btn-confirm" (click)="closeBooking()">Done</button>
+    </div>
+  </div>
+</div>

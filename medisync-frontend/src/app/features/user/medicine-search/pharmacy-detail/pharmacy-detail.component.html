@@ -1,0 +1,111 @@
+<div class="modal-overlay" (click)="close.emit()">
+  <div class="modal-card" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="modal-header">
+      <div class="pharmacy-info">
+        <div class="pharmacy-avatar">
+          <i class="ti ti-building-hospital"></i>
+        </div>
+        <div class="pharmacy-meta">
+          <h2>{{ pharmacy?.pharmacyName }}</h2>
+          <div class="header-badges">
+            <span class="rating-badge">
+              <i class="ti ti-star-filled"></i>
+              {{ rating.average }}
+              <span class="rating-text">({{ rating.total }})</span>
+            </span>
+            <span class="open-badge">
+              <i class="ti ti-clock"></i> Open Now
+            </span>
+          </div>
+        </div>
+      </div>
+      <button class="close-btn" (click)="close.emit()">
+        <i class="ti ti-x"></i>
+      </button>
+    </div>
+
+    <!-- Medicine Details (if provided) -->
+    <div class="section medicine-section" *ngIf="medicine">
+      <div class="section-label">
+        <i class="ti ti-pill"></i>
+        <span>Medicine</span>
+      </div>
+      <div class="medicine-card">
+        <div class="medicine-top">
+          <div class="medicine-name-group">
+            <span class="medicine-name">{{ medicine.medicineName }}</span>
+            <span class="medicine-mfg">by {{ medicine.manufacturer }}</span>
+          </div>
+          <span class="stock-badge" [ngClass]="medicine.stockQuantity > 0 ? 'in-stock' : 'out-stock'">
+            <i class="ti" [ngClass]="medicine.stockQuantity > 0 ? 'ti-circle-check' : 'ti-circle-x'"></i>
+            {{ medicine.stockQuantity > 0 ? 'In Stock' : 'Out of Stock' }}
+          </span>
+        </div>
+        <div class="medicine-bottom">
+          <div class="price-block">
+            <span class="price-current">₹{{ medicine.price }}</span>
+            <span class="price-mrp" *ngIf="medicine.mrp && medicine.mrp > medicine.price">₹{{ medicine.mrp }}</span>
+          </div>
+          <span class="discount-badge" *ngIf="getDiscount() > 0">
+            {{ getDiscount() }}% OFF
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pharmacy Details -->
+    <div class="section details-section">
+      <div class="section-label">
+        <i class="ti ti-info-circle"></i>
+        <span>Pharmacy Details</span>
+      </div>
+      <div class="details-grid">
+        <div class="detail-cell">
+          <i class="ti ti-map-pin"></i>
+          <div>
+            <span class="cell-label">Address</span>
+            <span class="cell-value">{{ pharmacy?.address }}, {{ pharmacy?.city }}, {{ pharmacy?.state }} - {{ pharmacy?.pincode }}</span>
+          </div>
+        </div>
+        <div class="detail-cell">
+          <i class="ti ti-phone"></i>
+          <div>
+            <span class="cell-label">Contact</span>
+            <span class="cell-value">{{ pharmacy?.phone }}</span>
+          </div>
+        </div>
+        <div class="detail-cell">
+          <i class="ti ti-user"></i>
+          <div>
+            <span class="cell-label">Owner</span>
+            <span class="cell-value">{{ pharmacy?.ownerName }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Map -->
+    <div class="section map-section">
+      <div class="section-label">
+        <i class="ti ti-map-2"></i>
+        <span>Location</span>
+      </div>
+      <div class="map-frame">
+        <div class="map-container" [id]="mapId"></div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="actions-section">
+      <a class="action-btn directions" [href]="getDirectionsUrl()" target="_blank">
+        <i class="ti ti-navigation"></i>
+        <span>Get Directions</span>
+      </a>
+      <a class="action-btn call" [href]="'tel:' + pharmacy?.phone">
+        <i class="ti ti-phone"></i>
+        <span>Call Pharmacy</span>
+      </a>
+    </div>
+  </div>
+</div>

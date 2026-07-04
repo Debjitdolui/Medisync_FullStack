@@ -1,0 +1,328 @@
+<div class="signup-page">
+  <div class="signup-container">
+    <!-- Left Side -->
+    <div class="signup-left">
+      <h1>Welcome to MediSync</h1>
+      <p class="subtitle">Your trusted platform for medicine availability and nurse assistance.</p>
+      <p class="desc">Create an account to find medicines, manage inventory, and get trusted nurse assistance.</p>
+
+      <div class="feature-list">
+        <div class="feature-item">
+          <div class="feature-icon"><i class="ti ti-download"></i></div>
+          <div>
+            <h4>Find Medicines</h4>
+            <p>Search and locate medicines from nearby pharmacies</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon"><i class="ti ti-user-heart"></i></div>
+          <div>
+            <h4>Nurse Assistant</h4>
+            <p>Book verified nurses for home care and support</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon"><i class="ti ti-building-hospital"></i></div>
+          <div>
+            <h4>Real-time Inventory</h4>
+            <p>Centralized inventory for accurate stock availability</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon"><i class="ti ti-shield-check"></i></div>
+          <div>
+            <h4>Secure & Reliable</h4>
+            <p>Your data is safe with us. We ensure privacy</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Side - SignUp Card -->
+    <div class="signup-right">
+      <div class="signup-card">
+        <div class="card-logo">
+          <i class="ti ti-heartbeat"></i>
+          <span>MediSync</span>
+        </div>
+
+        <h2>Create Your Account</h2>
+        <p class="card-subtitle">Register to access MediSync services.</p>
+
+        <div class="error-message" *ngIf="errorMessage">
+          <i class="ti ti-alert-circle"></i> {{ errorMessage }}
+        </div>
+
+        <div class="success-message" *ngIf="successMessage">
+          <i class="ti ti-circle-check"></i> {{ successMessage }}
+          <a routerLink="/login" class="go-login">Go to Login</a>
+        </div>
+
+        <form [formGroup]="signupForm" (ngSubmit)="onSubmit()" *ngIf="!successMessage">
+          <!-- Full Name -->
+          <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <div class="input-wrapper" [class.invalid]="submitted && f['fullName'].errors">
+              <i class="ti ti-user"></i>
+              <input type="text" class="form-input" placeholder="Enter Your Full Name"
+                     formControlName="fullName">
+            </div>
+            <span class="field-error" *ngIf="submitted && f['fullName'].errors">
+              <span *ngIf="f['fullName'].errors['required']">Full name is required</span>
+              <span *ngIf="f['fullName'].errors['minlength']">Full name must be at least 3 characters</span>
+            </span>
+          </div>
+
+          <!-- Email + Phone side by side -->
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Email ID</label>
+              <div class="input-wrapper" [class.invalid]="submitted && f['email'].errors">
+                <i class="ti ti-mail"></i>
+                <input type="email" class="form-input" placeholder="Enter Your Email"
+                       formControlName="email">
+              </div>
+              <span class="field-error" *ngIf="submitted && f['email'].errors">
+                <span *ngIf="f['email'].errors['required']">Email is required</span>
+                <span *ngIf="f['email'].errors['email']">Please enter a valid email</span>
+              </span>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Phone Number</label>
+              <div class="input-wrapper" [class.invalid]="submitted && f['phone'].errors">
+                <i class="ti ti-phone"></i>
+                <input type="tel" class="form-input" placeholder="Phone No"
+                       formControlName="phone">
+              </div>
+              <span class="field-error" *ngIf="submitted && f['phone'].errors">
+                <span *ngIf="f['phone'].errors['required']">Phone number is required</span>
+                <span *ngIf="f['phone'].errors['pattern']">Must be exactly 10 digits</span>
+              </span>
+            </div>
+          </div>
+
+          <!-- Role Selection -->
+          <div class="form-group">
+            <label class="form-label">Choose Your Role</label>
+            <div class="role-selector">
+              <label class="role-option" [class.active]="f['selectedRole'].value === 'user'">
+                <input type="radio" formControlName="selectedRole" value="user">
+                <i class="ti ti-user"></i> User
+              </label>
+              <label class="role-option" [class.active]="f['selectedRole'].value === 'pharmacy'">
+                <input type="radio" formControlName="selectedRole" value="pharmacy">
+                <i class="ti ti-building-hospital"></i> Pharmacy
+              </label>
+              <label class="role-option" [class.active]="f['selectedRole'].value === 'nurse'">
+                <input type="radio" formControlName="selectedRole" value="nurse">
+                <i class="ti ti-nurse"></i> Nurse
+              </label>
+            </div>
+          </div>
+
+          <!-- Pharmacy Extra Fields -->
+          <ng-container *ngIf="f['selectedRole'].value === 'pharmacy'">
+            <div class="form-group">
+              <label class="form-label">Pharmacy Name</label>
+              <div class="input-wrapper" [class.invalid]="submitted && f['pharmacyName'].errors">
+                <i class="ti ti-building"></i>
+                <input type="text" class="form-input" placeholder="Enter Pharmacy Name"
+                       formControlName="pharmacyName">
+              </div>
+              <span class="field-error" *ngIf="submitted && f['pharmacyName'].errors">
+                <span *ngIf="f['pharmacyName'].errors['required']">Pharmacy name is required</span>
+              </span>
+            </div>
+            <div class="form-group">
+              <label class="form-label">License Number</label>
+              <div class="input-wrapper" [class.invalid]="submitted && f['licenseNumber'].errors">
+                <i class="ti ti-certificate"></i>
+                <input type="text" class="form-input" placeholder="License Number"
+                       formControlName="licenseNumber">
+              </div>
+              <span class="field-error" *ngIf="submitted && f['licenseNumber'].errors">
+                <span *ngIf="f['licenseNumber'].errors['required']">License number is required</span>
+              </span>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Address</label>
+                <div class="input-wrapper" [class.invalid]="submitted && f['address'].errors">
+                  <i class="ti ti-map-pin"></i>
+                  <input type="text" class="form-input" placeholder="Address"
+                         formControlName="address">
+                </div>
+                <span class="field-error" *ngIf="submitted && f['address'].errors">
+                  <span *ngIf="f['address'].errors['required']">Address is required</span>
+                </span>
+              </div>
+              <div class="form-group">
+                <label class="form-label">City</label>
+                <div class="input-wrapper" [class.invalid]="submitted && f['city'].errors">
+                  <i class="ti ti-building-community"></i>
+                  <input type="text" class="form-input" placeholder="City"
+                         formControlName="city">
+                </div>
+                <span class="field-error" *ngIf="submitted && f['city'].errors">
+                  <span *ngIf="f['city'].errors['required']">City is required</span>
+                </span>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">State</label>
+                <div class="input-wrapper" [class.invalid]="submitted && f['state'].errors">
+                  <i class="ti ti-map"></i>
+                  <input type="text" class="form-input" placeholder="State"
+                         formControlName="state">
+                </div>
+                <span class="field-error" *ngIf="submitted && f['state'].errors">
+                  <span *ngIf="f['state'].errors['required']">State is required</span>
+                </span>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Pincode</label>
+                <div class="input-wrapper" [class.invalid]="submitted && f['pincode'].errors">
+                  <i class="ti ti-hash"></i>
+                  <input type="text" class="form-input" placeholder="Pincode"
+                         formControlName="pincode">
+                </div>
+                <span class="field-error" *ngIf="submitted && f['pincode'].errors">
+                  <span *ngIf="f['pincode'].errors['required']">Pincode is required</span>
+                </span>
+              </div>
+            </div>
+          </ng-container>
+
+          <!-- Nurse Extra Fields -->
+          <ng-container *ngIf="f['selectedRole'].value === 'nurse'">
+            <div class="form-group">
+              <label class="form-label">Qualification</label>
+              <div class="input-wrapper" [class.invalid]="submitted && f['qualification'].errors">
+                <i class="ti ti-school"></i>
+                <input type="text" class="form-input" placeholder="e.g., B.Sc Nursing"
+                       formControlName="qualification">
+              </div>
+              <span class="field-error" *ngIf="submitted && f['qualification'].errors">
+                <span *ngIf="f['qualification'].errors['required']">Qualification is required</span>
+              </span>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">License Number</label>
+                <div class="input-wrapper" [class.invalid]="submitted && f['nurseLicense'].errors">
+                  <i class="ti ti-certificate"></i>
+                  <input type="text" class="form-input" placeholder="License No."
+                         formControlName="nurseLicense">
+                </div>
+                <span class="field-error" *ngIf="submitted && f['nurseLicense'].errors">
+                  <span *ngIf="f['nurseLicense'].errors['required']">License number is required</span>
+                </span>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Specialization</label>
+                <div class="input-wrapper" [class.invalid]="submitted && f['specialization'].errors">
+                  <i class="ti ti-stethoscope"></i>
+                  <input type="text" class="form-input" placeholder="e.g., Home Care"
+                         formControlName="specialization">
+                </div>
+                <span class="field-error" *ngIf="submitted && f['specialization'].errors">
+                  <span *ngIf="f['specialization'].errors['required']">Specialization is required</span>
+                </span>
+              </div>
+            </div>
+          </ng-container>
+
+          <!-- Password -->
+          <div class="form-group">
+            <label class="form-label">Create a password</label>
+            <div class="input-wrapper" [class.invalid]="submitted && f['password'].errors">
+              <i class="ti ti-lock"></i>
+              <input [type]="showPassword ? 'text' : 'password'" class="form-input"
+                     placeholder="Create a password"
+                     formControlName="password">
+            </div>
+            <span class="field-error" *ngIf="submitted && f['password'].errors">
+              <span *ngIf="f['password'].errors['required']">Password is required</span>
+              <span *ngIf="f['password'].errors['minlength']">Password must be at least 8 characters</span>
+              <span *ngIf="f['password'].errors['pattern'] && !f['password'].errors['minlength']">Password must meet all requirements below</span>
+            </span>
+
+            <!-- Password Strength Bar -->
+            <div class="password-strength" *ngIf="passwordValue">
+              <div class="strength-bar">
+                <div class="bar-fill" [ngClass]="getPasswordStrength()"></div>
+              </div>
+              <span class="strength-label" [ngClass]="getPasswordStrength()">
+                {{ getPasswordStrength() | titlecase }}
+              </span>
+            </div>
+
+            <!-- Password Requirements Checklist -->
+            <div class="password-requirements" *ngIf="f['password'].value">
+              <div class="req-item" [class.met]="passwordValue.length >= 8">
+                <i class="ti" [class.ti-check]="passwordValue.length >= 8" [class.ti-x]="passwordValue.length < 8"></i>
+                At least 8 characters
+              </div>
+              <div class="req-item" [class.met]="passwordValue.match('[A-Z]')">
+                <i class="ti" [class.ti-check]="passwordValue.match('[A-Z]')" [class.ti-x]="!passwordValue.match('[A-Z]')"></i>
+                One uppercase letter
+              </div>
+              <div class="req-item" [class.met]="passwordValue.match('[a-z]')">
+                <i class="ti" [class.ti-check]="passwordValue.match('[a-z]')" [class.ti-x]="!passwordValue.match('[a-z]')"></i>
+                One lowercase letter
+              </div>
+              <div class="req-item" [class.met]="passwordValue.match('[0-9]')">
+                <i class="ti" [class.ti-check]="passwordValue.match('[0-9]')" [class.ti-x]="!passwordValue.match('[0-9]')"></i>
+                One number
+              </div>
+              <div class="req-item" [class.met]="passwordValue.match('[!@#$%^&*]')">
+                <i class="ti" [class.ti-check]="passwordValue.match('[!@#$%^&*]')" [class.ti-x]="!passwordValue.match('[!@#$%^&*]')"></i>
+                One special character (!&#64;#$%^&*)
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Confirm password</label>
+            <div class="input-wrapper" [class.invalid]="submitted && f['confirmPassword'].errors">
+              <i class="ti ti-lock"></i>
+              <input [type]="showPassword ? 'text' : 'password'" class="form-input"
+                     placeholder="Confirm password"
+                     formControlName="confirmPassword">
+            </div>
+            <span class="field-error" *ngIf="submitted && f['confirmPassword'].errors">
+              <span *ngIf="f['confirmPassword'].errors['required']">Please confirm your password</span>
+              <span *ngIf="f['confirmPassword'].errors['passwordMismatch']">Passwords do not match</span>
+            </span>
+          </div>
+
+          <!-- Terms -->
+          <div class="terms-check">
+            <label>
+              <input type="checkbox" formControlName="agreeTerms">
+              I agree to the <a href="#">Terms of use</a> and <a href="#">privacy policy</a>
+            </label>
+            <span class="field-error" *ngIf="submitted && f['agreeTerms'].errors">
+              <span *ngIf="f['agreeTerms'].errors['required']">You must agree to the terms</span>
+            </span>
+          </div>
+
+          <!-- Submit -->
+          <button type="submit" class="btn-submit" [disabled]="isLoading">
+            <span *ngIf="!isLoading">Sign Up</span>
+            <span *ngIf="isLoading">Creating account...</span>
+          </button>
+        </form>
+
+        <div class="divider">
+          <span>or</span>
+        </div>
+
+        <p class="login-link">
+          Already have an account? <a routerLink="/login">Log In</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

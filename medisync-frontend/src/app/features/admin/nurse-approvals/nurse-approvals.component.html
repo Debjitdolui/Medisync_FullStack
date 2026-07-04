@@ -1,0 +1,66 @@
+<div class="nurse-approvals">
+  <div class="page-header">
+    <h1><i class="ti ti-nurse"></i> Nurse Approvals</h1>
+    <p class="subtitle">Manage nurse registration requests</p>
+  </div>
+  <div class="tabs-bar">
+    <button class="tab-btn" [class.active]="activeTab === 'all'" (click)="activeTab = 'all'">
+      All <span class="tab-count">{{ nurses.length }}</span>
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'pending'" (click)="activeTab = 'pending'">
+      Pending <span class="tab-count orange">{{ getCount('pending') }}</span>
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'approved'" (click)="activeTab = 'approved'">
+      Approved <span class="tab-count green">{{ getCount('approved') }}</span>
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'rejected'" (click)="activeTab = 'rejected'">
+      Rejected <span class="tab-count red">{{ getCount('rejected') }}</span>
+    </button>
+  </div>
+  <div class="table-card">
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Qualification</th>
+            <th>Specialization</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let n of paginatedNurses">
+            <td class="name-cell">{{ n.fullName }}</td>
+            <td class="email-cell">{{ n.email }}</td>
+            <td>{{ n.phone }}</td>
+            <td>{{ n.qualification }}</td>
+            <td><span class="spec-badge">{{ n.specialization }}</span></td>
+            <td><span class="status-badge" [ngClass]="n.approvalStatus">{{ n.approvalStatus }}</span></td>
+            <td class="actions-cell">
+              <button class="btn-approve" *ngIf="n.approvalStatus === 'pending'" (click)="approve(n.nurseId)">
+                <i class="ti ti-check"></i> Approve
+              </button>
+              <button class="btn-reject" *ngIf="n.approvalStatus === 'pending'" (click)="reject(n.nurseId)">
+                <i class="ti ti-x"></i> Reject
+              </button>
+              <span class="no-action" *ngIf="n.approvalStatus !== 'pending'">—</span>
+            </td>
+          </tr>
+          <tr *ngIf="filteredNurses.length === 0">
+            <td colspan="7" class="empty-row"><i class="ti ti-nurse-off"></i> No nurses found</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <app-pagination
+    [totalItems]="filteredNurses.length"
+    [pageSize]="pageSize"
+    [currentPage]="currentPage"
+    (pageChange)="onPageChange($event)"
+    (pageSizeChange)="onPageSizeChange($event)">
+  </app-pagination>
+</div>

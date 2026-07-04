@@ -1,0 +1,229 @@
+<div class="inventory-page">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <h1>Inventory Management</h1>
+      <p class="header-sub">Manage your pharmacy medicines and stock levels</p>
+    </div>
+    <button class="btn-primary add-btn" (click)="openAddModal()">
+      <i class="ti ti-plus"></i>
+      Add Medicine
+    </button>
+  </div>
+
+  <!-- Filters & Search -->
+  <div class="filters-bar">
+    <div class="search-wrapper">
+      <i class="ti ti-search"></i>
+      <input type="text" placeholder="Search medicines..." [(ngModel)]="searchTerm" (input)="filterMedicines()" />
+    </div>
+    <div class="filter-group">
+      <select class="filter-select" [(ngModel)]="selectedCategory" (change)="filterMedicines()">
+        <option value="">All Categories</option>
+        <option *ngFor="let cat of categories" [value]="cat.categoryId">{{ cat.categoryName }}</option>
+      </select>
+      <select class="filter-select" [(ngModel)]="stockFilter" (change)="filterMedicines()">
+        <option value="">All Stock</option>
+        <option value="low">Low Stock (&lt; 10)</option>
+        <option value="out">Out of Stock</option>
+        <option value="normal">Normal</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Stats Row -->
+  <div class="stats-row">
+    <div class="stat-chip">
+      <span class="stat-count">{{ filteredMedicines.length }}</span>
+      <span class="stat-label">Showing</span>
+    </div>
+    <div class="stat-chip">
+      <span class="stat-count total">{{ medicines.length }}</span>
+      <span class="stat-label">Total Medicines</span>
+    </div>
+  </div>
+
+  <!-- Inventory Table -->
+  <div class="table-card">
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Medicine Name</th>
+            <th>Category</th>
+            <th>Manufacturer</th>
+            <th>Price (₹)</th>
+            <th>Stock</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let med of paginatedMedicines">
+            <td class="med-name-cell">
+              <span class="med-name">{{ med.medicineName }}</span>
+              <span class="med-desc" *ngIf="med.description">{{ med.description }}</span>
+            </td>
+            <td>
+              <span class="category-chip">{{ med.category.categoryName }}</span>
+            </td>
+            <td>{{ med.manufacturer || '—' }}</td>
+            <td class="price-cell">₹{{ med.price }}</td>
+            <td>
+              <span class="stock-badge" [ngClass]="{
+                'critical': med.stockQuantity === 0,
+                'low': med.stockQuantity > 0 && med.stockQuantity < 10,
+                'normal': med.stockQuantity >= 10
+              }">
+                {{ med.stockQuantity }} units
+              </span>
+            </td>
+            <td class="actions-cell">
+              <button class="action-btn edit" title="Edit" (click)="openEditModal(med)">
+                <i class="ti ti-pencil"></i>
+              </button>
+              <button class="action-btn stock" title="Update Stock" (click)="openStockModal(med)">
+                <i class="ti ti-package"></i>
+              </button>
+              <button class="action-btn delete" title="Delete" (click)="confirmDelete(med)">
+                <i class="ti ti-trash"></i>
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="filteredMedicines.length === 0">
+            <td colspan="6" class="empty-row">
+              <div class="empty-state">
+                <i class="ti ti-pill-off"></i>
+                <p>No medicines found</p>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <app-pagination
+    [totalItems]="filteredMedicines.length"
+    [pageSize]="pageSize"
+    [currentPage]="currentPage"
+    (pageChange)="onPageChange($event)"
+    (pageSizeChange)="onPageSizeChange($event)">
+  </app-pagination>
+
+  <!-- Add/Edit Medicine Modal -->
+  <div class="modal-overlay" *ngIf="showMedicineModal" (click)="closeMedicineModal()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{ editingMedicine ? 'Edit Medicine' : 'Add New Medicine' }}</h3>
+        <button class="modal-close" (click)="closeMedicineModal()">
+          <i class="ti ti-x"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group full">
+            <label class="form-label">Medicine Name *</label>
+            <input type="text" class="form-input" [(ngModel)]="medicineForm.medicineName" placeholder="Enter medicine name" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Category *</label>
+            <select class="form-input" [(ngModel)]="medicineForm.categoryId">
+              <option value="">Select Category</option>
+              <option *ngFor="let cat of categories" [value]="cat.categoryId">{{ cat.categoryName }}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Manufacturer</label>
+            <input type="text" class="form-input" [(ngModel)]="medicineForm.manufacturer" placeholder="e.g., Cipla" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Price (₹) *</label>
+            <input type="number" class="form-input" [(ngModel)]="medicineForm.price" placeholder="0.00" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Stock Quantity *</label>
+            <input type="number" class="form-input" [(ngModel)]="medicineForm.stockQuantity" placeholder="0" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group full">
+            <label class="form-label">Description</label>
+            <input type="text" class="form-input" [(ngModel)]="medicineForm.description" placeholder="Brief description" />
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-outline" (click)="closeMedicineModal()">Cancel</button>
+        <button class="btn-primary" (click)="saveMedicine()">
+          {{ editingMedicine ? 'Update Medicine' : 'Add Medicine' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stock Update Modal -->
+  <div class="modal-overlay" *ngIf="showStockModal" (click)="closeStockModal()">
+    <div class="modal-card small" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Update Stock</h3>
+        <button class="modal-close" (click)="closeStockModal()">
+          <i class="ti ti-x"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="stock-info">
+          <span class="stock-med-name">{{ stockMedicine?.medicineName }}</span>
+          <span class="stock-current">Current Stock: <strong>{{ stockMedicine?.stockQuantity }} units</strong></span>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Quantity</label>
+          <input type="number" class="form-input" [(ngModel)]="stockQuantity" min="1" placeholder="Enter quantity" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Action</label>
+          <div class="radio-group">
+            <label class="radio-option" [class.active]="stockAction === 'add'">
+              <input type="radio" name="stockAction" value="add" [(ngModel)]="stockAction" />
+              <i class="ti ti-plus"></i> Add Stock
+            </label>
+            <label class="radio-option" [class.active]="stockAction === 'remove'">
+              <input type="radio" name="stockAction" value="remove" [(ngModel)]="stockAction" />
+              <i class="ti ti-minus"></i> Remove Stock
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-outline" (click)="closeStockModal()">Cancel</button>
+        <button class="btn-primary" (click)="updateStock()">Update Stock</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="modal-overlay" *ngIf="showDeleteModal" (click)="showDeleteModal = false">
+    <div class="modal-card small" (click)="$event.stopPropagation()">
+      <div class="modal-header danger">
+        <h3>Delete Medicine</h3>
+        <button class="modal-close" (click)="showDeleteModal = false">
+          <i class="ti ti-x"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="delete-warning">
+          <i class="ti ti-alert-triangle"></i>
+          <p>Are you sure you want to delete <strong>{{ deleteMedicine?.medicineName }}</strong>?</p>
+          <span>This action cannot be undone.</span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-outline" (click)="showDeleteModal = false">Cancel</button>
+        <button class="btn-danger" (click)="deleteConfirmed()">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>

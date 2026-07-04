@@ -1,0 +1,11 @@
+<div class="star-rating" [class]="size">
+  <span *ngFor="let star of stars"
+        class="star"
+        [class]="getStarClass(star)"
+        [class.editable]="editable"
+        (click)="onStarClick(star)"
+        (mouseenter)="onStarHover(star)"
+        (mouseleave)="onStarLeave()">
+    <i class="ti ti-star-filled"></i>
+  </span>
+</div>

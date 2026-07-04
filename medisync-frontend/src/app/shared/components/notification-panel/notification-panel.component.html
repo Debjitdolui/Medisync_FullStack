@@ -1,0 +1,31 @@
+<div class="notif-panel">
+  <div class="notif-header">
+    <span class="notif-title">Notifications</span>
+    <button class="notif-mark-all" (click)="markAllAsRead()">Mark all as read</button>
+  </div>
+
+  <div class="notif-list">
+    <div *ngFor="let notif of notifications"
+         class="notif-item"
+         [class.unread]="!notif.isRead"
+         (click)="markAsRead(notif)">
+      <div class="notif-icon" [ngClass]="notif.isRead ? 'read' : 'unread'">
+        <i class="ti {{ getIcon(notif.type) }}"></i>
+      </div>
+      <div class="notif-content">
+        <p class="notif-text-title">{{ notif.title }}</p>
+        <p class="notif-message">{{ notif.message }}</p>
+        <span class="notif-time">{{ getTimeAgo(notif.createdAt) }}</span>
+      </div>
+      <div class="notif-dot" *ngIf="!notif.isRead"></div>
+    </div>
+
+    <div *ngIf="notifications.length === 0" class="notif-empty">
+      No notifications yet
+    </div>
+  </div>
+
+  <div class="notif-footer">
+    <a href="#">View all notifications</a>
+  </div>
+</div>

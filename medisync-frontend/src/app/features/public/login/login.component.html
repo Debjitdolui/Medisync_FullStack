@@ -1,0 +1,98 @@
+<div class="login-page">
+  <div class="login-container">
+    <!-- Left Side -->
+    <div class="login-left">
+      <h1>Welcome to MediSync</h1>
+      <p class="subtitle">Your trusted platform for medicine availability and nurse assistance.</p>
+      <p class="desc">Access your account to find medicine, manage inventory, and get trusted nurse assistance.</p>
+
+      <div class="feature-list">
+        <div class="feature-item">
+          <div class="feature-icon">
+            <i class="ti ti-chart-bar"></i>
+          </div>
+          <div>
+            <h4>Find Medicines</h4>
+            <p>Search and locate medicines from nearby pharmacies</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">
+            <i class="ti ti-user-heart"></i>
+          </div>
+          <div>
+            <h4>Nurse Assistance</h4>
+            <p>Book verified nurses for home care and support</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Side - Login Card -->
+    <div class="login-right">
+      <div class="login-card">
+        <div class="card-logo">
+          <i class="ti ti-heartbeat"></i>
+          <span>MediSync</span>
+        </div>
+
+        <h2>Welcome Back</h2>
+        <p class="card-subtitle">Please login to your account</p>
+
+        <div class="error-message" *ngIf="errorMessage">
+          <i class="ti ti-alert-circle"></i>
+          {{ errorMessage }}
+        </div>
+
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <div class="input-wrapper" [class.invalid]="submitted && f['email'].errors">
+              <i class="ti ti-mail"></i>
+              <input type="email"
+                     class="form-input"
+                     placeholder="Enter Your Email"
+                     formControlName="email">
+            </div>
+            <span class="field-error" *ngIf="submitted && f['email'].errors">
+              <span *ngIf="f['email'].errors['required']">Email is required</span>
+              <span *ngIf="f['email'].errors['email']">Please enter a valid email</span>
+            </span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <div class="input-wrapper" [class.invalid]="submitted && f['password'].errors">
+              <i class="ti ti-lock"></i>
+              <input [type]="showPassword ? 'text' : 'password'"
+                     class="form-input"
+                     placeholder="Enter Your Password"
+                     formControlName="password">
+              <button type="button" class="toggle-password" (click)="togglePassword()">
+                <i class="ti" [class.ti-eye]="!showPassword" [class.ti-eye-off]="showPassword"></i>
+              </button>
+            </div>
+            <span class="field-error" *ngIf="submitted && f['password'].errors">
+              <span *ngIf="f['password'].errors['required']">Password is required</span>
+              <span *ngIf="f['password'].errors['minlength']">Password must be at least 6 characters</span>
+            </span>
+            <a routerLink="/forgot-password" class="forgot-link">Forgot Password?</a>
+          </div>
+
+          <button type="submit" class="btn-submit" [disabled]="isLoading">
+            <span *ngIf="!isLoading">Login</span>
+            <span *ngIf="isLoading">Logging in...</span>
+          </button>
+        </form>
+
+        <div class="divider">
+          <span>or</span>
+        </div>
+
+        <p class="signup-link">
+          Don't have an account? <a routerLink="/signup">Sign Up</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

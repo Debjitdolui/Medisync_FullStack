@@ -1,0 +1,79 @@
+<div class="admin-dashboard">
+  <div class="page-header">
+    <h1><i class="ti ti-dashboard"></i> Admin Dashboard</h1>
+    <p class="subtitle">Overview of your platform</p>
+  </div>
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <div class="metric-icon blue"><i class="ti ti-users"></i></div>
+      <div class="metric-info">
+        <span class="metric-value">{{ dashboard?.totalUsers || 0 }}</span>
+        <span class="metric-label">Total Users</span>
+      </div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-icon green"><i class="ti ti-building-store"></i></div>
+      <div class="metric-info">
+        <span class="metric-value">{{ dashboard?.totalPharmacies || 0 }}</span>
+        <span class="metric-label">Total Pharmacies</span>
+      </div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-icon cyan"><i class="ti ti-nurse"></i></div>
+      <div class="metric-info">
+        <span class="metric-value">{{ dashboard?.totalNurses || 0 }}</span>
+        <span class="metric-label">Total Nurses</span>
+      </div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-icon purple"><i class="ti ti-pill"></i></div>
+      <div class="metric-info">
+        <span class="metric-value">{{ dashboard?.totalMedicines || 0 }}</span>
+        <span class="metric-label">Total Medicines</span>
+      </div>
+    </div>
+  </div>
+  <div class="panels-grid">
+    <div class="panel-card">
+      <div class="panel-header"><h3><i class="ti ti-clock"></i> Pending Approvals</h3></div>
+      <div class="panel-body">
+        <div class="approval-item">
+          <div class="approval-icon orange"><i class="ti ti-building-store"></i></div>
+          <div class="approval-info">
+            <span class="approval-label">Pharmacy Approvals</span>
+            <span class="approval-desc">{{ dashboard?.pendingPharmacies || 0 }} pending requests</span>
+          </div>
+          <span class="approval-count orange">{{ dashboard?.pendingPharmacies || 0 }}</span>
+        </div>
+        <div class="approval-item">
+          <div class="approval-icon cyan"><i class="ti ti-nurse"></i></div>
+          <div class="approval-info">
+            <span class="approval-label">Nurse Approvals</span>
+            <span class="approval-desc">Awaiting verification</span>
+          </div>
+          <span class="approval-count cyan">{{ pendingNurseCount }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="panel-card">
+      <div class="panel-header"><h3><i class="ti ti-activity"></i> Recent Activity</h3></div>
+      <div class="panel-body">
+        <div class="activity-item" *ngFor="let log of recentLogs">
+          <div class="activity-icon" [ngClass]="getLogIconClass(log.action)">
+            <i class="ti" [ngClass]="getLogIcon(log.action)"></i>
+          </div>
+          <div class="activity-info">
+            <span class="activity-text">{{ log.details }}</span>
+            <span class="activity-meta">
+              <span class="activity-admin">{{ log.admin?.username || 'System' }}</span>
+              &middot; {{ formatTime(log.createdAt) }}
+            </span>
+          </div>
+        </div>
+        <div class="empty-state" *ngIf="recentLogs.length === 0">
+          <i class="ti ti-notes-off"></i><span>No recent activity</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

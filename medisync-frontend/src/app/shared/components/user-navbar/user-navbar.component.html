@@ -1,0 +1,52 @@
+<nav class="user-navbar">
+  <div class="navbar-container">
+    <a routerLink="/user/dashboard" class="navbar-brand">
+      <i class="ti ti-heartbeat"></i>
+      <span>MediSync</span>
+    </a>
+
+    <ul class="navbar-links" [class.active]="mobileMenuOpen">
+      <li><a routerLink="/user/dashboard" routerLinkActive="active" (click)="closeMobile()">Dashboard</a></li>
+      <li><a routerLink="/user/medicine-search" routerLinkActive="active" (click)="closeMobile()">Medicine Search</a></li>
+      <li><a routerLink="/user/nurse-booking" routerLinkActive="active" (click)="closeMobile()">Nurse Booking</a></li>
+      <li><a routerLink="/user/feedback" routerLinkActive="active" (click)="closeMobile()">Feedback / Rating</a></li>
+      <li><a routerLink="/user/support" routerLinkActive="active" (click)="closeMobile()">Help & Support</a></li>
+    </ul>
+
+    <div class="navbar-actions">
+      <div class="notif-wrapper">
+        <button class="icon-btn" (click)="toggleNotifications()">
+          <i class="ti ti-bell"></i>
+          <span class="badge" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
+        </button>
+        <div class="notif-dropdown" *ngIf="showNotifications">
+          <app-notification-panel (close)="showNotifications = false"></app-notification-panel>
+        </div>
+      </div>
+
+      <div class="profile-wrapper">
+        <button class="profile-btn" (click)="toggleProfileMenu()">
+          <i class="ti ti-user-circle"></i>
+        </button>
+
+        <!-- Profile Dropdown -->
+        <div class="profile-dropdown" *ngIf="showProfileMenu">
+          <a routerLink="/user/profile" class="dropdown-item" (click)="closeDropdowns()">
+            <i class="ti ti-user"></i> My Profile
+          </a>
+          <a routerLink="/user/profile" fragment="bookings" class="dropdown-item" (click)="closeDropdowns()">
+            <i class="ti ti-calendar"></i> My Bookings
+          </a>
+          <div class="dropdown-divider"></div>
+          <button class="dropdown-item danger" (click)="logout()">
+            <i class="ti ti-logout"></i> Logout
+          </button>
+        </div>
+      </div>
+
+      <button class="navbar-toggle" (click)="toggleMobile()">
+        <i class="ti" [ngClass]="mobileMenuOpen ? 'ti-x' : 'ti-menu-2'"></i>
+      </button>
+    </div>
+  </div>
+</nav>

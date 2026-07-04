@@ -1,0 +1,33 @@
+<div class="admin-wrapper">
+  <app-admin-sidebar [role]="role" [userName]="userName" [isOpen]="sidebarOpen"></app-admin-sidebar>
+  <div class="sidebar-overlay" [class.visible]="sidebarOpen" (click)="sidebarOpen = false"></div>
+
+  <div class="admin-main">
+    <header class="admin-topbar">
+      <div class="topbar-left">
+        <button class="menu-toggle" (click)="sidebarOpen = !sidebarOpen">
+          <i class="ti ti-menu-2"></i>
+        </button>
+        <span class="topbar-date">{{ getCurrentDate() }}</span>
+      </div>
+      <div class="topbar-right">
+        <button class="topbar-icon-btn" (click)="toggleNotifications()">
+          <i class="ti ti-bell"></i>
+          <span class="notif-dot" *ngIf="unreadCount > 0"></span>
+        </button>
+        <div class="admin-chip">
+          <i class="ti ti-user-circle"></i>
+          <span>{{ userName }}</span>
+        </div>
+      </div>
+
+      <div class="notif-panel-wrapper" *ngIf="showNotifications">
+        <app-notification-panel (close)="showNotifications = false"></app-notification-panel>
+      </div>
+    </header>
+
+    <main class="admin-content">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

@@ -1,0 +1,66 @@
+<div class="pharmacy-approvals">
+  <div class="page-header">
+    <h1><i class="ti ti-building-store"></i> Pharmacy Approvals</h1>
+    <p class="subtitle">Manage pharmacy registration requests</p>
+  </div>
+  <div class="tabs-bar">
+    <button class="tab-btn" [class.active]="activeTab === 'all'" (click)="activeTab = 'all'">
+      All <span class="tab-count">{{ pharmacies.length }}</span>
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'pending'" (click)="activeTab = 'pending'">
+      Pending <span class="tab-count orange">{{ getCount('pending') }}</span>
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'approved'" (click)="activeTab = 'approved'">
+      Approved <span class="tab-count green">{{ getCount('approved') }}</span>
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'rejected'" (click)="activeTab = 'rejected'">
+      Rejected <span class="tab-count red">{{ getCount('rejected') }}</span>
+    </button>
+  </div>
+  <div class="table-card">
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Pharmacy Name</th>
+            <th>Owner</th>
+            <th>Email</th>
+            <th>City</th>
+            <th>License</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let p of paginatedPharmacies">
+            <td class="name-cell">{{ p.pharmacyName }}</td>
+            <td>{{ p.ownerName }}</td>
+            <td class="email-cell">{{ p.email }}</td>
+            <td>{{ p.city }}</td>
+            <td><code class="license">{{ p.licenseNumber }}</code></td>
+            <td><span class="status-badge" [ngClass]="p.approvalStatus">{{ p.approvalStatus }}</span></td>
+            <td class="actions-cell">
+              <button class="btn-approve" *ngIf="p.approvalStatus === 'pending'" (click)="approve(p.pharmacyId)">
+                <i class="ti ti-check"></i> Approve
+              </button>
+              <button class="btn-reject" *ngIf="p.approvalStatus === 'pending'" (click)="reject(p.pharmacyId)">
+                <i class="ti ti-x"></i> Reject
+              </button>
+              <span class="no-action" *ngIf="p.approvalStatus !== 'pending'">—</span>
+            </td>
+          </tr>
+          <tr *ngIf="filteredPharmacies.length === 0">
+            <td colspan="7" class="empty-row"><i class="ti ti-building-store-off"></i> No pharmacies found</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <app-pagination
+    [totalItems]="filteredPharmacies.length"
+    [pageSize]="pageSize"
+    [currentPage]="currentPage"
+    (pageChange)="onPageChange($event)"
+    (pageSizeChange)="onPageSizeChange($event)">
+  </app-pagination>
+</div>

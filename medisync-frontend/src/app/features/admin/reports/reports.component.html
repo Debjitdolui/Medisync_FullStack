@@ -1,0 +1,79 @@
+<div class="reports-page">
+  <div class="page-header">
+    <h1><i class="ti ti-chart-bar"></i> Reports</h1>
+    <p class="subtitle">Platform analytics and statistics</p>
+  </div>
+  <div class="metrics-grid" *ngIf="report">
+    <div class="metric-card">
+      <div class="metric-icon blue"><i class="ti ti-users"></i></div>
+      <div class="metric-info">
+        <span class="metric-value">{{ report.totalUsers }}</span>
+        <span class="metric-label">Total Users</span>
+      </div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-icon green"><i class="ti ti-building-store"></i></div>
+      <div class="metric-info">
+        <span class="metric-value">{{ report.totalPharmacies }}</span>
+        <span class="metric-label">Total Pharmacies</span>
+      </div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-icon cyan"><i class="ti ti-nurse"></i></div>
+      <div class="metric-info">
+        <span class="metric-value">{{ report.totalNurses }}</span>
+        <span class="metric-label">Total Nurses</span>
+      </div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-icon purple"><i class="ti ti-pill"></i></div>
+      <div class="metric-info">
+        <span class="metric-value">{{ report.totalMedicines }}</span>
+        <span class="metric-label">Total Medicines</span>
+      </div>
+    </div>
+  </div>
+  <div class="breakdown-grid" *ngIf="report">
+    <div class="breakdown-card">
+      <div class="breakdown-header">
+        <h3><i class="ti ti-building-store"></i> Pharmacy Breakdown</h3>
+        <span class="total-badge">{{ report.totalPharmacies }} total</span>
+      </div>
+      <div class="breakdown-body">
+        <div class="bar-item">
+          <div class="bar-label"><span class="dot green"></span> Approved</div>
+          <div class="bar-track"><div class="bar-fill green" [style.width.%]="getPercent(report.approvedPharmacies, report.totalPharmacies)"></div></div>
+          <span class="bar-value">{{ report.approvedPharmacies }}</span>
+        </div>
+        <div class="bar-item">
+          <div class="bar-label"><span class="dot orange"></span> Pending</div>
+          <div class="bar-track"><div class="bar-fill orange" [style.width.%]="getPercent(report.pendingPharmacies, report.totalPharmacies)"></div></div>
+          <span class="bar-value">{{ report.pendingPharmacies }}</span>
+        </div>
+        <div class="bar-item">
+          <div class="bar-label"><span class="dot red"></span> Rejected</div>
+          <div class="bar-track"><div class="bar-fill red" [style.width.%]="getPercent(report.rejectedPharmacies, report.totalPharmacies)"></div></div>
+          <span class="bar-value">{{ report.rejectedPharmacies }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="breakdown-card">
+      <div class="breakdown-header">
+        <h3><i class="ti ti-nurse"></i> Nurse Breakdown</h3>
+        <span class="total-badge">{{ report.totalNurses }} total</span>
+      </div>
+      <div class="breakdown-body">
+        <div class="bar-item">
+          <div class="bar-label"><span class="dot green"></span> Approved</div>
+          <div class="bar-track"><div class="bar-fill green" [style.width.%]="getPercent(report.approvedNurses, report.totalNurses)"></div></div>
+          <span class="bar-value">{{ report.approvedNurses }}</span>
+        </div>
+        <div class="bar-item">
+          <div class="bar-label"><span class="dot orange"></span> Pending</div>
+          <div class="bar-track"><div class="bar-fill orange" [style.width.%]="getPercent(report.pendingNurses, report.totalNurses)"></div></div>
+          <span class="bar-value">{{ report.pendingNurses }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

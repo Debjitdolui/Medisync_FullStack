@@ -1,0 +1,147 @@
+<div class="nurse-dashboard">
+  <!-- Welcome & Status Section -->
+  <div class="welcome-card">
+    <div class="welcome-left">
+      <div class="nurse-avatar">
+        <span>{{ nurseInitial }}</span>
+      </div>
+      <div class="welcome-info">
+        <h1>Welcome, <span class="highlight">{{ nurseName }}</span></h1>
+        <p class="welcome-sub">{{ specialization }} • {{ qualification }}</p>
+      </div>
+    </div>
+    <div class="status-toggle-wrapper">
+      <span class="status-label">Status:</span>
+      <div class="status-indicator" [ngClass]="currentStatus">
+        <span class="status-dot"></span>
+        <span class="status-text">{{ currentStatus === 'online' ? 'Online' : 'Offline' }}</span>
+      </div>
+      <label class="toggle-switch">
+        <input type="checkbox" [checked]="currentStatus === 'online'" (change)="toggleStatus()" />
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon blue">
+        <i class="ti ti-clipboard-list"></i>
+      </div>
+      <div class="stat-info">
+        <span class="stat-value">{{ totalRequests }}</span>
+        <span class="stat-label">Total Requests</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon amber">
+        <i class="ti ti-clock"></i>
+      </div>
+      <div class="stat-info">
+        <span class="stat-value">{{ pendingRequests }}</span>
+        <span class="stat-label">Pending</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon green">
+        <i class="ti ti-circle-check"></i>
+      </div>
+      <div class="stat-info">
+        <span class="stat-value">{{ completedRequests }}</span>
+        <span class="stat-label">Completed</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon orange">
+        <i class="ti ti-star"></i>
+      </div>
+      <div class="stat-info">
+        <span class="stat-value">{{ averageRating }}</span>
+        <span class="stat-label">Rating ({{ totalReviews }} reviews)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content Grid -->
+  <div class="content-grid">
+    <!-- Recent Requests -->
+    <div class="panel-card">
+      <div class="panel-header">
+        <h3>Recent Requests</h3>
+        <a routerLink="/nurse/requests" class="view-all-link">View All →</a>
+      </div>
+      <div class="request-list">
+        <div class="request-item" *ngFor="let req of recentRequests">
+          <div class="request-left">
+            <div class="patient-avatar">
+              {{ req.patient.username.charAt(0).toUpperCase() }}
+            </div>
+            <div class="request-details">
+              <span class="patient-name">{{ req.patient.username }}</span>
+              <span class="request-service">{{ req.service.serviceName }}</span>
+              <span class="request-date">{{ req.requestDate | date:'dd MMM yyyy' }} • {{ req.preferredTime }}</span>
+            </div>
+          </div>
+          <span class="request-status" [ngClass]="req.requestStatus">
+            {{ req.requestStatus | titlecase }}
+          </span>
+        </div>
+        <div class="empty-state" *ngIf="recentRequests.length === 0">
+          <i class="ti ti-clipboard-off"></i>
+          <p>No requests yet</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Info Panel -->
+    <div class="panel-card">
+      <div class="panel-header">
+        <h3>Quick Info</h3>
+      </div>
+      <div class="quick-info">
+        <div class="info-block">
+          <i class="ti ti-phone"></i>
+          <div>
+            <span class="info-title">Phone</span>
+            <span class="info-detail">{{ nursePhone }}</span>
+          </div>
+        </div>
+        <div class="info-block">
+          <i class="ti ti-mail"></i>
+          <div>
+            <span class="info-title">Email</span>
+            <span class="info-detail">{{ nurseEmail }}</span>
+          </div>
+        </div>
+        <div class="info-block">
+          <i class="ti ti-certificate"></i>
+          <div>
+            <span class="info-title">License</span>
+            <span class="info-detail">{{ licenseNumber }}</span>
+          </div>
+        </div>
+        <div class="info-block">
+          <i class="ti ti-calendar"></i>
+          <div>
+            <span class="info-title">Member Since</span>
+            <span class="info-detail">{{ memberSince }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="quick-actions">
+        <button class="quick-action-btn" routerLink="/nurse/requests">
+          <i class="ti ti-list-check"></i>
+          <span>Manage Requests</span>
+        </button>
+        <button class="quick-action-btn" routerLink="/nurse/availability">
+          <i class="ti ti-toggle-right"></i>
+          <span>Set Availability</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

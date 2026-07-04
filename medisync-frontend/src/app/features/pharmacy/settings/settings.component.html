@@ -1,0 +1,186 @@
+<div class="settings-page">
+  <!-- Page Header -->
+  <div class="page-header">
+    <h1>Pharmacy Settings</h1>
+    <p class="header-sub">Manage your pharmacy profile and account preferences</p>
+  </div>
+
+  <!-- Settings Content -->
+  <div class="settings-grid">
+    <!-- Pharmacy Profile Section -->
+    <div class="settings-card">
+      <div class="card-header">
+        <div class="card-header-icon blue">
+          <i class="ti ti-building-hospital"></i>
+        </div>
+        <div>
+          <h3>Pharmacy Profile</h3>
+          <p>Update your pharmacy information</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Pharmacy Name</label>
+            <input type="text" class="form-input" [(ngModel)]="pharmacyForm.pharmacyName" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Owner Name</label>
+            <input type="text" class="form-input" [(ngModel)]="pharmacyForm.ownerName" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">License Number</label>
+            <input type="text" class="form-input" [(ngModel)]="pharmacyForm.licenseNumber" readonly />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone</label>
+            <input type="text" class="form-input" [(ngModel)]="pharmacyForm.phone" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group full">
+            <label class="form-label">Address</label>
+            <input type="text" class="form-input" [(ngModel)]="pharmacyForm.address" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">City</label>
+            <input type="text" class="form-input" [(ngModel)]="pharmacyForm.city" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">State</label>
+            <input type="text" class="form-input" [(ngModel)]="pharmacyForm.state" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Pincode</label>
+            <input type="text" class="form-input" [(ngModel)]="pharmacyForm.pincode" />
+          </div>
+        </div>
+        <div class="card-actions">
+          <button class="btn-primary" (click)="saveProfile()">
+            <i class="ti ti-device-floppy"></i>
+            Save Changes
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Account Settings Section -->
+    <div class="settings-card">
+      <div class="card-header">
+        <div class="card-header-icon green">
+          <i class="ti ti-user-circle"></i>
+        </div>
+        <div>
+          <h3>Account Settings</h3>
+          <p>Manage your account credentials</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="info-row">
+          <div class="info-item">
+            <span class="info-label">Email Address</span>
+            <span class="info-value">{{ pharmacy?.email }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Account Status</span>
+            <span class="status-chip approved">
+              <i class="ti ti-circle-check"></i>
+              {{ pharmacy?.approvalStatus | titlecase }}
+            </span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Registered On</span>
+            <span class="info-value">{{ pharmacy?.createdAt | date:'dd MMM yyyy' }}</span>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <h4 class="subsection-title">Change Password</h4>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Current Password</label>
+            <input type="password" class="form-input" [(ngModel)]="passwordForm.currentPassword" placeholder="Enter current password" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">New Password</label>
+            <input type="password" class="form-input" [(ngModel)]="passwordForm.newPassword" placeholder="Enter new password" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Confirm New Password</label>
+            <input type="password" class="form-input" [(ngModel)]="passwordForm.confirmPassword" placeholder="Confirm new password" />
+          </div>
+        </div>
+        <div class="card-actions">
+          <button class="btn-primary" (click)="changePassword()">
+            <i class="ti ti-lock"></i>
+            Update Password
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notification Preferences -->
+    <div class="settings-card">
+      <div class="card-header">
+        <div class="card-header-icon amber">
+          <i class="ti ti-bell"></i>
+        </div>
+        <div>
+          <h3>Notification Preferences</h3>
+          <p>Manage how you receive notifications</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="toggle-list">
+          <div class="toggle-item">
+            <div class="toggle-info">
+              <span class="toggle-label">Low Stock Alerts</span>
+              <span class="toggle-desc">Get notified when medicine stock falls below threshold</span>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" [(ngModel)]="notifications.lowStock" />
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="toggle-item">
+            <div class="toggle-info">
+              <span class="toggle-label">Expiry Reminders</span>
+              <span class="toggle-desc">Get notified 30 days before medicine expiry</span>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" [(ngModel)]="notifications.expiry" />
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="toggle-item">
+            <div class="toggle-info">
+              <span class="toggle-label">Order Updates</span>
+              <span class="toggle-desc">Notifications for new orders and reviews</span>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" [(ngModel)]="notifications.orders" />
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="toggle-item">
+            <div class="toggle-info">
+              <span class="toggle-label">Email Notifications</span>
+              <span class="toggle-desc">Receive notifications via email</span>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" [(ngModel)]="notifications.email" />
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

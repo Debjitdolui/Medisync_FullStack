@@ -1,0 +1,431 @@
+.feedback-page {
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 28px 24px 48px;
+}
+
+// ─── Page Header ──────────────────────────────────────────────────────────────
+.page-header {
+  margin-bottom: 24px;
+
+  h1 { font-size: 26px; font-weight: 800; color: var(--text-primary); margin-bottom: 4px; }
+  p { font-size: 15px; color: var(--text-secondary); }
+}
+
+// ─── Type Tabs ────────────────────────────────────────────────────────────────
+.type-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 28px;
+  padding: 6px;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+}
+
+.type-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border: none;
+  background: transparent;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+
+  i { font-size: 18px; }
+
+  &:hover {
+    background: var(--bg);
+    color: var(--text-primary);
+  }
+
+  &.active {
+    background: var(--primary);
+    color: #ffffff;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(26, 115, 232, 0.25);
+  }
+}
+
+// ─── Content Grid ─────────────────────────────────────────────────────────────
+.content-grid {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+// ─── Rating Form Card ─────────────────────────────────────────────────────────
+.rating-form-card {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 28px;
+  box-shadow: var(--shadow);
+}
+
+// Selection Section
+.selection-section {
+  margin-bottom: 24px;
+}
+
+.form-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+
+  .optional {
+    font-weight: 400;
+    color: var(--text-muted);
+  }
+}
+
+.form-input {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--text-primary);
+  transition: border-color 0.2s, box-shadow 0.2s;
+
+  &:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.08);
+  }
+
+  &::placeholder { color: var(--text-muted); }
+
+  &.textarea { resize: vertical; min-height: 100px; }
+}
+
+// Booking Cards (nurse selection)
+.booking-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.booking-select-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    border-color: #c7d2fe;
+    background: #fafbff;
+  }
+
+  &.selected {
+    border-color: var(--primary);
+    background: var(--primary-light);
+
+    .check-icon { display: block; }
+  }
+}
+
+.booking-avatar {
+  width: 40px;
+  height: 40px;
+  background: #f0fdf4;
+  color: #16a34a;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.booking-info {
+  flex: 1;
+
+  .booking-nurse-name {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+  }
+
+  .booking-detail {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+}
+
+.check-icon {
+  color: var(--primary);
+  font-size: 20px;
+  display: none;
+}
+
+.no-bookings {
+  text-align: center;
+  padding: 32px 16px;
+  background: var(--bg);
+  border-radius: 12px;
+
+  i { font-size: 32px; color: var(--text-muted); margin-bottom: 8px; }
+  p { font-size: 13px; color: var(--text-muted); }
+}
+
+// Platform info
+.platform-info {
+  text-align: center;
+  padding: 20px;
+  margin-bottom: 20px;
+
+  .platform-icon {
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, #e8f0fe, #dbeafe);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 12px;
+
+    i { font-size: 24px; color: var(--primary); }
+  }
+
+  p { font-size: 14px; color: var(--text-secondary); }
+}
+
+// Rating Section
+.rating-section {
+  text-align: center;
+  margin-bottom: 24px;
+  padding: 20px;
+  background: var(--bg);
+  border-radius: 14px;
+
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+  }
+
+  .rating-label {
+    display: block;
+    margin-top: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--primary);
+  }
+}
+
+// Form Group
+.form-group {
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.char-count {
+  position: absolute;
+  bottom: 8px;
+  right: 12px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+// Submit
+.btn-submit {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px;
+  background: var(--primary);
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  i { font-size: 18px; }
+
+  &:hover:not(:disabled) {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+  }
+
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+// Success State
+.success-state {
+  text-align: center;
+  padding: 40px 20px;
+
+  h3 { font-size: 20px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; }
+  p { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; }
+}
+
+.success-icon {
+  width: 64px;
+  height: 64px;
+  background: #f0fdf4;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+
+  i { font-size: 32px; color: #16a34a; }
+}
+
+.btn-another {
+  padding: 10px 24px;
+  background: var(--bg);
+  color: var(--primary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+
+  &:hover { background: var(--primary-light); border-color: var(--primary); }
+}
+
+// ─── Reviews Panel ────────────────────────────────────────────────────────────
+.reviews-panel {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.reviews-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+
+  h3 { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+}
+
+.review-list {
+  padding: 16px 24px;
+  max-height: 420px;
+  overflow-y: auto;
+}
+
+.review-card {
+  padding: 14px 0;
+  border-bottom: 1px solid #f1f5f9;
+
+  &:last-child { border-bottom: none; }
+}
+
+.review-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.reviewer-avatar {
+  width: 34px;
+  height: 34px;
+  background: var(--primary-light);
+  color: var(--primary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.reviewer-info {
+  flex: 1;
+
+  .reviewer-name {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+  }
+}
+
+.review-date {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.review-text {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  padding-left: 44px;
+}
+
+.no-reviews {
+  text-align: center;
+  padding: 32px 16px;
+
+  p { font-size: 13px; color: var(--text-muted); }
+}
+
+.view-all-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 14px;
+  background: var(--bg);
+  border: none;
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary);
+  cursor: pointer;
+  transition: background 0.2s;
+
+  i { font-size: 16px; }
+
+  &:hover { background: var(--primary-light); }
+}
+
+// ─── Responsive ───────────────────────────────────────────────────────────────
+@media (max-width: 1024px) {
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .type-tabs {
+    flex-direction: column;
+  }
+
+  .type-tab {
+    justify-content: flex-start;
+  }
+}

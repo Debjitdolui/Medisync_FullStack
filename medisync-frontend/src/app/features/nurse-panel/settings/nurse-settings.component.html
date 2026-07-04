@@ -1,0 +1,114 @@
+<div class="nurse-settings">
+  <!-- Page Header -->
+  <div class="page-header">
+    <h1>My Profile</h1>
+    <p>View and manage your profile details</p>
+  </div>
+
+  <div class="settings-grid">
+    <!-- Profile Card -->
+    <div class="profile-card">
+      <div class="profile-top">
+        <div class="profile-avatar">{{ nurseInitial }}</div>
+        <div class="profile-info">
+          <h2>{{ nurse?.fullName }}</h2>
+          <span class="profile-spec">{{ nurse?.specialization }}</span>
+          <div class="profile-badges">
+            <span class="badge status-badge" [ngClass]="nurse?.approvalStatus">
+              <i class="ti ti-circle-check"></i> {{ nurse?.approvalStatus | titlecase }}
+            </span>
+            <span class="badge rating-badge">
+              <i class="ti ti-star-filled"></i> {{ averageRating }} ({{ totalReviews }})
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="profile-meta">
+        <div class="meta-item">
+          <i class="ti ti-mail"></i>
+          <span>{{ nurse?.email }}</span>
+        </div>
+        <div class="meta-item">
+          <i class="ti ti-phone"></i>
+          <span>{{ nurse?.phone }}</span>
+        </div>
+        <div class="meta-item">
+          <i class="ti ti-certificate"></i>
+          <span>{{ nurse?.licenseNumber }}</span>
+        </div>
+        <div class="meta-item">
+          <i class="ti ti-calendar"></i>
+          <span>Member since {{ nurse?.createdAt | date:'MMM yyyy' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Form -->
+    <div class="form-card">
+      <div class="form-card-header">
+        <h3><i class="ti ti-edit"></i> Edit Profile</h3>
+      </div>
+      <div class="form-card-body">
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input type="text" class="form-input" [(ngModel)]="editForm.fullName" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Phone</label>
+            <input type="text" class="form-input" [(ngModel)]="editForm.phone" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-input" [value]="nurse?.email" readonly />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Qualification</label>
+            <input type="text" class="form-input" [(ngModel)]="editForm.qualification" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Specialization</label>
+            <input type="text" class="form-input" [(ngModel)]="editForm.specialization" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">License Number</label>
+          <input type="text" class="form-input" [value]="nurse?.licenseNumber" readonly />
+        </div>
+        <button class="btn-save" (click)="saveProfile()" [disabled]="isSaving">
+          <i class="ti ti-device-floppy"></i>
+          {{ isSaving ? 'Saving...' : 'Save Changes' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Change Password -->
+    <div class="form-card">
+      <div class="form-card-header">
+        <h3><i class="ti ti-lock"></i> Change Password</h3>
+      </div>
+      <div class="form-card-body">
+        <div class="form-group">
+          <label class="form-label">Current Password</label>
+          <input type="password" class="form-input" [(ngModel)]="passwordForm.current" placeholder="Enter current password" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">New Password</label>
+            <input type="password" class="form-input" [(ngModel)]="passwordForm.newPass" placeholder="Enter new password" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Confirm Password</label>
+            <input type="password" class="form-input" [(ngModel)]="passwordForm.confirm" placeholder="Confirm new password" />
+          </div>
+        </div>
+        <button class="btn-save secondary" (click)="changePassword()" [disabled]="!passwordForm.current || !passwordForm.newPass || passwordForm.newPass !== passwordForm.confirm">
+          <i class="ti ti-lock"></i>
+          Update Password
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

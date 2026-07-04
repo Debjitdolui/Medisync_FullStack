@@ -1,0 +1,35 @@
+<aside class="sidebar" [class.open]="isOpen">
+  <div class="sidebar-logo">
+    <div class="logo-icon">
+      <i class="ti ti-heartbeat"></i>
+    </div>
+    <div>
+      <span class="logo-name">Medisync</span>
+      <span class="logo-tag">{{ roleLabel }}</span>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <a *ngFor="let item of navItems"
+       [routerLink]="item.route"
+       routerLinkActive="active"
+       class="nav-item">
+      <i class="ti {{ item.icon }}"></i>
+      <span>{{ item.label }}</span>
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="user-row">
+      <div class="avatar">{{ userName.charAt(0).toUpperCase() }}</div>
+      <div>
+        <div class="u-name">{{ userName }}</div>
+        <div class="u-role">{{ role | titlecase }}</div>
+      </div>
+    </div>
+    <button class="logout-row" (click)="logout()">
+      <i class="ti ti-logout"></i>
+      <span>Log Out</span>
+    </button>
+  </div>
+</aside>

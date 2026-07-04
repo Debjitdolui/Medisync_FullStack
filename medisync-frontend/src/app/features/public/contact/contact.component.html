@@ -1,0 +1,78 @@
+<div class="contact-page">
+  <div class="contact-container">
+    <!-- Left Side -->
+    <div class="contact-left">
+      <span class="contact-badge">
+        <i class="ti ti-phone"></i> Contact MediSync
+      </span>
+      <h1>Get In Touch</h1>
+      <p class="desc">
+        Contact us for healthcare support, pharmacy management, medicine availability, and nurse assistance services.
+      </p>
+
+      <div class="contact-info">
+        <div class="info-item">
+          <i class="ti ti-mail"></i>
+          <span>Email: support&#64;medisync.com</span>
+        </div>
+        <div class="info-item">
+          <i class="ti ti-phone"></i>
+          <span>Phone: +91 12345 67890</span>
+        </div>
+        <div class="info-item">
+          <i class="ti ti-map-pin"></i>
+          <span>123 Health St, Medical City</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Side - Form Card -->
+    <div class="contact-right">
+      <div class="contact-card">
+        <h2>Send Message</h2>
+
+        <div class="error-message" *ngIf="errorMessage">
+          <i class="ti ti-alert-circle"></i> {{ errorMessage }}
+        </div>
+
+        <div class="success-message" *ngIf="successMessage">
+          <i class="ti ti-circle-check"></i> {{ successMessage }}
+        </div>
+
+        <form (ngSubmit)="onSubmit()" *ngIf="!successMessage">
+          <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input type="text" class="form-input" placeholder="Enter your Full Name"
+                   [(ngModel)]="fullName" name="fullName" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Phone Number</label>
+            <input type="tel" class="form-input" placeholder="Enter your Phone Number"
+                   [(ngModel)]="phone" name="phone" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Subject</label>
+            <input type="text" class="form-input" placeholder="Enter Subject"
+                   [(ngModel)]="subject" name="subject" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Message</label>
+            <textarea class="form-input textarea" placeholder="Enter your Message"
+                      [(ngModel)]="message" name="message" rows="4" required></textarea>
+          </div>
+
+          <button type="submit" class="btn-submit" [disabled]="isLoading">
+            {{ isLoading ? 'Sending...' : 'Send Message' }}
+          </button>
+        </form>
+
+        <button *ngIf="successMessage" class="btn-submit" (click)="successMessage = ''">
+          Send Another Message
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

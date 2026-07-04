@@ -1,0 +1,124 @@
+<div class="feedback-page">
+  <!-- Page Header -->
+  <div class="page-header">
+    <h1>Feedback & Rating</h1>
+    <p>Share your experience with pharmacies and nurses</p>
+  </div>
+
+  <!-- Type Tabs -->
+  <div class="type-tabs">
+    <button class="type-tab" [class.active]="selectedType === 'pharmacy'" (click)="selectType('pharmacy')">
+      <i class="ti ti-building-hospital"></i>
+      <span>Rate Pharmacy</span>
+    </button>
+    <button class="type-tab" [class.active]="selectedType === 'nurse'" (click)="selectType('nurse')">
+      <i class="ti ti-nurse"></i>
+      <span>Rate Nurse</span>
+    </button>
+    <button class="type-tab" [class.active]="selectedType === 'platform'" (click)="selectType('platform')">
+      <i class="ti ti-heart"></i>
+      <span>Rate MediSync</span>
+    </button>
+  </div>
+
+  <div class="content-grid">
+    <!-- Rating Form -->
+    <main class="rating-form-card">
+      <div *ngIf="!submitted">
+        <!-- Pharmacy Selection -->
+        <div *ngIf="selectedType === 'pharmacy'" class="selection-section">
+          <label class="form-label">Select Pharmacy</label>
+          <select class="form-input" [(ngModel)]="selectedPharmacyId" (change)="onPharmacySelected()">
+            <option [ngValue]="null" disabled>Choose a pharmacy to rate</option>
+            <option *ngFor="let p of pharmacies" [ngValue]="p.pharmacyId">{{ p.pharmacyName }} — {{ p.city }}</option>
+          </select>
+        </div>
+
+        <!-- Nurse Selection (only completed bookings) -->
+        <div *ngIf="selectedType === 'nurse'" class="selection-section">
+          <label class="form-label">Select from your completed bookings</label>
+          <div class="booking-cards" *ngIf="completedBookings.length > 0">
+            <div *ngFor="let booking of completedBookings"
+                 class="booking-select-card"
+                 [class.selected]="selectedBooking?.requestId === booking.requestId"
+                 (click)="selectBooking(booking)">
+              <div class="booking-avatar">{{ booking.nurse.fullName.charAt(0) }}</div>
+              <div class="booking-info">
+                <span class="booking-nurse-name">{{ booking.nurse.fullName }}</span>
+                <span class="booking-detail">{{ booking.service.serviceName }} • {{ booking.requestDate | date:'dd MMM yyyy' }}</span>
+              </div>
+              <i class="ti ti-circle-check-filled check-icon" *ngIf="selectedBooking?.requestId === booking.requestId"></i>
+            </div>
+          </div>
+          <div class="no-bookings" *ngIf="completedBookings.length === 0">
+            <i class="ti ti-calendar-off"></i>
+            <p>You don't have any completed nurse bookings to rate yet.</p>
+          </div>
+        </div>
+
+        <!-- Platform info -->
+        <div *ngIf="selectedType === 'platform'" class="platform-info">
+          <div class="platform-icon"><i class="ti ti-heartbeat"></i></div>
+          <p>How would you rate your overall experience with MediSync?</p>
+        </div>
+
+        <!-- Star Rating -->
+        <div class="rating-section" *ngIf="canShowRating()">
+          <label>Your Rating</label>
+          <app-star-rating [rating]="rating" [editable]="true" size="lg" (ratingChange)="onRatingChange($event)"></app-star-rating>
+          <span class="rating-label">{{ getRatingLabel() }}</span>
+        </div>
+
+        <!-- Feedback Text -->
+        <div class="form-group" *ngIf="canShowRating()">
+          <label class="form-label">Your Feedback <span class="optional">(Optional)</span></label>
+          <textarea class="form-input textarea" rows="4" placeholder="Tell us about your experience..." [(ngModel)]="feedbackText" maxlength="500"></textarea>
+          <span class="char-count">{{ feedbackText.length }}/500</span>
+        </div>
+
+        <!-- Submit -->
+        <button class="btn-submit" *ngIf="canShowRating()" (click)="submitReview()" [disabled]="rating === 0 || isSubmitting">
+          <i class="ti ti-send"></i>
+          {{ isSubmitting ? 'Submitting...' : 'Submit Review' }}
+        </button>
+      </div>
+
+      <!-- Success State -->
+      <div *ngIf="submitted" class="success-state">
+        <div class="success-icon"><i class="ti ti-circle-check"></i></div>
+        <h3>Thank you!</h3>
+        <p>Your review has been submitted successfully.</p>
+        <button class="btn-another" (click)="resetForm()">Submit Another Review</button>
+      </div>
+    </main>
+
+    <!-- Reviews Panel -->
+    <aside class="reviews-panel">
+      <div class="reviews-header">
+        <h3>Recent Reviews</h3>
+      </div>
+      <div class="review-list">
+        <div *ngFor="let review of recentReviews" class="review-card">
+          <div class="review-top">
+            <div class="reviewer-avatar">{{ review.user.username.charAt(0).toUpperCase() }}</div>
+            <div class="reviewer-info">
+              <span class="reviewer-name">{{ review.user.username }}</span>
+              <app-star-rating [rating]="review.rating" size="sm"></app-star-rating>
+            </div>
+            <span class="review-date">{{ review.createdAt | date:'dd MMM' }}</span>
+          </div>
+          <p class="review-text">{{ review.reviewText }}</p>
+        </div>
+        <div class="no-reviews" *ngIf="recentReviews.length === 0">
+          <p>No reviews yet for this selection.</p>
+        </div>
+      </div>
+
+      <!-- View All Reviews -->
+      <button class="view-all-btn" *ngIf="recentReviews.length > 0" (click)="toggleAllReviews()">
+        <i class="ti" [ngClass]="showAllReviews ? 'ti-chevron-up' : 'ti-chevron-down'"></i>
+        {{ showAllReviews ? 'Show Less' : 'View All Reviews' }}
+      </button>
+    </aside>
+  </div>
+</div>

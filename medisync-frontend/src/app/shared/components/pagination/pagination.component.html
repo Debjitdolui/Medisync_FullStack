@@ -1,0 +1,24 @@
+<div class="pagination-wrapper" *ngIf="totalItems > 0">
+  <span class="pagination-info">Showing {{ startItem }}-{{ endItem }} of {{ totalItems }}</span>
+  <div class="pagination-controls">
+    <select class="page-size-select" [value]="pageSize" (change)="onPageSizeChange($event)">
+      <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }} / page</option>
+    </select>
+    <button class="page-btn nav-btn" (click)="previousPage()" [disabled]="currentPage === 1" aria-label="Previous page">
+      <i class="ti ti-chevron-left"></i>
+    </button>
+    <ng-container *ngFor="let page of pageNumbers">
+      <span class="page-ellipsis" *ngIf="page === -1">...</span>
+      <button
+        *ngIf="page !== -1"
+        class="page-btn"
+        [class.active]="page === currentPage"
+        (click)="goToPage(page)">
+        {{ page }}
+      </button>
+    </ng-container>
+    <button class="page-btn nav-btn" (click)="nextPage()" [disabled]="currentPage === totalPages" aria-label="Next page">
+      <i class="ti ti-chevron-right"></i>
+    </button>
+  </div>
+</div>

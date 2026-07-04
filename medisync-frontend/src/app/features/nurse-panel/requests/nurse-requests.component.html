@@ -1,0 +1,110 @@
+<div class="requests-page">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <h1>My Requests</h1>
+      <p class="header-sub">Manage patient service requests</p>
+    </div>
+    <div class="header-stats">
+      <span class="stat-pill pending">{{ pendingCount }} Pending</span>
+      <span class="stat-pill accepted">{{ acceptedCount }} Active</span>
+    </div>
+  </div>
+
+  <!-- Tab Filters -->
+  <div class="tab-filters">
+    <button class="tab-btn" [class.active]="activeTab === 'all'" (click)="setTab('all')">
+      All <span class="tab-count">{{ allRequests.length }}</span>
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'pending'" (click)="setTab('pending')">
+      Pending <span class="tab-count">{{ pendingCount }}</span>
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'accepted'" (click)="setTab('accepted')">
+      Accepted <span class="tab-count">{{ acceptedCount }}</span>
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'completed'" (click)="setTab('completed')">
+      Completed <span class="tab-count">{{ completedCount }}</span>
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'cancelled'" (click)="setTab('cancelled')">
+      Cancelled <span class="tab-count">{{ cancelledCount }}</span>
+    </button>
+  </div>
+
+  <!-- Request Cards -->
+  <div class="requests-list">
+    <div class="request-card" *ngFor="let req of paginatedRequests">
+      <div class="request-top">
+        <div class="request-left">
+          <div class="patient-avatar">
+            {{ req.patient.username.charAt(0).toUpperCase() }}
+          </div>
+          <div class="request-info">
+            <span class="patient-name">{{ req.patient.username }}</span>
+            <span class="request-service">
+              <i class="ti ti-activity-heartbeat"></i>
+              {{ req.service.serviceName }}
+            </span>
+          </div>
+        </div>
+        <span class="request-status-badge" [ngClass]="req.requestStatus">
+          {{ formatStatus(req.requestStatus) }}
+        </span>
+      </div>
+
+      <div class="request-details">
+        <div class="detail-item">
+          <i class="ti ti-calendar"></i>
+          <span>{{ req.requestDate | date:'EEE, dd MMM yyyy' }}</span>
+        </div>
+        <div class="detail-item" *ngIf="req.preferredTime">
+          <i class="ti ti-clock"></i>
+          <span>{{ req.preferredTime }}</span>
+        </div>
+        <div class="detail-item">
+          <i class="ti ti-map-pin"></i>
+          <span>{{ req.address }}</span>
+        </div>
+        <div class="detail-item" *ngIf="req.healthIssue">
+          <i class="ti ti-stethoscope"></i>
+          <span>{{ req.healthIssue }}</span>
+        </div>
+      </div>
+
+      <div class="request-footer">
+        <div class="request-meta">
+          <span class="meta-price">₹{{ req.service.basePrice }}</span>
+          <span class="meta-time">Requested {{ req.createdAt | date:'dd MMM, h:mm a' }}</span>
+        </div>
+        <div class="request-actions">
+          <button class="action-btn accept" *ngIf="req.requestStatus === 'pending'" (click)="updateStatus(req, 'accepted')">
+            <i class="ti ti-check"></i> Accept
+          </button>
+          <button class="action-btn reject" *ngIf="req.requestStatus === 'pending'" (click)="updateStatus(req, 'cancelled')">
+            <i class="ti ti-x"></i> Decline
+          </button>
+          <button class="action-btn complete" *ngIf="req.requestStatus === 'accepted'" (click)="updateStatus(req, 'completed')">
+            <i class="ti ti-circle-check"></i> Mark Complete
+          </button>
+          <button class="action-btn cancel" *ngIf="req.requestStatus === 'accepted'" (click)="updateStatus(req, 'cancelled')">
+            <i class="ti ti-x"></i> Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="filteredRequests.length === 0">
+      <i class="ti ti-clipboard-off"></i>
+      <h3>No {{ activeTab === 'all' ? '' : activeTab }} requests</h3>
+      <p>{{ getEmptyMessage() }}</p>
+    </div>
+  </div>
+
+  <app-pagination
+    [totalItems]="filteredRequests.length"
+    [pageSize]="pageSize"
+    [currentPage]="currentPage"
+    (pageChange)="onPageChange($event)"
+    (pageSizeChange)="onPageSizeChange($event)">
+  </app-pagination>
+</div>

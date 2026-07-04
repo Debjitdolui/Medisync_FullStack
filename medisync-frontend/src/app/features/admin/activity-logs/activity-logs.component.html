@@ -1,0 +1,55 @@
+<div class="activity-logs">
+  <div class="page-header">
+    <h1><i class="ti ti-history"></i> Activity Logs</h1>
+    <p class="subtitle">Track all admin actions on the platform</p>
+  </div>
+  <div class="filters-bar">
+    <select class="filter-select" [(ngModel)]="actionFilter">
+      <option value="all">All Actions</option>
+      <option value="PHARMACY_APPROVED">Pharmacy Approved</option>
+      <option value="PHARMACY_REJECTED">Pharmacy Rejected</option>
+      <option value="NURSE_APPROVED">Nurse Approved</option>
+      <option value="NURSE_REJECTED">Nurse Rejected</option>
+      <option value="BLOCK_USER">Block User</option>
+      <option value="UNBLOCK_USER">Unblock User</option>
+    </select>
+    <span class="results-count">{{ filteredLogs.length }} entries</span>
+  </div>
+  <div class="table-card">
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Admin</th>
+            <th>Action</th>
+            <th>Entity Type</th>
+            <th>Details</th>
+            <th>Timestamp</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let log of paginatedLogs">
+            <td class="admin-cell">
+              <div class="admin-avatar"><i class="ti ti-user-shield"></i></div>
+              {{ log.admin?.username || 'System' }}
+            </td>
+            <td><span class="action-badge" [ngClass]="getActionClass(log.action)">{{ formatAction(log.action) }}</span></td>
+            <td><span class="entity-type">{{ log.entityType }}</span></td>
+            <td class="details-cell">{{ log.details }}</td>
+            <td class="date-cell">{{ log.createdAt | date:'medium' }}</td>
+          </tr>
+          <tr *ngIf="filteredLogs.length === 0">
+            <td colspan="5" class="empty-row"><i class="ti ti-history-off"></i> No logs found</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <app-pagination
+    [totalItems]="filteredLogs.length"
+    [pageSize]="pageSize"
+    [currentPage]="currentPage"
+    (pageChange)="onPageChange($event)"
+    (pageSizeChange)="onPageSizeChange($event)">
+  </app-pagination>
+</div>

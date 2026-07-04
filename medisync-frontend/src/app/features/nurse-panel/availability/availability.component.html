@@ -1,0 +1,100 @@
+<div class="availability-page">
+  <!-- Page Header -->
+  <div class="page-header">
+    <h1>Availability Settings</h1>
+    <p class="header-sub">Control when you're available for patient requests</p>
+  </div>
+
+  <!-- Status Card -->
+  <div class="status-card" [ngClass]="currentStatus">
+    <div class="status-visual">
+      <div class="status-circle">
+        <i class="ti" [ngClass]="currentStatus === 'online' ? 'ti-wifi' : 'ti-wifi-off'"></i>
+      </div>
+      <div class="pulse-ring" *ngIf="currentStatus === 'online'"></div>
+    </div>
+    <div class="status-info">
+      <h2>You are currently <span [ngClass]="currentStatus">{{ currentStatus === 'online' ? 'Online' : 'Offline' }}</span></h2>
+      <p *ngIf="currentStatus === 'online'">Patients can see you and send service requests.</p>
+      <p *ngIf="currentStatus === 'offline'">You are invisible to patients. No new requests will arrive.</p>
+    </div>
+    <label class="big-toggle">
+      <input type="checkbox" [checked]="currentStatus === 'online'" (change)="toggleAvailability()" />
+      <span class="big-toggle-slider">
+        <span class="toggle-label-on">ON</span>
+        <span class="toggle-label-off">OFF</span>
+      </span>
+    </label>
+  </div>
+
+  <!-- Info Cards Grid -->
+  <div class="info-grid">
+    <!-- How it works -->
+    <div class="info-card">
+      <div class="info-card-header">
+        <i class="ti ti-info-circle"></i>
+        <h3>How it works</h3>
+      </div>
+      <ul class="info-list">
+        <li>
+          <span class="bullet green"></span>
+          <span>When <strong>Online</strong>, you appear in patient search results and can receive booking requests.</span>
+        </li>
+        <li>
+          <span class="bullet gray"></span>
+          <span>When <strong>Offline</strong>, you won't receive new requests but existing accepted bookings remain active.</span>
+        </li>
+        <li>
+          <span class="bullet blue"></span>
+          <span>Your status can be toggled anytime from this page or the dashboard.</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Current Stats -->
+    <div class="info-card">
+      <div class="info-card-header">
+        <i class="ti ti-chart-bar"></i>
+        <h3>Today's Summary</h3>
+      </div>
+      <div class="summary-stats">
+        <div class="summary-item">
+          <span class="summary-value">{{ pendingRequests }}</span>
+          <span class="summary-label">Pending Requests</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-value">{{ acceptedRequests }}</span>
+          <span class="summary-label">Active Bookings</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-value">{{ completedToday }}</span>
+          <span class="summary-label">Completed Today</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Schedule Preferences -->
+    <div class="info-card full-width">
+      <div class="info-card-header">
+        <i class="ti ti-calendar-time"></i>
+        <h3>Schedule Preferences</h3>
+        <span class="badge-coming-soon">Coming Soon</span>
+      </div>
+      <div class="schedule-preview">
+        <div class="schedule-row" *ngFor="let day of weekDays">
+          <span class="day-name">{{ day.name }}</span>
+          <span class="day-hours" [ngClass]="{'active': day.active}">
+            {{ day.active ? day.hours : 'Not Set' }}
+          </span>
+          <span class="day-status" [ngClass]="{'active': day.active}">
+            <i class="ti" [ngClass]="day.active ? 'ti-circle-check' : 'ti-circle-x'"></i>
+          </span>
+        </div>
+      </div>
+      <p class="schedule-note">
+        <i class="ti ti-info-circle"></i>
+        Scheduled availability will automatically toggle your status at set times.
+      </p>
+    </div>
+  </div>
+</div>

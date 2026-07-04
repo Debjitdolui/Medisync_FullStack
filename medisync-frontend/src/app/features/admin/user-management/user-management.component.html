@@ -1,0 +1,70 @@
+<div class="user-management">
+  <div class="page-header">
+    <h1><i class="ti ti-users-group"></i> User Management</h1>
+    <p class="subtitle">Manage all platform users</p>
+  </div>
+  <div class="filters-bar">
+    <div class="search-box">
+      <i class="ti ti-search"></i>
+      <input type="text" placeholder="Search by name or email..." [(ngModel)]="searchTerm" />
+    </div>
+    <select class="filter-select" [(ngModel)]="roleFilter">
+      <option value="all">All Roles</option>
+      <option value="customer">Customer</option>
+      <option value="pharmacy">Pharmacy</option>
+      <option value="nurse">Nurse</option>
+      <option value="admin">Admin</option>
+    </select>
+    <select class="filter-select" [(ngModel)]="statusFilter">
+      <option value="all">All Status</option>
+      <option value="active">Active</option>
+      <option value="inactive">Inactive</option>
+      <option value="blocked">Blocked</option>
+    </select>
+  </div>
+  <div class="table-card">
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Created</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let u of paginatedUsers">
+            <td class="name-cell">{{ u.username }}</td>
+            <td class="email-cell">{{ u.email }}</td>
+            <td>{{ u.phone || '—' }}</td>
+            <td><span class="role-badge" [ngClass]="u.role || 'customer'">{{ u.role || 'customer' }}</span></td>
+            <td><span class="status-badge" [ngClass]="u.status">{{ u.status }}</span></td>
+            <td class="date-cell">{{ u.createdAt | date:'mediumDate' }}</td>
+            <td class="actions-cell">
+              <button class="btn-block" *ngIf="u.status !== 'blocked'" (click)="blockUser(u.userId)">
+                <i class="ti ti-lock"></i> Block
+              </button>
+              <button class="btn-unblock" *ngIf="u.status === 'blocked'" (click)="unblockUser(u.userId)">
+                <i class="ti ti-lock-open"></i> Unblock
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="filteredUsers.length === 0">
+            <td colspan="7" class="empty-row"><i class="ti ti-users-minus"></i> No users found</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <app-pagination
+    [totalItems]="filteredUsers.length"
+    [pageSize]="pageSize"
+    [currentPage]="currentPage"
+    (pageChange)="onPageChange($event)"
+    (pageSizeChange)="onPageSizeChange($event)">
+  </app-pagination>
+</div>

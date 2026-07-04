@@ -1,0 +1,126 @@
+<div class="profile-page" *ngIf="!isLoading">
+  <div class="profile-grid">
+    <!-- Left Sidebar -->
+    <aside class="profile-sidebar">
+      <div class="avatar-section">
+        <div class="avatar">
+          <i class="ti ti-user"></i>
+        </div>
+        <h3>{{ user?.username }}</h3>
+        <p>{{ user?.email }}</p>
+        <p class="phone">{{ user?.phone || '+91 xxxxx xxxxx' }}</p>
+      </div>
+
+      <nav class="profile-nav">
+        <button [class.active]="activeTab === 'profile'" (click)="activeTab = 'profile'">
+          <i class="ti ti-user"></i> User Profile
+        </button>
+        <button [class.active]="activeTab === 'addresses'" (click)="activeTab = 'addresses'">
+          <i class="ti ti-map-pin"></i> Saved Address
+        </button>
+        <button [class.active]="activeTab === 'bookings'" (click)="activeTab = 'bookings'">
+          <i class="ti ti-calendar"></i> My Bookings
+        </button>
+        <button [class.active]="activeTab === 'security'" (click)="activeTab = 'security'">
+          <i class="ti ti-shield"></i> Security
+        </button>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="profile-main">
+      <!-- User Profile Tab -->
+      <div *ngIf="activeTab === 'profile'">
+        <h2 class="tab-title">User Profile</h2>
+        <div class="profile-fields">
+          <div class="field-row">
+            <label>Full Name</label>
+            <input [value]="editName" [(ngModel)]="editName" [readonly]="!isEditing" [class.editable]="isEditing">
+          </div>
+          <div class="field-row">
+            <label>Email</label>
+            <input [value]="user?.email" readonly>
+          </div>
+          <div class="field-row">
+            <label>Phone Number</label>
+            <input [value]="editPhone" [(ngModel)]="editPhone" [readonly]="!isEditing" [class.editable]="isEditing">
+          </div>
+          <div class="field-row">
+            <label>Address</label>
+            <input [value]="getDefaultAddress()" readonly>
+          </div>
+        </div>
+        <button class="btn-primary-full" *ngIf="!isEditing" (click)="isEditing = true">Edit Profile</button>
+        <div class="edit-actions" *ngIf="isEditing">
+          <button class="btn-primary-full" (click)="saveProfile()">Save Changes</button>
+          <button class="btn-outline-full" (click)="isEditing = false">Cancel</button>
+        </div>
+      </div>
+
+      <!-- Addresses Tab -->
+      <div *ngIf="activeTab === 'addresses'">
+        <div class="tab-header">
+          <h2 class="tab-title">Saved Addresses</h2>
+          <button class="btn-add" (click)="showAddressForm = !showAddressForm">
+            <i class="ti ti-plus"></i> Add Address
+          </button>
+        </div>
+
+        <div class="address-form" *ngIf="showAddressForm">
+          <input class="form-input" placeholder="Address Line" [(ngModel)]="newAddress.addressLine">
+          <div class="form-row">
+            <input class="form-input" placeholder="City" [(ngModel)]="newAddress.city">
+            <input class="form-input" placeholder="State" [(ngModel)]="newAddress.state">
+            <input class="form-input" placeholder="Pincode" [(ngModel)]="newAddress.pincode">
+          </div>
+          <button class="btn-primary-full" (click)="addAddress()">Save Address</button>
+        </div>
+
+        <div class="address-list">
+          <div *ngFor="let addr of addresses" class="address-card">
+            <div class="addr-info">
+              <p class="addr-line">{{ addr.addressLine }}</p>
+              <p class="addr-detail">{{ addr.city }}, {{ addr.state }} - {{ addr.pincode }}</p>
+              <span class="default-badge" *ngIf="addr.isDefault">Default</span>
+            </div>
+            <button class="delete-btn" (click)="deleteAddress(addr.addressId)"><i class="ti ti-trash"></i></button>
+          </div>
+          <p *ngIf="addresses.length === 0" class="empty">No addresses saved yet</p>
+        </div>
+      </div>
+
+      <!-- Bookings Tab -->
+      <div *ngIf="activeTab === 'bookings'">
+        <h2 class="tab-title">My Bookings</h2>
+        <div class="bookings-list">
+          <div *ngFor="let booking of bookings" class="booking-card">
+            <div class="booking-info">
+              <h4>{{ booking.service.serviceName }}</h4>
+              <p>Nurse: {{ booking.nurse.fullName }}</p>
+              <p class="booking-date">{{ booking.requestDate }} | {{ booking.preferredTime }}</p>
+            </div>
+            <span class="status-badge" [ngClass]="getStatusClass(booking.requestStatus)">
+              {{ booking.requestStatus }}
+            </span>
+          </div>
+          <p *ngIf="bookings.length === 0" class="empty">No bookings yet</p>
+        </div>
+      </div>
+
+      <!-- Security Tab -->
+      <div *ngIf="activeTab === 'security'">
+        <h2 class="tab-title">Security Settings</h2>
+        <div class="security-section">
+          <h3>Change Password</h3>
+          <p class="security-note">Use the Forgot Password flow to change your password securely.</p>
+          <a routerLink="/forgot-password" class="btn-outline-full">Change Password</a>
+        </div>
+        <div class="security-section danger-section">
+          <h3>Deactivate Account</h3>
+          <p class="security-note">Deactivating your account will disable access. You can reactivate later.</p>
+          <button class="btn-danger" (click)="deactivateAccount()">Deactivate Account</button>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>

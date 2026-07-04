@@ -1,0 +1,97 @@
+<div class="dashboard">
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-content">
+      <div class="greeting-badge">
+        <i class="ti ti-sparkles"></i>
+        <span>Good {{ timeOfDay }}, {{ userName }}!</span>
+      </div>
+      <h1>Your Health, <span class="highlight">Our Priority</span></h1>
+      <p class="hero-subtitle">Search medicines, book home nurses, and manage your healthcare — all in one place.</p>
+
+      <form class="search-bar" (ngSubmit)="onSearch()">
+        <i class="ti ti-search"></i>
+        <input type="text"
+               placeholder="Search medicine (e.g., Paracetamol 650mg)"
+               [(ngModel)]="searchQuery"
+               name="searchQuery">
+        <button type="submit" class="search-btn">Search</button>
+      </form>
+
+      <div class="hero-tags">
+        <span class="tag" (click)="searchFor('Paracetamol')">Paracetamol</span>
+        <span class="tag" (click)="searchFor('Amoxicillin')">Amoxicillin</span>
+        <span class="tag" (click)="searchFor('Cetirizine')">Cetirizine</span>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="stat-cards">
+        <div class="mini-stat">
+          <i class="ti ti-building-hospital"></i>
+          <div>
+            <span class="stat-num">2K+</span>
+            <span class="stat-text">Pharmacies</span>
+          </div>
+        </div>
+        <div class="mini-stat">
+          <i class="ti ti-nurse"></i>
+          <div>
+            <span class="stat-num">200+</span>
+            <span class="stat-text">Nurses</span>
+          </div>
+        </div>
+        <div class="mini-stat">
+          <i class="ti ti-pill"></i>
+          <div>
+            <span class="stat-num">20K+</span>
+            <span class="stat-text">Medicines</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quick Actions -->
+  <section class="quick-actions">
+    <div class="section-header">
+      <h2>Quick Actions</h2>
+      <p>Access key features in one click</p>
+    </div>
+    <div class="actions-grid">
+      <a *ngFor="let action of quickActions"
+         [routerLink]="action.route"
+         class="action-card">
+        <div class="action-icon" [style.background]="action.bgColor" [style.color]="action.color">
+          <i class="ti {{ action.icon }}"></i>
+        </div>
+        <h3 [style.color]="action.color">{{ action.title }}</h3>
+        <p>{{ action.subtitle }}</p>
+        <div class="card-accent" [style.background]="action.color"></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- Info Cards Row -->
+  <section class="info-row">
+    <div class="info-card tip-card">
+      <div class="info-icon">
+        <i class="ti ti-bulb"></i>
+      </div>
+      <div class="info-content">
+        <h4>Health Tip</h4>
+        <p>Stay hydrated! Drink at least 8 glasses of water daily for better medicine absorption.</p>
+      </div>
+    </div>
+    <div class="info-card support-card">
+      <div class="info-icon">
+        <i class="ti ti-headset"></i>
+      </div>
+      <div class="info-content">
+        <h4>Need Help?</h4>
+        <p>Our support team is available 24/7. Call us or visit Help & Support section.</p>
+      </div>
+      <a routerLink="/user/support" class="info-link">Get Help →</a>
+    </div>
+  </section>
+</div>

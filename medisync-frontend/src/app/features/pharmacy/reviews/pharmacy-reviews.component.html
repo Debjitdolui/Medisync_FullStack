@@ -1,0 +1,61 @@
+<div class="reviews-page">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <h1>Customer Reviews</h1>
+      <p>See what customers are saying about your pharmacy</p>
+    </div>
+    <div class="rating-summary">
+      <div class="rating-big">
+        <i class="ti ti-star-filled"></i>
+        <span class="rating-num">{{ averageRating }}</span>
+      </div>
+      <span class="rating-total">{{ totalReviews }} reviews</span>
+    </div>
+  </div>
+
+  <!-- Rating Breakdown -->
+  <div class="breakdown-card">
+    <div class="breakdown-row" *ngFor="let bar of ratingBars">
+      <span class="bar-label">{{ bar.stars }} <i class="ti ti-star-filled"></i></span>
+      <div class="bar-track">
+        <div class="bar-fill" [style.width.%]="bar.percent"></div>
+      </div>
+      <span class="bar-count">{{ bar.count }}</span>
+    </div>
+  </div>
+
+  <!-- Reviews List -->
+  <div class="reviews-list">
+    <div *ngFor="let review of paginatedReviews" class="review-card">
+      <div class="review-header">
+        <div class="reviewer-info">
+          <div class="reviewer-avatar">{{ review.user.username.charAt(0).toUpperCase() }}</div>
+          <div>
+            <span class="reviewer-name">{{ review.user.username }}</span>
+            <span class="review-date">{{ review.createdAt | date:'dd MMM yyyy' }}</span>
+          </div>
+        </div>
+        <div class="review-stars">
+          <i *ngFor="let s of [1,2,3,4,5]" class="ti"
+             [ngClass]="s <= review.rating ? 'ti-star-filled star-filled' : 'ti-star star-empty'"></i>
+        </div>
+      </div>
+      <p class="review-text" *ngIf="review.reviewText">{{ review.reviewText }}</p>
+    </div>
+
+    <div class="empty-state" *ngIf="reviews.length === 0">
+      <i class="ti ti-message-off"></i>
+      <h3>No reviews yet</h3>
+      <p>Customers haven't left any reviews for your pharmacy yet.</p>
+    </div>
+  </div>
+
+  <app-pagination
+    [totalItems]="reviews.length"
+    [pageSize]="pageSize"
+    [currentPage]="currentPage"
+    (pageChange)="onPageChange($event)"
+    (pageSizeChange)="onPageSizeChange($event)">
+  </app-pagination>
+</div>

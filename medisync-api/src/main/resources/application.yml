@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/healthdb
+    username: postgres
+    password: postgres
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        default_schema: dev
+    show-sql: true
+
+# JWT Configuration
+jwt:
+  secret: MediSync2026SecretKeyForJWTTokenGenerationAndValidation!@#$%^&*
+  expiration: 86400000
