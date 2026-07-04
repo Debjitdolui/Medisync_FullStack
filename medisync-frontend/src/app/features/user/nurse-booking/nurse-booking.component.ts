@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NurseApiService } from '../../../core/services/nurse.service';
 import { NurseRequestService } from '../../../core/services/nurse-request.service';
+import { ReviewService } from '../../../core/services/review.service';
 import { Nurse, NurseService } from '../../../core/models';
 
 @Component({
@@ -38,7 +39,8 @@ export class NurseBookingComponent implements OnInit {
 
   constructor(
     private nurseService: NurseApiService,
-    private nurseRequestService: NurseRequestService
+    private nurseRequestService: NurseRequestService,
+    private reviewService: ReviewService
   ) {}
 
   ngOnInit(): void {
@@ -91,8 +93,22 @@ export class NurseBookingComponent implements OnInit {
     }
   }
 
+  // Ratings cache
+  private nurseRatingsCache: Map<number, { average: number; total: number }> = new Map();
+
   getNurseRating(nurseId: number): { average: number; total: number } {
-    return { average: 0, total: 0 };
+    if (!this.nurseRatingsCache.has(nurseId)) {
+      // Set default and fetch
+      this.nurseRatingsCache.set(nurseId, { average: 0, total: 0 });
+      this.reviewService.getNurseReviews(nurseId, { page: 0, size: 100 }).subscribe(page => {
+        const reviews = page.content;
+        if (reviews.length > 0) {
+          const avg = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
+          this.nurseRatingsCache.set(nurseId, { average: Math.round(avg * 10) / 10, total: reviews.length });
+        }
+      });
+    }
+    return this.nurseRatingsCache.get(nurseId) || { average: 0, total: 0 };
   }
 
   getDistance(nurseId: number): string {

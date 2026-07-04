@@ -6,6 +6,7 @@ import { SearchService } from '../../../core/services/search.service';
 import { MedicineService } from '../../../core/services/medicine.service';
 import { PharmacyService } from '../../../core/services/pharmacy.service';
 import { AddressService } from '../../../core/services/address.service';
+import { ReviewService } from '../../../core/services/review.service';
 import { Medicine, Pharmacy, PrescriptionSearchResult, UserAddress } from '../../../core/models';
 import { PharmacyDetailComponent } from './pharmacy-detail/pharmacy-detail.component';
 import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
@@ -80,6 +81,7 @@ export class MedicineSearchComponent implements OnInit {
     private medicineService: MedicineService,
     private pharmacyService: PharmacyService,
     private addressService: AddressService,
+    private reviewService: ReviewService,
     private route: ActivatedRoute
   ) {}
 
@@ -344,8 +346,22 @@ export class MedicineSearchComponent implements OnInit {
     return 0;
   }
 
+  // Ratings cache
+  private pharmacyRatingsCache: Map<number, { average: number; total: number }> = new Map();
+
   getPharmacyRating(pharmacyId: number): { average: number; total: number } {
-    return { average: 0, total: 0 };
+    if (!this.pharmacyRatingsCache.has(pharmacyId)) {
+      // Set default and fetch
+      this.pharmacyRatingsCache.set(pharmacyId, { average: 0, total: 0 });
+      this.reviewService.getPharmacyReviews(pharmacyId, { page: 0, size: 100 }).subscribe(page => {
+        const reviews = page.content;
+        if (reviews.length > 0) {
+          const avg = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
+          this.pharmacyRatingsCache.set(pharmacyId, { average: Math.round(avg * 10) / 10, total: reviews.length });
+        }
+      });
+    }
+    return this.pharmacyRatingsCache.get(pharmacyId) || { average: 0, total: 0 };
   }
 
   getDistanceForMedicine(medicine: Medicine): string {
