@@ -94,14 +94,9 @@ INSERT INTO dev.medicine_categories (category_name, description) VALUES
 -- NURSE SERVICES
 -- ═══════════════════════════════════════════════════════════════════
 INSERT INTO dev.nurse_services (service_name, description, base_price) VALUES
-('General Health Checkup', 'Basic health monitoring including BP, sugar, temperature', 500.00),
-('Wound Dressing', 'Cleaning and dressing of wounds', 300.00),
-('Injection Administration', 'Intramuscular or subcutaneous injections', 200.00),
-('IV Drip Setup', 'Intravenous drip setup and monitoring', 800.00),
-('Post-Surgery Care', 'Post-operative monitoring and wound care', 1200.00),
-('Elder Care', 'Daily assistance and health monitoring for elderly patients', 1500.00),
-('Physiotherapy Assistance', 'Basic physiotherapy exercises and monitoring', 700.00),
-('Blood Sample Collection', 'Drawing blood for lab tests at home', 250.00);
+('IV Drip', 'Intravenous drip setup, monitoring, and removal at home', 800.00),
+('Home Nursing', 'Complete home nursing care including health monitoring, medication management, and daily assistance', 1500.00),
+('Injection', 'Intramuscular or subcutaneous injection administration at home', 200.00);
 
 -- ═══════════════════════════════════════════════════════════════════
 -- USER ADDRESSES
@@ -148,12 +143,12 @@ INSERT INTO dev.medicines (pharmacy_id, category_id, medicine_name, manufacturer
 -- NURSE REQUESTS
 -- ═══════════════════════════════════════════════════════════════════
 INSERT INTO dev.nurse_requests (patient_id, nurse_id, service_id, address, health_issue, request_date, preferred_time, request_status, created_at, updated_at) VALUES
-(2, 1, 1, '15/A Ballygunge Circular Road, Kolkata', 'Regular health checkup needed', '2026-07-05', '10:00 AM', 'completed', NOW() - INTERVAL '30 days', NOW() - INTERVAL '28 days'),
+(2, 1, 3, '15/A Ballygunge Circular Road, Kolkata', 'Need injection for vitamin deficiency', '2026-07-05', '10:00 AM', 'completed', NOW() - INTERVAL '30 days', NOW() - INTERVAL '28 days'),
 (3, 1, 3, '42 New Town Action Area I, Kolkata', 'Need insulin injection daily', '2026-07-06', '08:00 AM', 'completed', NOW() - INTERVAL '25 days', NOW() - INTERVAL '23 days'),
-(2, 2, 6, '15/A Ballygunge Circular Road, Kolkata', 'Elderly father needs daily monitoring', '2026-07-10', '09:00 AM', 'accepted', NOW() - INTERVAL '10 days', NOW() - INTERVAL '8 days'),
-(4, 1, 5, '7 Jadavpur University Campus Road, Kolkata', 'Post knee surgery care needed', '2026-07-08', '11:00 AM', 'in_progress', NOW() - INTERVAL '7 days', NOW() - INTERVAL '5 days'),
-(5, 2, 2, '33 Dum Dum Cantonment, Kolkata', 'Wound dressing after accident', '2026-07-12', '02:00 PM', 'pending', NOW() - INTERVAL '3 days', NOW() - INTERVAL '3 days'),
-(3, 3, 4, '42 New Town Action Area I, Kolkata', 'IV drip for dehydration', '2026-07-15', '06:00 PM', 'pending', NOW() - INTERVAL '1 day', NOW() - INTERVAL '1 day');
+(2, 2, 2, '15/A Ballygunge Circular Road, Kolkata', 'Elderly father needs daily monitoring', '2026-07-10', '09:00 AM', 'accepted', NOW() - INTERVAL '10 days', NOW() - INTERVAL '8 days'),
+(4, 1, 2, '7 Jadavpur University Campus Road, Kolkata', 'Post knee surgery home nursing needed', '2026-07-08', '11:00 AM', 'in_progress', NOW() - INTERVAL '7 days', NOW() - INTERVAL '5 days'),
+(5, 2, 1, '33 Dum Dum Cantonment, Kolkata', 'IV drip for dehydration after fever', '2026-07-12', '02:00 PM', 'pending', NOW() - INTERVAL '3 days', NOW() - INTERVAL '3 days'),
+(3, 3, 1, '42 New Town Action Area I, Kolkata', 'IV drip for weakness', '2026-07-15', '06:00 PM', 'pending', NOW() - INTERVAL '1 day', NOW() - INTERVAL '1 day');
 
 -- ═══════════════════════════════════════════════════════════════════
 -- PHARMACY REVIEWS
