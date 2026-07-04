@@ -51,30 +51,30 @@ ALTER SEQUENCE dev.password_resets_reset_id_seq RESTART WITH 1;
 -- USERS (1 admin, 5 customers)
 -- ═══════════════════════════════════════════════════════════════════
 INSERT INTO dev.users (username, email, password_hash, phone, role, status, is_active, created_at, updated_at) VALUES
-('admin_rahul', 'admin@medisync.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', '9876543210', 'admin', 'active', true, NOW() - INTERVAL '90 days', NOW()),
-('amit_sharma', 'amit@gmail.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', '9876543211', 'customer', 'active', true, NOW() - INTERVAL '60 days', NOW()),
-('priya_patel', 'priya@gmail.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', '9876543212', 'customer', 'active', true, NOW() - INTERVAL '45 days', NOW()),
-('sneha_das', 'sneha@gmail.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', '9876543213', 'customer', 'active', true, NOW() - INTERVAL '30 days', NOW()),
-('vikram_singh', 'vikram@gmail.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', '9876543214', 'customer', 'active', true, NOW() - INTERVAL '20 days', NOW()),
-('ritu_gupta', 'ritu@gmail.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', '9876543215', 'customer', 'blocked', false, NOW() - INTERVAL '15 days', NOW());
+('debjit', 'debjit@admin.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', '9876543210', 'admin', 'active', true, NOW() - INTERVAL '90 days', NOW()),
+('muskan', 'muskan@user.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', '9876543211', 'customer', 'active', true, NOW() - INTERVAL '60 days', NOW()),
+('aditya', 'aditya@user.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', '9876543212', 'customer', 'active', true, NOW() - INTERVAL '45 days', NOW()),
+('anubhab', 'anubhab@user.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', '9876543213', 'customer', 'active', true, NOW() - INTERVAL '30 days', NOW()),
+('abhijit', 'abhijit@user.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', '9876543214', 'customer', 'active', true, NOW() - INTERVAL '20 days', NOW()),
+('omkar', 'omkar@user.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', '9876543215', 'customer', 'blocked', false, NOW() - INTERVAL '15 days', NOW());
 
 -- ═══════════════════════════════════════════════════════════════════
 -- PHARMACIES (4 pharmacies: 2 approved, 1 pending, 1 rejected)
 -- ═══════════════════════════════════════════════════════════════════
 INSERT INTO dev.pharmacies (owner_name, email, password_hash, pharmacy_name, license_number, address, city, state, pincode, phone, latitude, longitude, approval_status, created_at, updated_at) VALUES
-('Rajesh Kumar', 'rajesh@medplus.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'MedPlus Pharmacy', 'PH-KOL-2024-001', '45 Park Street', 'Kolkata', 'West Bengal', '700016', '9800000001', 22.5170, 88.3630, 'approved', NOW() - INTERVAL '80 days', NOW()),
-('Anita Dey', 'anita@healthkart.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'HealthKart Pharmacy', 'PH-KOL-2024-002', '12 Salt Lake Sector V', 'Kolkata', 'West Bengal', '700091', '9800000002', 22.5726, 88.4313, 'approved', NOW() - INTERVAL '70 days', NOW()),
-('Suresh Mondal', 'suresh@apollo.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'Apollo Pharmacy Howrah', 'PH-HWH-2024-003', '78 GT Road', 'Howrah', 'West Bengal', '711101', '9800000003', 22.5958, 88.2636, 'pending', NOW() - INTERVAL '10 days', NOW()),
-('Deepak Jain', 'deepak@lifecare.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'LifeCare Medicals', 'PH-KOL-2024-004', '23 Gariahat Road', 'Kolkata', 'West Bengal', '700029', '9800000004', 22.5087, 88.3671, 'rejected', NOW() - INTERVAL '40 days', NOW());
+('Kaniska', 'kaniska@pharmacy.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'Kaniska MedPlus', 'PH-KOL-2024-001', '45 Park Street', 'Kolkata', 'West Bengal', '700016', '9800000001', 22.5170, 88.3630, 'approved', NOW() - INTERVAL '80 days', NOW()),
+('Subhajit', 'subhajit@pharmacy.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'Subhajit HealthKart', 'PH-KOL-2024-002', '12 Salt Lake Sector V', 'Kolkata', 'West Bengal', '700091', '9800000002', 22.5726, 88.4313, 'approved', NOW() - INTERVAL '70 days', NOW()),
+('Aditya', 'aditya@pharmacy.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'Aditya Apollo Pharmacy', 'PH-HWH-2024-003', '78 GT Road', 'Howrah', 'West Bengal', '711101', '9800000003', 22.5958, 88.2636, 'pending', NOW() - INTERVAL '10 days', NOW()),
+('Omkar', 'omkar@pharmacy.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'Omkar LifeCare', 'PH-KOL-2024-004', '23 Gariahat Road', 'Kolkata', 'West Bengal', '700029', '9800000004', 22.5087, 88.3671, 'rejected', NOW() - INTERVAL '40 days', NOW());
 
 -- ═══════════════════════════════════════════════════════════════════
 -- NURSES (4 nurses: 2 approved/online, 1 approved/offline, 1 pending)
 -- ═══════════════════════════════════════════════════════════════════
 INSERT INTO dev.nurses (full_name, email, password_hash, phone, qualification, license_number, specialization, availability_status, approval_status, created_at, updated_at) VALUES
-('Priya Sharma', 'priya.nurse@gmail.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', '9800100001', 'B.Sc Nursing', 'NR-WB-2024-001', 'General Care', 'online', 'approved', NOW() - INTERVAL '75 days', NOW()),
-('Anjali Roy', 'anjali.nurse@gmail.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', '9800100002', 'GNM', 'NR-WB-2024-002', 'Elder Care', 'online', 'approved', NOW() - INTERVAL '60 days', NOW()),
-('Meena Kumari', 'meena.nurse@gmail.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', '9800100003', 'B.Sc Nursing', 'NR-WB-2024-003', 'Post-Surgery Care', 'offline', 'approved', NOW() - INTERVAL '50 days', NOW()),
-('Kavita Sen', 'kavita.nurse@gmail.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', '9800100004', 'M.Sc Nursing', 'NR-WB-2024-004', 'Critical Care', 'offline', 'pending', NOW() - INTERVAL '5 days', NOW());
+('Muskan Sharma', 'muskan@nurse.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', '9800100001', 'B.Sc Nursing', 'NR-WB-2024-001', 'General Care', 'online', 'approved', NOW() - INTERVAL '75 days', NOW()),
+('Anubhab Roy', 'anubhab@nurse.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', '9800100002', 'GNM', 'NR-WB-2024-002', 'Elder Care', 'online', 'approved', NOW() - INTERVAL '60 days', NOW()),
+('Abhijit Das', 'abhijit@nurse.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', '9800100003', 'B.Sc Nursing', 'NR-WB-2024-003', 'Post-Surgery Care', 'offline', 'approved', NOW() - INTERVAL '50 days', NOW()),
+('Subhajit Sen', 'subhajit@nurse.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', '9800100004', 'M.Sc Nursing', 'NR-WB-2024-004', 'Critical Care', 'offline', 'pending', NOW() - INTERVAL '5 days', NOW());
 
 
 -- ═══════════════════════════════════════════════════════════════════
@@ -113,12 +113,9 @@ INSERT INTO dev.user_addresses (user_id, address_line, city, state, pincode, lat
 (4, '7 Jadavpur University Campus Road', 'Kolkata', 'West Bengal', '700032', 22.4966, 88.3715, true),
 (5, '33 Dum Dum Cantonment', 'Kolkata', 'West Bengal', '700028', 22.6400, 88.4200, true);
 
-
 -- ═══════════════════════════════════════════════════════════════════
--- MEDICINES (pharmacy_id 1 and 2 are approved, so they have stock)
+-- MEDICINES - Kaniska MedPlus (pharmacy_id: 1)
 -- ═══════════════════════════════════════════════════════════════════
-
--- MedPlus Pharmacy (ID: 1) medicines
 INSERT INTO dev.medicines (pharmacy_id, category_id, medicine_name, manufacturer, price, stock_quantity, expiry_date, description, created_at, updated_at) VALUES
 (1, 1, 'Amoxicillin 500mg', 'Cipla', 85.00, 150, '2027-06-15', 'Broad-spectrum antibiotic for bacterial infections', NOW() - INTERVAL '60 days', NOW()),
 (1, 1, 'Azithromycin 250mg', 'Sun Pharma', 120.00, 80, '2027-08-20', 'Macrolide antibiotic for respiratory infections', NOW() - INTERVAL '55 days', NOW()),
@@ -131,7 +128,9 @@ INSERT INTO dev.medicines (pharmacy_id, category_id, medicine_name, manufacturer
 (1, 7, 'Vitamin D3 1000IU', 'HealthVit', 180.00, 100, '2028-03-15', 'Vitamin D supplement for bone health', NOW() - INTERVAL '25 days', NOW()),
 (1, 5, 'Montelukast 10mg', 'Zydus', 95.00, 120, '2027-11-10', 'Leukotriene inhibitor for asthma', NOW() - INTERVAL '20 days', NOW());
 
--- HealthKart Pharmacy (ID: 2) medicines
+-- ═══════════════════════════════════════════════════════════════════
+-- MEDICINES - Subhajit HealthKart (pharmacy_id: 2)
+-- ═══════════════════════════════════════════════════════════════════
 INSERT INTO dev.medicines (pharmacy_id, category_id, medicine_name, manufacturer, price, stock_quantity, expiry_date, description, created_at, updated_at) VALUES
 (2, 1, 'Ciprofloxacin 500mg', 'Ranbaxy', 65.00, 100, '2027-05-20', 'Fluoroquinolone antibiotic', NOW() - INTERVAL '50 days', NOW()),
 (2, 2, 'Diclofenac 50mg', 'Novartis', 40.00, 220, '2027-09-10', 'NSAID for pain and inflammation', NOW() - INTERVAL '45 days', NOW()),
@@ -146,7 +145,7 @@ INSERT INTO dev.medicines (pharmacy_id, category_id, medicine_name, manufacturer
 
 
 -- ═══════════════════════════════════════════════════════════════════
--- NURSE REQUESTS (various statuses for testing)
+-- NURSE REQUESTS
 -- ═══════════════════════════════════════════════════════════════════
 INSERT INTO dev.nurse_requests (patient_id, nurse_id, service_id, address, health_issue, request_date, preferred_time, request_status, created_at, updated_at) VALUES
 (2, 1, 1, '15/A Ballygunge Circular Road, Kolkata', 'Regular health checkup needed', '2026-07-05', '10:00 AM', 'completed', NOW() - INTERVAL '30 days', NOW() - INTERVAL '28 days'),
@@ -172,38 +171,38 @@ INSERT INTO dev.pharmacy_reviews (user_id, pharmacy_id, rating, review_text, cre
 -- NURSE REVIEWS (only for completed requests)
 -- ═══════════════════════════════════════════════════════════════════
 INSERT INTO dev.nurse_reviews (user_id, nurse_id, request_id, rating, review_text, created_at) VALUES
-(2, 1, 1, 5, 'Priya is very professional and caring. Thorough checkup done.', NOW() - INTERVAL '27 days'),
+(2, 1, 1, 5, 'Muskan is very professional and caring. Thorough checkup done.', NOW() - INTERVAL '27 days'),
 (3, 1, 2, 4, 'Good service, punctual and gentle with injections.', NOW() - INTERVAL '22 days'),
-(4, 2, 3, 5, 'Anjali is amazing with elderly patients. Very patient and kind.', NOW() - INTERVAL '7 days');
+(4, 2, 3, 5, 'Anubhab is amazing with elderly patients. Very patient and kind.', NOW() - INTERVAL '7 days');
 
 -- ═══════════════════════════════════════════════════════════════════
 -- NOTIFICATIONS
 -- ═══════════════════════════════════════════════════════════════════
 INSERT INTO dev.notifications (user_id, type, title, message, is_read, created_at) VALUES
-(2, 'REQUEST_UPDATE', 'Nurse Request Accepted', 'Your nurse request #3 has been accepted by Anjali Roy.', false, NOW() - INTERVAL '8 days'),
+(2, 'REQUEST_UPDATE', 'Nurse Request Accepted', 'Your nurse request #3 has been accepted by Anubhab Roy.', false, NOW() - INTERVAL '8 days'),
 (2, 'SYSTEM', 'Welcome to MediSync', 'Thank you for joining MediSync! Explore medicines and book nurses.', true, NOW() - INTERVAL '60 days'),
 (2, 'REQUEST_UPDATE', 'Request Completed', 'Your nurse request #1 has been marked as completed.', true, NOW() - INTERVAL '28 days'),
 (3, 'REQUEST_UPDATE', 'Request Completed', 'Your nurse request #2 has been marked as completed.', true, NOW() - INTERVAL '23 days'),
-(3, 'SYSTEM', 'Rate Your Experience', 'Please rate your recent nurse visit with Priya Sharma.', false, NOW() - INTERVAL '22 days'),
-(4, 'REQUEST_UPDATE', 'Nurse Request In Progress', 'Priya Sharma is on the way for your post-surgery care.', false, NOW() - INTERVAL '5 days'),
+(3, 'SYSTEM', 'Rate Your Experience', 'Please rate your recent nurse visit with Muskan Sharma.', false, NOW() - INTERVAL '22 days'),
+(4, 'REQUEST_UPDATE', 'Nurse Request In Progress', 'Muskan Sharma is on the way for your post-surgery care.', false, NOW() - INTERVAL '5 days'),
 (5, 'REQUEST_UPDATE', 'Nurse Request Submitted', 'Your nurse request #5 has been submitted. Waiting for nurse confirmation.', false, NOW() - INTERVAL '3 days'),
-(1, 'ADMIN', 'New Pharmacy Registration', 'Apollo Pharmacy Howrah has submitted registration for approval.', false, NOW() - INTERVAL '10 days'),
-(1, 'ADMIN', 'New Nurse Registration', 'Kavita Sen has submitted nurse registration for approval.', false, NOW() - INTERVAL '5 days');
+(1, 'ADMIN', 'New Pharmacy Registration', 'Aditya Apollo Pharmacy has submitted registration for approval.', false, NOW() - INTERVAL '10 days'),
+(1, 'ADMIN', 'New Nurse Registration', 'Subhajit Sen has submitted nurse registration for approval.', false, NOW() - INTERVAL '5 days');
 
 -- ═══════════════════════════════════════════════════════════════════
 -- ADMIN ACTIVITY LOGS
 -- ═══════════════════════════════════════════════════════════════════
 INSERT INTO dev.admin_activity_logs (admin_id, action, entity_type, entity_id, details, created_at) VALUES
-(1, 'PHARMACY_APPROVED', 'Pharmacy', 1, 'Pharmacy MedPlus Pharmacy approved', NOW() - INTERVAL '79 days'),
-(1, 'PHARMACY_APPROVED', 'Pharmacy', 2, 'Pharmacy HealthKart Pharmacy approved', NOW() - INTERVAL '69 days'),
-(1, 'PHARMACY_REJECTED', 'Pharmacy', 4, 'Pharmacy LifeCare Medicals rejected - invalid license', NOW() - INTERVAL '38 days'),
-(1, 'NURSE_APPROVED', 'Nurse', 1, 'Nurse Priya Sharma approved', NOW() - INTERVAL '74 days'),
-(1, 'NURSE_APPROVED', 'Nurse', 2, 'Nurse Anjali Roy approved', NOW() - INTERVAL '59 days'),
-(1, 'NURSE_APPROVED', 'Nurse', 3, 'Nurse Meena Kumari approved', NOW() - INTERVAL '49 days'),
-(1, 'BLOCK_USER', 'User', 6, 'Blocked user ritu@gmail.com - suspicious activity', NOW() - INTERVAL '10 days');
+(1, 'PHARMACY_APPROVED', 'Pharmacy', 1, 'Pharmacy Kaniska MedPlus approved', NOW() - INTERVAL '79 days'),
+(1, 'PHARMACY_APPROVED', 'Pharmacy', 2, 'Pharmacy Subhajit HealthKart approved', NOW() - INTERVAL '69 days'),
+(1, 'PHARMACY_REJECTED', 'Pharmacy', 4, 'Pharmacy Omkar LifeCare rejected - invalid license', NOW() - INTERVAL '38 days'),
+(1, 'NURSE_APPROVED', 'Nurse', 1, 'Nurse Muskan Sharma approved', NOW() - INTERVAL '74 days'),
+(1, 'NURSE_APPROVED', 'Nurse', 2, 'Nurse Anubhab Roy approved', NOW() - INTERVAL '59 days'),
+(1, 'NURSE_APPROVED', 'Nurse', 3, 'Nurse Abhijit Das approved', NOW() - INTERVAL '49 days'),
+(1, 'BLOCK_USER', 'User', 6, 'Blocked user omkar@user.com - suspicious activity', NOW() - INTERVAL '10 days');
 
 -- ═══════════════════════════════════════════════════════════════════
--- INVENTORY LOGS (for tracking stock changes)
+-- INVENTORY LOGS
 -- ═══════════════════════════════════════════════════════════════════
 INSERT INTO dev.inventory_logs (medicine_id, action, quantity_change, stock_after, created_at) VALUES
 (1, 'add', 200, 150, NOW() - INTERVAL '60 days'),
@@ -216,24 +215,24 @@ INSERT INTO dev.inventory_logs (medicine_id, action, quantity_change, stock_afte
 -- DONE! Summary of test accounts:
 -- ═══════════════════════════════════════════════════════════════════
 -- 
--- ┌─────────────────────────────────────────────────────────────────┐
--- │ ROLE       │ EMAIL                    │ PASSWORD     │ NOTES    │
--- ├─────────────────────────────────────────────────────────────────┤
--- │ Admin      │ admin@medisync.com       │ password123  │          │
--- │ Customer   │ amit@gmail.com           │ password123  │          │
--- │ Customer   │ priya@gmail.com          │ password123  │          │
--- │ Customer   │ sneha@gmail.com          │ password123  │          │
--- │ Customer   │ vikram@gmail.com         │ password123  │          │
--- │ Customer   │ ritu@gmail.com           │ password123  │ BLOCKED  │
--- │ Pharmacy   │ rajesh@medplus.com       │ password123  │ APPROVED │
--- │ Pharmacy   │ anita@healthkart.com     │ password123  │ APPROVED │
--- │ Pharmacy   │ suresh@apollo.com        │ password123  │ PENDING  │
--- │ Pharmacy   │ deepak@lifecare.com      │ password123  │ REJECTED │
--- │ Nurse      │ priya.nurse@gmail.com    │ password123  │ ONLINE   │
--- │ Nurse      │ anjali.nurse@gmail.com   │ password123  │ ONLINE   │
--- │ Nurse      │ meena.nurse@gmail.com    │ password123  │ OFFLINE  │
--- │ Nurse      │ kavita.nurse@gmail.com   │ password123  │ PENDING  │
--- └─────────────────────────────────────────────────────────────────┘
+-- ┌──────────────────────────────────────────────────────────────────┐
+-- │ ROLE       │ EMAIL                    │ PASSWORD     │ NOTES     │
+-- ├──────────────────────────────────────────────────────────────────┤
+-- │ Admin      │ debjit@admin.com         │ password123  │           │
+-- │ Customer   │ muskan@user.com          │ password123  │           │
+-- │ Customer   │ aditya@user.com          │ password123  │           │
+-- │ Customer   │ anubhab@user.com         │ password123  │           │
+-- │ Customer   │ abhijit@user.com         │ password123  │           │
+-- │ Customer   │ omkar@user.com           │ password123  │ BLOCKED   │
+-- │ Pharmacy   │ kaniska@pharmacy.com     │ password123  │ APPROVED  │
+-- │ Pharmacy   │ subhajit@pharmacy.com    │ password123  │ APPROVED  │
+-- │ Pharmacy   │ aditya@pharmacy.com      │ password123  │ PENDING   │
+-- │ Pharmacy   │ omkar@pharmacy.com       │ password123  │ REJECTED  │
+-- │ Nurse      │ muskan@nurse.com         │ password123  │ ONLINE    │
+-- │ Nurse      │ anubhab@nurse.com        │ password123  │ ONLINE    │
+-- │ Nurse      │ abhijit@nurse.com        │ password123  │ OFFLINE   │
+-- │ Nurse      │ subhajit@nurse.com       │ password123  │ PENDING   │
+-- └──────────────────────────────────────────────────────────────────┘
 --
 -- All passwords: password123
 -- ═══════════════════════════════════════════════════════════════════
