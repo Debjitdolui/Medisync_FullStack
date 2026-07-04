@@ -14,23 +14,20 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ReviewServiceTest {
 
-    @Mock
-    private PharmacyReviewRepository pharmacyReviewRepository;
-    @Mock
-    private NurseReviewRepository nurseReviewRepository;
-    @Mock
-    private UserRepository userRepository;
-    @Mock
-    private PharmacyRepository pharmacyRepository;
-    @Mock
-    private NurseRepository nurseRepository;
-    @Mock
-    private NurseRequestRepository nurseRequestRepository;
+    @Mock private PharmacyReviewRepository pharmacyReviewRepository;
+    @Mock private NurseReviewRepository nurseReviewRepository;
+    @Mock private UserRepository userRepository;
+    @Mock private PharmacyRepository pharmacyRepository;
+    @Mock private NurseRepository nurseRepository;
+    @Mock private NurseRequestRepository nurseRequestRepository;
+    @Mock private NotificationService notificationService;
 
     @InjectMocks
     private ReviewService reviewService;
@@ -39,9 +36,12 @@ class ReviewServiceTest {
     void testAddPharmacyReview() {
         User user = new User();
         user.setUserId(1L);
+        user.setUsername("testuser");
 
         Pharmacy pharmacy = new Pharmacy();
         pharmacy.setPharmacyId(1L);
+        pharmacy.setPharmacyName("MediStore");
+        pharmacy.setEmail("pharmacy@mail.com");
 
         PharmacyReviewRequest req = new PharmacyReviewRequest();
         req.setPharmacyId(1L);
@@ -63,15 +63,18 @@ class ReviewServiceTest {
 
         assertEquals(5, result.getRating());
         verify(pharmacyReviewRepository).save(any(PharmacyReview.class));
+        verify(notificationService).notifyPharmacy(eq("pharmacy@mail.com"), anyString(), anyString(), anyString());
     }
 
     @Test
     void testAddNurseReview() {
         User user = new User();
         user.setUserId(1L);
+        user.setUsername("testuser");
 
         Nurse nurse = new Nurse();
         nurse.setNurseId(1L);
+        nurse.setEmail("nurse@mail.com");
 
         NurseRequest request = new NurseRequest();
         request.setRequestId(1L);
@@ -99,5 +102,6 @@ class ReviewServiceTest {
 
         assertEquals(4, result.getRating());
         verify(nurseReviewRepository).save(any(NurseReview.class));
+        verify(notificationService).notifyNurse(eq("nurse@mail.com"), anyString(), anyString(), anyString());
     }
 }

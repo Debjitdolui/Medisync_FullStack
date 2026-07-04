@@ -1,9 +1,7 @@
 package com.medisync.service;
 
 import com.medisync.entity.Notification;
-import com.medisync.entity.User;
 import com.medisync.repository.NotificationRepository;
-import com.medisync.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -23,30 +21,26 @@ class NotificationServiceTest {
 
     @Mock
     private NotificationRepository notificationRepository;
-    @Mock
-    private UserRepository userRepository;
 
     @InjectMocks
     private NotificationService notificationService;
 
     @Test
     void testGetUserNotifications() {
-        User user = new User();
-        user.setUserId(1L);
-        user.setEmail("user@mail.com");
-
         Notification n1 = new Notification();
         n1.setNotificationId(1L);
+        n1.setRecipientEmail("user@mail.com");
         Notification n2 = new Notification();
         n2.setNotificationId(2L);
+        n2.setRecipientEmail("user@mail.com");
 
-        when(userRepository.findByEmail("user@mail.com")).thenReturn(Optional.of(user));
-        when(notificationRepository.findByUserUserIdOrderByCreatedAtDesc(1L)).thenReturn(Arrays.asList(n1, n2));
+        when(notificationRepository.findByRecipientEmailOrderByCreatedAtDesc("user@mail.com"))
+                .thenReturn(Arrays.asList(n1, n2));
 
         List<Notification> result = notificationService.getUserNotifications("user@mail.com");
 
         assertEquals(2, result.size());
-        verify(notificationRepository).findByUserUserIdOrderByCreatedAtDesc(1L);
+        verify(notificationRepository).findByRecipientEmailOrderByCreatedAtDesc("user@mail.com");
     }
 
     @Test
@@ -61,6 +55,42 @@ class NotificationServiceTest {
         Notification result = notificationService.markAsRead(1L);
 
         assertTrue(result.getIsRead());
+        verify(notificationRepository).save(any(Notification.class));
+    }
+
+    @Test
+    void testMarkAllAsRead() {
+        Notification n1 = new Notification();
+        n1.setIsRead(false);
+        Notification n2 = new Notification();
+        n2.setIsRead(false);
+
+        when(notificationRepository.findByRecipientEmailAndIsReadFalse("user@mail.com"))
+                .thenReturn(Arrays.asList(n1, n2));
+
+        int count = notificationService.markAllAsRead("user@mail.com");
+
+        assertEquals(2, count);
+        assertTrue(n1.getIsRead());
+        assertTrue(n2.getIsRead());
+    }
+
+    @Test
+    void testCreateNotification() {
+        Notification saved = new Notification();
+        saved.setNotificationId(1L);
+        saved.setRecipientEmail("nurse@mail.com");
+        saved.setRecipientType("nurse");
+        saved.setType("NEW_REQUEST");
+        saved.setTitle("New Request");
+        saved.setMessage("You have a new request");
+
+        when(notificationRepository.save(any(Notification.class))).thenReturn(saved);
+
+        Notification result = notificationService.createNotification("nurse@mail.com", "nurse", "NEW_REQUEST", "New Request", "You have a new request");
+
+        assertEquals("nurse@mail.com", result.getRecipientEmail());
+        assertEquals("nurse", result.getRecipientType());
         verify(notificationRepository).save(any(Notification.class));
     }
 }

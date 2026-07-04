@@ -12,21 +12,18 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class AdminServiceTest {
 
-    @Mock
-    private UserRepository userRepository;
-    @Mock
-    private PharmacyRepository pharmacyRepository;
-    @Mock
-    private NurseRepository nurseRepository;
-    @Mock
-    private MedicineRepository medicineRepository;
-    @Mock
-    private AdminActivityLogRepository adminActivityLogRepository;
+    @Mock private UserRepository userRepository;
+    @Mock private PharmacyRepository pharmacyRepository;
+    @Mock private NurseRepository nurseRepository;
+    @Mock private MedicineRepository medicineRepository;
+    @Mock private AdminActivityLogRepository adminActivityLogRepository;
+    @Mock private NotificationService notificationService;
 
     @InjectMocks
     private AdminService adminService;
@@ -36,6 +33,7 @@ class AdminServiceTest {
         Pharmacy pharmacy = new Pharmacy();
         pharmacy.setPharmacyId(1L);
         pharmacy.setPharmacyName("MediStore");
+        pharmacy.setEmail("pharmacy@mail.com");
         pharmacy.setApprovalStatus("pending");
 
         User adminUser = new User();
@@ -50,6 +48,7 @@ class AdminServiceTest {
 
         assertEquals("approved", result.getApprovalStatus());
         verify(pharmacyRepository).save(pharmacy);
+        verify(notificationService).notifyPharmacy(eq("pharmacy@mail.com"), anyString(), anyString(), anyString());
     }
 
     @Test
@@ -73,6 +72,52 @@ class AdminServiceTest {
         assertEquals("blocked", result.getStatus());
         assertFalse(result.getIsActive());
         verify(userRepository).save(user);
+    }
+
+    @Test
+    void testBlockPharmacy() {
+        Pharmacy pharmacy = new Pharmacy();
+        pharmacy.setPharmacyId(1L);
+        pharmacy.setPharmacyName("MediStore");
+        pharmacy.setEmail("pharmacy@mail.com");
+        pharmacy.setIsBlocked(false);
+
+        User admin = new User();
+        admin.setUserId(1L);
+        admin.setEmail("admin@mail.com");
+
+        when(pharmacyRepository.findById(1L)).thenReturn(Optional.of(pharmacy));
+        when(userRepository.findByEmail("admin@mail.com")).thenReturn(Optional.of(admin));
+        when(adminActivityLogRepository.save(any(AdminActivityLog.class))).thenReturn(new AdminActivityLog());
+
+        Pharmacy result = adminService.blockPharmacy(1L, "admin@mail.com");
+
+        assertTrue(result.getIsBlocked());
+        verify(notificationService).notifyPharmacy(eq("pharmacy@mail.com"), anyString(), anyString(), anyString());
+    }
+
+    @Test
+    void testBlockNurse() {
+        Nurse nurse = new Nurse();
+        nurse.setNurseId(1L);
+        nurse.setFullName("Jane Doe");
+        nurse.setEmail("nurse@mail.com");
+        nurse.setIsBlocked(false);
+        nurse.setAvailabilityStatus("online");
+
+        User admin = new User();
+        admin.setUserId(1L);
+        admin.setEmail("admin@mail.com");
+
+        when(nurseRepository.findById(1L)).thenReturn(Optional.of(nurse));
+        when(userRepository.findByEmail("admin@mail.com")).thenReturn(Optional.of(admin));
+        when(adminActivityLogRepository.save(any(AdminActivityLog.class))).thenReturn(new AdminActivityLog());
+
+        Nurse result = adminService.blockNurse(1L, "admin@mail.com");
+
+        assertTrue(result.getIsBlocked());
+        assertEquals("offline", result.getAvailabilityStatus());
+        verify(notificationService).notifyNurse(eq("nurse@mail.com"), anyString(), anyString(), anyString());
     }
 
     @Test

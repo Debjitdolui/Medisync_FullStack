@@ -17,21 +17,18 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class NurseModuleServiceTest {
 
-    @Mock
-    private NurseRepository nurseRepository;
-    @Mock
-    private NurseServiceRepository nurseServiceRepository;
-    @Mock
-    private NurseRequestRepository nurseRequestRepository;
-    @Mock
-    private UserRepository userRepository;
-    @Mock
-    private PasswordEncoder passwordEncoder;
+    @Mock private NurseRepository nurseRepository;
+    @Mock private NurseServiceRepository nurseServiceRepository;
+    @Mock private NurseRequestRepository nurseRequestRepository;
+    @Mock private UserRepository userRepository;
+    @Mock private PasswordEncoder passwordEncoder;
+    @Mock private NotificationService notificationService;
 
     @InjectMocks
     private NurseModuleService nurseModuleService;
@@ -79,14 +76,16 @@ class NurseModuleServiceTest {
     void testCreateRequest_Success() {
         User user = new User();
         user.setUserId(1L);
+        user.setUsername("patient");
         user.setEmail("patient@mail.com");
 
         Nurse nurse = new Nurse();
         nurse.setNurseId(1L);
+        nurse.setEmail("nurse@mail.com");
 
         NurseService service = new NurseService();
         service.setServiceId(1L);
-        service.setServiceName("Home Care");
+        service.setServiceName("Home Nursing");
         service.setBasePrice(new BigDecimal("500"));
 
         NurseRequestDto dto = new NurseRequestDto();
@@ -113,13 +112,27 @@ class NurseModuleServiceTest {
         assertNotNull(result);
         assertEquals(1L, result.getRequestId());
         verify(nurseRequestRepository).save(any(NurseRequest.class));
+        verify(notificationService).notifyNurse(eq("nurse@mail.com"), anyString(), anyString(), anyString());
     }
 
     @Test
     void testUpdateRequestStatus() {
+        User patient = new User();
+        patient.setEmail("patient@mail.com");
+
+        Nurse nurse = new Nurse();
+        nurse.setFullName("Jane Doe");
+
+        NurseService service = new NurseService();
+        service.setServiceName("Home Nursing");
+
         NurseRequest request = new NurseRequest();
         request.setRequestId(1L);
         request.setRequestStatus("pending");
+        request.setPatient(patient);
+        request.setNurse(nurse);
+        request.setService(service);
+        request.setRequestDate(LocalDate.now());
 
         when(nurseRequestRepository.findById(1L)).thenReturn(Optional.of(request));
         when(nurseRequestRepository.save(any(NurseRequest.class))).thenReturn(request);
@@ -128,5 +141,6 @@ class NurseModuleServiceTest {
 
         assertEquals("accepted", result.getRequestStatus());
         verify(nurseRequestRepository).save(any(NurseRequest.class));
+        verify(notificationService).notifyUser(eq("patient@mail.com"), anyString(), anyString(), anyString());
     }
 }
