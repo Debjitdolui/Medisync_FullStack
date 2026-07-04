@@ -5,10 +5,36 @@
       <h1>Medicine Search</h1>
       <p>Find and compare medicines from nearby pharmacies</p>
     </div>
-    <div class="location-badge" (click)="detectLocation()">
-      <i class="ti ti-map-pin"></i>
-      <span>{{ userLocation }}</span>
-      <i class="ti ti-chevron-down"></i>
+    <div class="location-selector">
+      <div class="location-badge" (click)="toggleLocationDropdown()">
+        <i class="ti ti-map-pin"></i>
+        <span>{{ userLocation }}</span>
+        <i class="ti ti-chevron-down"></i>
+      </div>
+      <div class="location-dropdown" *ngIf="showLocationDropdown">
+        <div class="location-option gps-option" (click)="detectLocation()">
+          <i class="ti ti-current-location"></i>
+          <span>{{ isDetectingLocation ? 'Detecting...' : 'Use Current Location' }}</span>
+          <i class="ti ti-loader" *ngIf="isDetectingLocation"></i>
+        </div>
+        <div class="location-divider" *ngIf="savedAddresses.length > 0"></div>
+        <div class="location-section-label" *ngIf="savedAddresses.length > 0">Saved Addresses</div>
+        <div
+          *ngFor="let addr of savedAddresses"
+          class="location-option"
+          (click)="selectAddress(addr)">
+          <i class="ti ti-home"></i>
+          <div class="addr-details">
+            <span class="addr-line">{{ addr.addressLine }}</span>
+            <span class="addr-city">{{ addr.city }}, {{ addr.pincode }}</span>
+          </div>
+          <span class="default-badge" *ngIf="addr.isDefault">Default</span>
+        </div>
+        <div class="location-option no-addr" *ngIf="savedAddresses.length === 0">
+          <i class="ti ti-info-circle"></i>
+          <span>No saved addresses. Add from Profile.</span>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -156,7 +182,8 @@
                 </div>
                 <div>
                   <h4>{{ result.pharmacyName }}</h4>
-                  <span class="presc-distance"><i class="ti ti-map-pin"></i> {{ result.distanceKm }} km away</span>
+                  <span class="presc-distance" *ngIf="result.distanceKm > 0"><i class="ti ti-map-pin"></i> {{ result.distanceKm.toFixed(1) }} km away</span>
+                  <span class="presc-distance" *ngIf="result.distanceKm === 0"><i class="ti ti-map-pin"></i> Distance N/A</span>
                 </div>
               </div>
               <div class="presc-price">₹{{ result.totalPrice }}</div>
@@ -173,6 +200,14 @@
                   <i class="ti ti-circle-check"></i> All Available
                 </span>
               </div>
+            </div>
+            <div class="presc-actions">
+              <button class="btn-view-detail" (click)="openPharmacyDetailById(result.pharmacyId)">
+                <i class="ti ti-eye"></i> View Details
+              </button>
+              <a class="btn-directions" [href]="getDirectionsUrlById(result.pharmacyId)" target="_blank" (click)="$event.stopPropagation()">
+                <i class="ti ti-navigation"></i> Get Directions
+              </a>
             </div>
           </div>
         </div>
@@ -201,7 +236,7 @@
                 </div>
                 <p class="result-medicine">{{ medicine.medicineName }} — {{ medicine.manufacturer }}</p>
                 <div class="result-meta">
-                  <span class="meta-distance"><i class="ti ti-map-pin"></i> 1.2 km</span>
+                  <span class="meta-distance"><i class="ti ti-map-pin"></i> {{ getDistanceForMedicine(medicine) }}</span>
                   <span class="meta-stock in-stock" *ngIf="medicine.stockQuantity > 0">
                     <i class="ti ti-circle-check"></i> In Stock
                   </span>
@@ -241,6 +276,8 @@
     [pharmacy]="selectedPharmacy"
     [medicine]="selectedMedicine"
     [rating]="selectedPharmacyRating"
+    [userLatitude]="userLatitude"
+    [userLongitude]="userLongitude"
     (close)="closePharmacyDetail()">
   </app-pharmacy-detail>
 </div>

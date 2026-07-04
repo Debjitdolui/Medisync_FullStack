@@ -1,9 +1,9 @@
 package com.medisync.service;
 
-import com.medisync.dto.request.PrescriptionSearchRequest;
-import com.medisync.dto.response.PharmacySearchResult;
-import com.medisync.model.Medicine;
-import com.medisync.model.Pharmacy;
+import com.medisync.dto.PrescriptionSearchRequest;
+import com.medisync.dto.PharmacySearchResult;
+import com.medisync.entity.Medicine;
+import com.medisync.entity.Pharmacy;
 import com.medisync.repository.MedicineRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

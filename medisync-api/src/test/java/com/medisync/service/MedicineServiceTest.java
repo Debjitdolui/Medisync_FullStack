@@ -1,11 +1,11 @@
 package com.medisync.service;
 
-import com.medisync.dto.request.MedicineRequest;
-import com.medisync.dto.request.StockUpdateRequest;
-import com.medisync.model.InventoryLog;
-import com.medisync.model.Medicine;
-import com.medisync.model.MedicineCategory;
-import com.medisync.model.Pharmacy;
+import com.medisync.dto.MedicineRequest;
+import com.medisync.dto.StockUpdateRequest;
+import com.medisync.entity.InventoryLog;
+import com.medisync.entity.Medicine;
+import com.medisync.entity.MedicineCategory;
+import com.medisync.entity.Pharmacy;
 import com.medisync.repository.InventoryLogRepository;
 import com.medisync.repository.MedicineCategoryRepository;
 import com.medisync.repository.MedicineRepository;

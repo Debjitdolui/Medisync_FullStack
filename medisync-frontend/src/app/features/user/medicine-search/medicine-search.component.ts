@@ -4,7 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { SearchService } from '../../../core/services/search.service';
 import { MedicineService } from '../../../core/services/medicine.service';
-import { Medicine, Pharmacy, PrescriptionSearchResult } from '../../../core/models';
+import { PharmacyService } from '../../../core/services/pharmacy.service';
+import { AddressService } from '../../../core/services/address.service';
+import { Medicine, Pharmacy, PrescriptionSearchResult, UserAddress } from '../../../core/models';
 import { PharmacyDetailComponent } from './pharmacy-detail/pharmacy-detail.component';
 import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 
@@ -44,7 +46,13 @@ export class MedicineSearchComponent implements OnInit {
   inStockOnly = true;
 
   // Location
-  userLocation = 'Kolkata, WB';
+  userLocation = 'Select Location';
+  userLatitude: number | null = null;
+  userLongitude: number | null = null;
+  showLocationDropdown = false;
+  savedAddresses: UserAddress[] = [];
+  isDetectingLocation = false;
+  locationSource: 'gps' | 'address' | 'none' = 'none';
 
   // Recent searches
   recentSearches: string[] = [];
@@ -70,12 +78,15 @@ export class MedicineSearchComponent implements OnInit {
   constructor(
     private searchService: SearchService,
     private medicineService: MedicineService,
+    private pharmacyService: PharmacyService,
+    private addressService: AddressService,
     private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
     this.loadRecentSearches();
     this.loadMedicineNames();
+    this.loadSavedAddresses();
 
     // Check query param from dashboard search
     this.route.queryParams.subscribe(params => {
@@ -86,11 +97,64 @@ export class MedicineSearchComponent implements OnInit {
     });
   }
 
+  // ─── Location Logic ───────────────────────────────────────────────────────────
+
+  private loadSavedAddresses(): void {
+    this.addressService.getAddresses().subscribe(addresses => {
+      this.savedAddresses = addresses;
+      // Set default address as selected location
+      const defaultAddr = addresses.find(a => a.isDefault) || addresses[0];
+      if (defaultAddr && defaultAddr.latitude && defaultAddr.longitude) {
+        this.userLatitude = defaultAddr.latitude;
+        this.userLongitude = defaultAddr.longitude;
+        this.userLocation = `${defaultAddr.addressLine}, ${defaultAddr.city}`;
+        this.locationSource = 'address';
+      }
+    });
+  }
+
+  toggleLocationDropdown(): void {
+    this.showLocationDropdown = !this.showLocationDropdown;
+  }
+
+  selectAddress(address: UserAddress): void {
+    if (address.latitude && address.longitude) {
+      this.userLatitude = address.latitude;
+      this.userLongitude = address.longitude;
+      this.userLocation = `${address.addressLine}, ${address.city}`;
+      this.locationSource = 'address';
+    }
+    this.showLocationDropdown = false;
+  }
+
+  detectLocation(): void {
+    if (!navigator.geolocation) {
+      alert('Geolocation is not supported by your browser');
+      return;
+    }
+
+    this.isDetectingLocation = true;
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        this.userLatitude = position.coords.latitude;
+        this.userLongitude = position.coords.longitude;
+        this.userLocation = `Current Location (${position.coords.latitude.toFixed(4)}, ${position.coords.longitude.toFixed(4)})`;
+        this.locationSource = 'gps';
+        this.isDetectingLocation = false;
+        this.showLocationDropdown = false;
+      },
+      (error) => {
+        console.error('Location error:', error);
+        alert('Unable to get your location. Please select a saved address.');
+        this.isDetectingLocation = false;
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  }
+
   private loadMedicineNames(): void {
-    // Load all unique medicine names for autocomplete
     this.medicineService.getMedicinesByPharmacy(1).subscribe(page => {
       const names = new Set<string>();
-      // Add known medicines for suggestion
       names.add('Paracetamol 650mg');
       names.add('Paracetamol 500mg');
       names.add('Amoxicillin 250mg');
@@ -143,7 +207,6 @@ export class MedicineSearchComponent implements OnInit {
     if (this.filteredSuggestions.length > 0) {
       this.selectSuggestion(this.filteredSuggestions[0]);
     } else if (this.inputValue.trim()) {
-      // Add custom entry if no suggestion matched
       const val = this.inputValue.trim();
       if (!this.selectedMedicines.includes(val)) {
         this.selectedMedicines.push(val);
@@ -185,7 +248,6 @@ export class MedicineSearchComponent implements OnInit {
 
   onSearch(): void {
     if (this.selectedMedicines.length === 0 && this.inputValue.trim()) {
-      // Add the typed value as a tag first
       this.selectedMedicines.push(this.inputValue.trim());
       this.inputValue = '';
     }
@@ -209,8 +271,8 @@ export class MedicineSearchComponent implements OnInit {
       this.isPrescriptionSearch = true;
       this.searchService.searchPrescription({
         medicineNames: this.selectedMedicines,
-        latitude: 22.5726,
-        longitude: 88.3639,
+        latitude: this.userLatitude ?? undefined,
+        longitude: this.userLongitude ?? undefined,
         maxDistanceKm: this.distanceFilter ? +this.distanceFilter : undefined
       }).subscribe(results => {
         this.prescriptionResults = results;
@@ -224,17 +286,14 @@ export class MedicineSearchComponent implements OnInit {
   applyFilters(): void {
     let results = [...this.singleResults];
 
-    // Category filter
     if (this.categoryFilter) {
       results = results.filter(m => m.category.categoryName === this.categoryFilter);
     }
 
-    // In stock only
     if (this.inStockOnly) {
       results = results.filter(m => m.stockQuantity > 0);
     }
 
-    // Price filter
     if (this.priceMin) {
       results = results.filter(m => m.price >= +this.priceMin);
     }
@@ -242,7 +301,6 @@ export class MedicineSearchComponent implements OnInit {
       results = results.filter(m => m.price <= +this.priceMax);
     }
 
-    // Sort
     switch (this.sortBy) {
       case 'price-low':
         results.sort((a, b) => a.price - b.price);
@@ -290,28 +348,74 @@ export class MedicineSearchComponent implements OnInit {
     return { average: 0, total: 0 };
   }
 
-  detectLocation(): void {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        () => { this.userLocation = 'Kolkata, WB (Detected)'; },
-        () => { this.userLocation = 'Kolkata, WB'; }
+  getDistanceForMedicine(medicine: Medicine): string {
+    if (this.userLatitude && this.userLongitude && medicine.pharmacy.latitude && medicine.pharmacy.longitude) {
+      const dist = this.calculateDistance(
+        this.userLatitude, this.userLongitude,
+        medicine.pharmacy.latitude, medicine.pharmacy.longitude
       );
+      return dist.toFixed(1) + ' km';
     }
+    return '--';
   }
 
-  // Pharmacy Detail Modal
+  private calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+    const R = 6371;
+    const dLat = this.toRad(lat2 - lat1);
+    const dLon = this.toRad(lon2 - lon1);
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+      + Math.cos(this.toRad(lat1)) * Math.cos(this.toRad(lat2))
+      * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
+
+  private toRad(deg: number): number {
+    return deg * (Math.PI / 180);
+  }
+
+  getDirectionsUrl(pharmacy: Pharmacy): string {
+    const destLat = pharmacy.latitude || 0;
+    const destLng = pharmacy.longitude || 0;
+    if (this.userLatitude && this.userLongitude) {
+      return `https://www.google.com/maps/dir/?api=1&origin=${this.userLatitude},${this.userLongitude}&destination=${destLat},${destLng}`;
+    }
+    return `https://www.google.com/maps/dir/?api=1&destination=${destLat},${destLng}`;
+  }
+
+  getDirectionsUrlById(pharmacyId: number): string {
+    // When pharmacy detail is opened, we'll get the full pharmacy data
+    // For now, use Google Maps search with pharmacy name from results
+    const result = this.prescriptionResults.find(r => r.pharmacyId === pharmacyId);
+    if (result && this.userLatitude && this.userLongitude) {
+      return `https://www.google.com/maps/dir/?api=1&origin=${this.userLatitude},${this.userLongitude}&destination=${encodeURIComponent(result.pharmacyName)}`;
+    }
+    if (result) {
+      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(result.pharmacyName)}`;
+    }
+    return '#';
+  }
+
+  // ─── Pharmacy Detail Modal ────────────────────────────────────────────────────
+
   showPharmacyDetail = false;
   selectedPharmacy: Pharmacy | null = null;
   selectedMedicine: Medicine | null = null;
   selectedPharmacyRating: { average: number; total: number } = { average: 0, total: 0 };
-
-  // ─── Pharmacy Detail ────────────────────────────────────────────────────────
 
   openPharmacyDetail(medicine: Medicine): void {
     this.selectedPharmacy = medicine.pharmacy;
     this.selectedMedicine = medicine;
     this.selectedPharmacyRating = this.getPharmacyRating(medicine.pharmacy.pharmacyId);
     this.showPharmacyDetail = true;
+  }
+
+  openPharmacyDetailById(pharmacyId: number): void {
+    this.pharmacyService.getPharmacyById(pharmacyId).subscribe(pharmacy => {
+      this.selectedPharmacy = pharmacy;
+      this.selectedMedicine = null;
+      this.selectedPharmacyRating = this.getPharmacyRating(pharmacyId);
+      this.showPharmacyDetail = true;
+    });
   }
 
   closePharmacyDetail(): void {

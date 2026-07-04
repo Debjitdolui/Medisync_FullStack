@@ -14,6 +14,8 @@ export class PharmacyDetailComponent implements AfterViewInit, OnDestroy {
   @Input() pharmacy!: Pharmacy;
   @Input() medicine: Medicine | null = null;
   @Input() rating: { average: number; total: number } = { average: 0, total: 0 };
+  @Input() userLatitude: number | null = null;
+  @Input() userLongitude: number | null = null;
   @Output() close = new EventEmitter<void>();
 
   mapId = 'pharmacy-map-' + Math.random().toString(36).substring(2, 9);
@@ -95,6 +97,9 @@ export class PharmacyDetailComponent implements AfterViewInit, OnDestroy {
   getDirectionsUrl(): string {
     const lat = this.pharmacy.latitude || 22.5726;
     const lng = this.pharmacy.longitude || 88.3639;
+    if (this.userLatitude && this.userLongitude) {
+      return `https://www.google.com/maps/dir/?api=1&origin=${this.userLatitude},${this.userLongitude}&destination=${lat},${lng}`;
+    }
     return `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
   }
 
