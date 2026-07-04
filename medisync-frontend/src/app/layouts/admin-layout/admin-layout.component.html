@@ -1,32 +1,78 @@
 <div class="admin-wrapper">
-  <app-admin-sidebar [role]="role" [userName]="userName" [isOpen]="sidebarOpen"></app-admin-sidebar>
-  <div class="sidebar-overlay" [class.visible]="sidebarOpen" (click)="sidebarOpen = false"></div>
-
-  <div class="admin-main">
-    <header class="admin-topbar">
-      <div class="topbar-left">
-        <button class="menu-toggle" (click)="sidebarOpen = !sidebarOpen">
-          <i class="ti ti-menu-2"></i>
-        </button>
-        <span class="topbar-date">{{ getCurrentDate() }}</span>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">
+        <i class="ti ti-heartbeat"></i>
       </div>
-      <div class="topbar-right">
-        <button class="topbar-icon-btn" (click)="toggleNotifications()">
-          <i class="ti ti-bell"></i>
-          <span class="notif-dot" *ngIf="unreadCount > 0"></span>
-        </button>
-        <div class="admin-chip">
-          <i class="ti ti-user-circle"></i>
-          <span>{{ userName }}</span>
+      <div>
+        <span class="logo-name">MediSync</span>
+        <span class="logo-tag">{{ roleLabel }}</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a *ngFor="let item of navItems"
+         [routerLink]="item.route"
+         routerLinkActive="active"
+         class="nav-item">
+        <i class="ti {{item.icon}}"></i>
+        <span>{{item.label}}</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-row">
+        <div class="avatar">{{userName.charAt(0).toUpperCase()}}</div>
+        <div>
+          <div class="u-name">{{userName}}</div>
+          <div class="u-role">{{roleLabel}}</div>
         </div>
       </div>
+      <button class="logout-btn" (click)="logout()">
+        <i class="ti ti-logout"></i>
+        <span>Log Out</span>
+      </button>
+    </div>
+  </aside>
 
-      <div class="notif-panel-wrapper" *ngIf="showNotifications">
-        <app-notification-panel (close)="showNotifications = false"></app-notification-panel>
+  <!-- Main Area -->
+  <div class="main-area">
+    <header class="topbar">
+      <span class="topbar-date">{{today}}</span>
+      <div class="topbar-actions">
+        <!-- Notification Bell (visible for nurse and pharmacy only) -->
+        <div class="notification-wrapper" *ngIf="role !== 'admin'">
+          <button class="notif-bell-btn" (click)="toggleNotifications()">
+            <i class="ti ti-bell"></i>
+            <span class="notif-badge" *ngIf="unreadCount > 0">{{unreadCount}}</span>
+          </button>
+          <div class="notif-panel-wrapper" *ngIf="showNotifications">
+            <app-notification-panel (close)="showNotifications = false"></app-notification-panel>
+          </div>
+        </div>
+
+        <!-- Profile Dropdown -->
+        <div class="profile-area">
+          <div class="topbar-user" (click)="toggleProfileMenu()">
+            <i class="ti ti-user-circle"></i>
+            <span>{{userName}}</span>
+            <i class="ti ti-chevron-down chevron"></i>
+          </div>
+          <div class="profile-dropdown" *ngIf="showProfileMenu">
+            <a class="dropdown-item" [routerLink]="getSettingsRoute()" (click)="showProfileMenu = false">
+              <i class="ti ti-settings"></i> Settings
+            </a>
+            <div class="dropdown-divider"></div>
+            <button class="dropdown-item danger" (click)="logout()">
+              <i class="ti ti-logout"></i> Logout
+            </button>
+          </div>
+        </div>
       </div>
     </header>
 
-    <main class="admin-content">
+    <main class="content-area">
       <router-outlet></router-outlet>
     </main>
   </div>
