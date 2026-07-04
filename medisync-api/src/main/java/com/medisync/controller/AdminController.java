@@ -1,7 +1,10 @@
 package com.medisync.controller;
 
+import com.medisync.entity.*;
 import com.medisync.service.AdminService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -14,13 +17,13 @@ public class AdminController {
     private final AdminService adminService;
 
     @GetMapping("/pharmacies")
-    public ResponseEntity<?> getAllPharmacies() {
-        return ResponseEntity.ok(adminService.getAllPharmacies());
+    public ResponseEntity<Page<Pharmacy>> getAllPharmacies(Pageable pageable) {
+        return ResponseEntity.ok(adminService.getAllPharmacies(pageable));
     }
 
     @GetMapping("/nurses")
-    public ResponseEntity<?> getAllNurses() {
-        return ResponseEntity.ok(adminService.getAllNurses());
+    public ResponseEntity<Page<Nurse>> getAllNurses(Pageable pageable) {
+        return ResponseEntity.ok(adminService.getAllNurses(pageable));
     }
 
     @PutMapping("/pharmacies/{id}/approve")
@@ -34,8 +37,8 @@ public class AdminController {
     }
 
     @GetMapping("/users")
-    public ResponseEntity<?> getAllUsers() {
-        return ResponseEntity.ok(adminService.getAllUsers());
+    public ResponseEntity<Page<User>> getAllUsers(Pageable pageable) {
+        return ResponseEntity.ok(adminService.getAllUsers(pageable));
     }
 
     @PutMapping("/users/{id}/block")
@@ -54,8 +57,8 @@ public class AdminController {
     }
 
     @GetMapping("/logs")
-    public ResponseEntity<?> getLogs() {
-        return ResponseEntity.ok(adminService.getLogs());
+    public ResponseEntity<Page<AdminActivityLog>> getLogs(Pageable pageable) {
+        return ResponseEntity.ok(adminService.getLogs(pageable));
     }
 
     @GetMapping("/reports")

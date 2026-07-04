@@ -73,9 +73,16 @@ export class NurseDashboardComponent implements OnInit {
   }
 
   private loadRating(): void {
-    const rating = this.reviewService.getNurseRating(this.nurseId);
-    this.averageRating = rating.average.toFixed(1);
-    this.totalReviews = rating.total;
+    this.reviewService.getNurseReviews(this.nurseId).subscribe(page => {
+      const reviews = page.content;
+      this.totalReviews = page.totalElements;
+      if (reviews.length > 0) {
+        const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
+        this.averageRating = (sum / reviews.length).toFixed(1);
+      } else {
+        this.averageRating = '0.0';
+      }
+    });
   }
 
   toggleStatus(): void {

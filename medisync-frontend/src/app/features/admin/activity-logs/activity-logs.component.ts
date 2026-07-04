@@ -22,7 +22,7 @@ export class ActivityLogsComponent implements OnInit {
   constructor(private adminService: AdminService) {}
 
   ngOnInit(): void {
-    this.adminService.getLogs().subscribe(data => { this.logs = data; });
+    this.adminService.getLogs().subscribe(page => { this.logs = page.content; });
   }
 
   get filteredLogs(): AdminActivityLog[] {

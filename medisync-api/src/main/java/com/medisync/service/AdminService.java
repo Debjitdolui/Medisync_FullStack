@@ -3,6 +3,8 @@ package com.medisync.service;
 import com.medisync.entity.*;
 import com.medisync.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -21,8 +23,16 @@ public class AdminService {
         return pharmacyRepository.findAll();
     }
 
+    public Page<Pharmacy> getAllPharmacies(Pageable pageable) {
+        return pharmacyRepository.findAll(pageable);
+    }
+
     public List<Nurse> getAllNurses() {
         return nurseRepository.findAll();
+    }
+
+    public Page<Nurse> getAllNurses(Pageable pageable) {
+        return nurseRepository.findAll(pageable);
     }
 
     public Pharmacy approvePharmacy(Long pharmacyId, String status, String adminEmail) {
@@ -45,6 +55,10 @@ public class AdminService {
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
+    }
+
+    public Page<User> getAllUsers(Pageable pageable) {
+        return userRepository.findAll(pageable);
     }
 
     public User blockUser(Long userId, String adminEmail) {
@@ -80,6 +94,10 @@ public class AdminService {
 
     public List<AdminActivityLog> getLogs() {
         return adminActivityLogRepository.findAllByOrderByCreatedAtDesc();
+    }
+
+    public Page<AdminActivityLog> getLogs(Pageable pageable) {
+        return adminActivityLogRepository.findAllByOrderByCreatedAtDesc(pageable);
     }
 
     public Map<String, Object> getReports() {

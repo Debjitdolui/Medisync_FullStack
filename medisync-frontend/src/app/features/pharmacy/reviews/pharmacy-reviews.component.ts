@@ -46,15 +46,20 @@ export class PharmacyReviewsComponent implements OnInit {
     this.pharmacyService.getDashboard().subscribe(dashboard => {
       this.pharmacyId = dashboard.pharmacy.pharmacyId;
 
-      // Load rating summary
-      const rating = this.reviewService.getPharmacyRating(this.pharmacyId);
-      this.averageRating = rating.average.toFixed(1);
-      this.totalReviews = rating.total;
-
       // Load reviews
-      this.reviewService.getPharmacyReviews(this.pharmacyId).subscribe(reviews => {
-        this.reviews = reviews;
-        this.calculateBreakdown(reviews);
+      this.reviewService.getPharmacyReviews(this.pharmacyId).subscribe(page => {
+        this.reviews = page.content;
+        this.totalReviews = page.totalElements;
+
+        // Compute average rating from reviews
+        if (this.reviews.length > 0) {
+          const sum = this.reviews.reduce((acc, r) => acc + r.rating, 0);
+          this.averageRating = (sum / this.reviews.length).toFixed(1);
+        } else {
+          this.averageRating = '0.0';
+        }
+
+        this.calculateBreakdown(this.reviews);
       });
     });
   }

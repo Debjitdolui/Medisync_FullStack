@@ -19,7 +19,7 @@ export class AdminDashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.adminService.getDashboard().subscribe(data => { this.dashboard = data; });
-    this.adminService.getLogs().subscribe(logs => { this.recentLogs = logs.slice(0, 5); });
+    this.adminService.getLogs().subscribe(page => { this.recentLogs = page.content.slice(0, 5); });
   }
 
   getLogIcon(action: string): string {

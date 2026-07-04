@@ -5,6 +5,8 @@ import com.medisync.dto.PharmacyReviewRequest;
 import com.medisync.entity.*;
 import com.medisync.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -35,6 +37,10 @@ public class ReviewService {
         return pharmacyReviewRepository.findByPharmacyPharmacyId(pharmacyId);
     }
 
+    public Page<PharmacyReview> getPharmacyReviews(Long pharmacyId, Pageable pageable) {
+        return pharmacyReviewRepository.findByPharmacyPharmacyId(pharmacyId, pageable);
+    }
+
     public NurseReview addNurseReview(String userEmail, NurseReviewRequest req) {
         User user = userRepository.findByEmail(userEmail).orElseThrow(() -> new RuntimeException("User not found"));
         Nurse nurse = nurseRepository.findById(req.getNurseId()).orElseThrow(() -> new RuntimeException("Nurse not found"));
@@ -50,5 +56,9 @@ public class ReviewService {
 
     public List<NurseReview> getNurseReviews(Long nurseId) {
         return nurseReviewRepository.findByNurseNurseId(nurseId);
+    }
+
+    public Page<NurseReview> getNurseReviews(Long nurseId, Pageable pageable) {
+        return nurseReviewRepository.findByNurseNurseId(nurseId, pageable);
     }
 }

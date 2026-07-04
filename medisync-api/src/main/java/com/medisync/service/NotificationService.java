@@ -5,6 +5,8 @@ import com.medisync.entity.User;
 import com.medisync.repository.NotificationRepository;
 import com.medisync.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,6 +22,12 @@ public class NotificationService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         return notificationRepository.findByUserUserIdOrderByCreatedAtDesc(user.getUserId());
+    }
+
+    public Page<Notification> getUserNotifications(String email, Pageable pageable) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return notificationRepository.findByUserUserIdOrderByCreatedAtDesc(user.getUserId(), pageable);
     }
 
     public Notification markAsRead(Long notificationId) {

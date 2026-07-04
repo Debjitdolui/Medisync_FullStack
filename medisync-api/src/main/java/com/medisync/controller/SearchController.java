@@ -5,6 +5,7 @@ import com.medisync.service.MedicineService;
 import com.medisync.service.PrescriptionSearchService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,7 +23,7 @@ public class SearchController {
     }
 
     @GetMapping("/medicines")
-    public ResponseEntity<?> searchByName(@RequestParam String name) {
-        return ResponseEntity.ok(medicineService.searchByName(name));
+    public ResponseEntity<?> searchByName(@RequestParam String name, Pageable pageable) {
+        return ResponseEntity.ok(medicineService.searchByName(name, pageable));
     }
 }

@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { SearchService } from '../../../core/services/search.service';
-import { ReviewService } from '../../../core/services/review.service';
 import { MedicineService } from '../../../core/services/medicine.service';
 import { Medicine, Pharmacy, PrescriptionSearchResult } from '../../../core/models';
 import { PharmacyDetailComponent } from './pharmacy-detail/pharmacy-detail.component';
@@ -70,7 +69,6 @@ export class MedicineSearchComponent implements OnInit {
 
   constructor(
     private searchService: SearchService,
-    private reviewService: ReviewService,
     private medicineService: MedicineService,
     private route: ActivatedRoute
   ) {}
@@ -90,7 +88,7 @@ export class MedicineSearchComponent implements OnInit {
 
   private loadMedicineNames(): void {
     // Load all unique medicine names for autocomplete
-    this.medicineService.getMedicinesByPharmacy(1).subscribe(meds => {
+    this.medicineService.getMedicinesByPharmacy(1).subscribe(page => {
       const names = new Set<string>();
       // Add known medicines for suggestion
       names.add('Paracetamol 650mg');
@@ -107,7 +105,7 @@ export class MedicineSearchComponent implements OnInit {
       names.add('Betadine Ointment');
       names.add('Crocin Advance');
       names.add('Vitamin D3 60K');
-      meds.forEach(m => names.add(m.medicineName));
+      page.content.forEach(m => names.add(m.medicineName));
       this.allMedicineNames = Array.from(names).sort();
     });
   }
@@ -201,8 +199,8 @@ export class MedicineSearchComponent implements OnInit {
     if (this.selectedMedicines.length === 1) {
       // Single medicine search
       this.isPrescriptionSearch = false;
-      this.searchService.searchMedicinesByName(this.selectedMedicines[0]).subscribe(results => {
-        this.singleResults = results;
+      this.searchService.searchMedicinesByName(this.selectedMedicines[0]).subscribe(page => {
+        this.singleResults = page.content;
         this.applyFilters();
         this.isLoading = false;
       });
@@ -254,8 +252,8 @@ export class MedicineSearchComponent implements OnInit {
         break;
       case 'rating':
         results.sort((a, b) => {
-          const rA = this.reviewService.getPharmacyRating(a.pharmacy.pharmacyId).average;
-          const rB = this.reviewService.getPharmacyRating(b.pharmacy.pharmacyId).average;
+          const rA = this.getPharmacyRating(a.pharmacy.pharmacyId).average;
+          const rB = this.getPharmacyRating(b.pharmacy.pharmacyId).average;
           return rB - rA;
         });
         break;
@@ -289,7 +287,7 @@ export class MedicineSearchComponent implements OnInit {
   }
 
   getPharmacyRating(pharmacyId: number): { average: number; total: number } {
-    return this.reviewService.getPharmacyRating(pharmacyId);
+    return { average: 0, total: 0 };
   }
 
   detectLocation(): void {

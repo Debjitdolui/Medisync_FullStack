@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NurseApiService } from '../../../core/services/nurse.service';
 import { AdminService } from '../../../core/services/admin.service';
 import { Nurse } from '../../../core/models';
 import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
@@ -19,12 +18,12 @@ export class NurseApprovalsComponent implements OnInit {
   currentPage = 1;
   pageSize = 10;
 
-  constructor(private nurseService: NurseApiService, private adminService: AdminService) {}
+  constructor(private adminService: AdminService) {}
 
   ngOnInit(): void { this.loadNurses(); }
 
   loadNurses(): void {
-    this.nurseService.getAllNurses().subscribe(data => { this.nurses = data; });
+    this.adminService.getAllNurses().subscribe(page => { this.nurses = page.content; });
   }
 
   get filteredNurses(): Nurse[] {

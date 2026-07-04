@@ -2,6 +2,7 @@ package com.medisync.controller;
 
 import com.medisync.service.NotificationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -16,9 +17,9 @@ public class NotificationController {
     private final NotificationService notificationService;
 
     @GetMapping
-    public ResponseEntity<?> getUserNotifications(Authentication auth) {
+    public ResponseEntity<?> getUserNotifications(Authentication auth, Pageable pageable) {
         String email = auth.getName();
-        return ResponseEntity.ok(notificationService.getUserNotifications(email));
+        return ResponseEntity.ok(notificationService.getUserNotifications(email, pageable));
     }
 
     @PutMapping("/{id}/read")

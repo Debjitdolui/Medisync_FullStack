@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NurseApiService } from '../../../core/services/nurse.service';
 import { NurseRequestService } from '../../../core/services/nurse-request.service';
-import { ReviewService } from '../../../core/services/review.service';
 import { Nurse, NurseService } from '../../../core/models';
 
 @Component({
@@ -39,8 +38,7 @@ export class NurseBookingComponent implements OnInit {
 
   constructor(
     private nurseService: NurseApiService,
-    private nurseRequestService: NurseRequestService,
-    private reviewService: ReviewService
+    private nurseRequestService: NurseRequestService
   ) {}
 
   ngOnInit(): void {
@@ -94,7 +92,7 @@ export class NurseBookingComponent implements OnInit {
   }
 
   getNurseRating(nurseId: number): { average: number; total: number } {
-    return this.reviewService.getNurseRating(nurseId);
+    return { average: 0, total: 0 };
   }
 
   getDistance(nurseId: number): string {

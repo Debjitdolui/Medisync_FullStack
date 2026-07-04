@@ -55,13 +55,21 @@ export class PharmacyDashboardComponent implements OnInit {
       this.pharmacyName = dashboard.pharmacy.pharmacyName;
       this.pharmacyId = dashboard.pharmacy.pharmacyId;
 
-      // Load rating
-      const rating = this.reviewService.getPharmacyRating(this.pharmacyId);
-      this.averageRating = rating.average.toFixed(1);
-      this.totalReviews = rating.total;
+      // Load rating from reviews
+      this.reviewService.getPharmacyReviews(this.pharmacyId).subscribe(page => {
+        const reviews = page.content;
+        this.totalReviews = page.totalElements;
+        if (reviews.length > 0) {
+          const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
+          this.averageRating = (sum / reviews.length).toFixed(1);
+        } else {
+          this.averageRating = '0.0';
+        }
+      });
 
-      this.medicineService.getMedicinesByPharmacy(this.pharmacyId).subscribe(medicines => {
-        this.totalMedicines = medicines.length;
+      this.medicineService.getMedicinesByPharmacy(this.pharmacyId).subscribe(page => {
+        const medicines = page.content;
+        this.totalMedicines = page.totalElements;
         this.totalStock = medicines.reduce((sum, m) => sum + m.stockQuantity, 0);
 
         const lowStock = medicines.filter(m => m.stockQuantity < 10);

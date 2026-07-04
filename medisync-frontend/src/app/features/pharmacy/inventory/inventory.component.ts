@@ -79,9 +79,9 @@ export class InventoryComponent implements OnInit {
       this.pharmacyId = dashboard.pharmacy.pharmacyId;
       this.medicineForm.pharmacyId = this.pharmacyId;
 
-      this.medicineService.getMedicinesByPharmacy(this.pharmacyId).subscribe(meds => {
-        this.medicines = meds;
-        this.filteredMedicines = [...meds];
+      this.medicineService.getMedicinesByPharmacy(this.pharmacyId).subscribe(page => {
+        this.medicines = page.content;
+        this.filteredMedicines = [...page.content];
       });
     });
 

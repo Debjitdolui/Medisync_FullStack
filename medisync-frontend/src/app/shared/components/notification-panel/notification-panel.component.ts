@@ -21,8 +21,8 @@ export class NotificationPanelComponent implements OnInit {
   }
 
   loadNotifications(): void {
-    this.notificationService.getNotifications().subscribe(data => {
-      this.notifications = data.slice(0, 5);
+    this.notificationService.getNotifications().subscribe(page => {
+      this.notifications = page.content.slice(0, 5);
     });
   }
 

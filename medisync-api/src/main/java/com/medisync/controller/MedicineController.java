@@ -5,6 +5,7 @@ import com.medisync.dto.StockUpdateRequest;
 import com.medisync.service.MedicineService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,8 +33,8 @@ public class MedicineController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getByPharmacy(@RequestParam Long pharmacyId) {
-        return ResponseEntity.ok(medicineService.getByPharmacy(pharmacyId));
+    public ResponseEntity<?> getByPharmacy(@RequestParam Long pharmacyId, Pageable pageable) {
+        return ResponseEntity.ok(medicineService.getByPharmacy(pharmacyId, pageable));
     }
 
     @PutMapping("/{id}/stock")

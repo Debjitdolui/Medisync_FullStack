@@ -1,10 +1,13 @@
 package com.medisync.repository;
 
 import com.medisync.entity.Notification;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
     List<Notification> findByUserUserIdOrderByCreatedAtDesc(Long userId);
+    Page<Notification> findByUserUserIdOrderByCreatedAtDesc(Long userId, Pageable pageable);
     List<Notification> findByUserUserIdAndIsReadFalse(Long userId);
 }

@@ -73,8 +73,8 @@ export class FeedbackRatingComponent implements OnInit {
   // Pharmacy selection
   onPharmacySelected(): void {
     if (this.selectedPharmacyId) {
-      this.reviewService.getPharmacyReviews(this.selectedPharmacyId).subscribe(reviews => {
-        this.recentReviews = reviews.slice(0, this.showAllReviews ? 20 : 3);
+      this.reviewService.getPharmacyReviews(this.selectedPharmacyId).subscribe(page => {
+        this.recentReviews = page.content.slice(0, this.showAllReviews ? 20 : 3);
       });
     }
   }

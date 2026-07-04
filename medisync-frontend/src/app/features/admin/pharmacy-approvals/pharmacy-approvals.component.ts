@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { PharmacyService } from '../../../core/services/pharmacy.service';
 import { AdminService } from '../../../core/services/admin.service';
 import { Pharmacy } from '../../../core/models';
 import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
@@ -19,12 +18,12 @@ export class PharmacyApprovalsComponent implements OnInit {
   currentPage = 1;
   pageSize = 10;
 
-  constructor(private pharmacyService: PharmacyService, private adminService: AdminService) {}
+  constructor(private adminService: AdminService) {}
 
   ngOnInit(): void { this.loadPharmacies(); }
 
   loadPharmacies(): void {
-    this.pharmacyService.getAllPharmacies().subscribe(data => { this.pharmacies = data; });
+    this.adminService.getAllPharmacies().subscribe(page => { this.pharmacies = page.content; });
   }
 
   get filteredPharmacies(): Pharmacy[] {

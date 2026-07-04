@@ -5,6 +5,8 @@ import com.medisync.dto.StockUpdateRequest;
 import com.medisync.entity.*;
 import com.medisync.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
@@ -58,6 +60,10 @@ public class MedicineService {
         return medicineRepository.findByPharmacyPharmacyId(pharmacyId);
     }
 
+    public Page<Medicine> getByPharmacy(Long pharmacyId, Pageable pageable) {
+        return medicineRepository.findByPharmacyPharmacyId(pharmacyId, pageable);
+    }
+
     public Medicine updateStock(Long id, StockUpdateRequest req) {
         Medicine m = medicineRepository.findById(id).orElseThrow();
         int change = req.getAction().equals("add") ? req.getQuantity() : -req.getQuantity();
@@ -79,5 +85,9 @@ public class MedicineService {
 
     public List<Medicine> searchByName(String name) {
         return medicineRepository.searchByName(name);
+    }
+
+    public Page<Medicine> searchByName(String name, Pageable pageable) {
+        return medicineRepository.searchByName(name, pageable);
     }
 }

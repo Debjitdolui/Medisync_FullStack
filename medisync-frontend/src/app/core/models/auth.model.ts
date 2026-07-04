@@ -13,6 +13,8 @@ export interface RegisterRequest {
 export interface AuthResponse {
   token: string;
   role: string;
+  username: string;
+  email: string;
 }
 
 export interface ForgotPasswordRequest {

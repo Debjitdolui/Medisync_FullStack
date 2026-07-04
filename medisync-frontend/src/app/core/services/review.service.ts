@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, of, delay } from 'rxjs';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { PharmacyReview, NurseReview, PharmacyReviewRequest, NurseReviewRequest } from '../models';
-import { MOCK_PHARMACY_REVIEWS, MOCK_PHARMACY_RATINGS, MOCK_NURSE_RATINGS } from '../mock/mock-data';
+import { PharmacyReview, NurseReview, PharmacyReviewRequest, NurseReviewRequest, Page, PageRequest } from '../models';
 
 @Injectable({ providedIn: 'root' })
 export class ReviewService {
@@ -12,35 +11,28 @@ export class ReviewService {
   constructor(private http: HttpClient) {}
 
   addPharmacyReview(request: PharmacyReviewRequest): Observable<PharmacyReview> {
-    // TODO: return this.http.post<PharmacyReview>(`${this.apiUrl}/pharmacy`, request);
-    const newReview: any = { reviewId: Date.now(), ...request, createdAt: new Date().toISOString() };
-    return of(newReview).pipe(delay(400));
+    return this.http.post<PharmacyReview>(`${this.apiUrl}/pharmacy`, request);
   }
 
-  getPharmacyReviews(pharmacyId: number): Observable<PharmacyReview[]> {
-    // TODO: return this.http.get<PharmacyReview[]>(`${this.apiUrl}/pharmacy/${pharmacyId}`);
-    const reviews = MOCK_PHARMACY_REVIEWS.filter(r => r.pharmacy.pharmacyId === pharmacyId);
-    return of(reviews).pipe(delay(300));
+  getPharmacyReviews(pharmacyId: number, pageRequest?: PageRequest): Observable<Page<PharmacyReview>> {
+    const pr = pageRequest || { page: 0, size: 20 };
+    let params = new HttpParams()
+      .set('page', pr.page.toString())
+      .set('size', pr.size.toString());
+    if (pr.sort) params = params.set('sort', pr.sort);
+    return this.http.get<Page<PharmacyReview>>(`${this.apiUrl}/pharmacy/${pharmacyId}`, { params });
   }
 
   addNurseReview(request: NurseReviewRequest): Observable<NurseReview> {
-    // TODO: return this.http.post<NurseReview>(`${this.apiUrl}/nurse`, request);
-    const newReview: any = { reviewId: Date.now(), ...request, createdAt: new Date().toISOString() };
-    return of(newReview).pipe(delay(400));
+    return this.http.post<NurseReview>(`${this.apiUrl}/nurse`, request);
   }
 
-  getNurseReviews(nurseId: number): Observable<NurseReview[]> {
-    // TODO: return this.http.get<NurseReview[]>(`${this.apiUrl}/nurse/${nurseId}`);
-    return of([]).pipe(delay(300));
-  }
-
-  // Helper: Get average rating for a pharmacy (computed from reviews or mock)
-  getPharmacyRating(pharmacyId: number): { average: number; total: number } {
-    return MOCK_PHARMACY_RATINGS[pharmacyId] || { average: 0, total: 0 };
-  }
-
-  // Helper: Get average rating for a nurse
-  getNurseRating(nurseId: number): { average: number; total: number } {
-    return MOCK_NURSE_RATINGS[nurseId] || { average: 0, total: 0 };
+  getNurseReviews(nurseId: number, pageRequest?: PageRequest): Observable<Page<NurseReview>> {
+    const pr = pageRequest || { page: 0, size: 20 };
+    let params = new HttpParams()
+      .set('page', pr.page.toString())
+      .set('size', pr.size.toString());
+    if (pr.sort) params = params.set('sort', pr.sort);
+    return this.http.get<Page<NurseReview>>(`${this.apiUrl}/nurse/${nurseId}`, { params });
   }
 }

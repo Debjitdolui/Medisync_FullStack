@@ -5,6 +5,7 @@ import com.medisync.dto.PharmacyReviewRequest;
 import com.medisync.service.ReviewService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -22,8 +23,8 @@ public class ReviewController {
     }
 
     @GetMapping("/pharmacy/{pharmacyId}")
-    public ResponseEntity<?> getPharmacyReviews(@PathVariable Long pharmacyId) {
-        return ResponseEntity.ok(reviewService.getPharmacyReviews(pharmacyId));
+    public ResponseEntity<?> getPharmacyReviews(@PathVariable Long pharmacyId, Pageable pageable) {
+        return ResponseEntity.ok(reviewService.getPharmacyReviews(pharmacyId, pageable));
     }
 
     @PostMapping("/nurse")
@@ -32,7 +33,7 @@ public class ReviewController {
     }
 
     @GetMapping("/nurse/{nurseId}")
-    public ResponseEntity<?> getNurseReviews(@PathVariable Long nurseId) {
-        return ResponseEntity.ok(reviewService.getNurseReviews(nurseId));
+    public ResponseEntity<?> getNurseReviews(@PathVariable Long nurseId, Pageable pageable) {
+        return ResponseEntity.ok(reviewService.getNurseReviews(nurseId, pageable));
     }
 }
