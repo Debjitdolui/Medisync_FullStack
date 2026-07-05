@@ -4,9 +4,10 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { SearchService } from '../../../core/services/search.service';
 import { MedicineService } from '../../../core/services/medicine.service';
+import { PharmacyService } from '../../../core/services/pharmacy.service';
 import { AddressService } from '../../../core/services/address.service';
 import { ReviewService } from '../../../core/services/review.service';
-import { PrescriptionSearchResult, UserAddress } from '../../../core/models';
+import { PrescriptionSearchResult, UserAddress, Pharmacy } from '../../../core/models';
 import { PharmacyDetailComponent } from './pharmacy-detail/pharmacy-detail.component';
 import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 
@@ -75,6 +76,7 @@ export class MedicineSearchComponent implements OnInit {
   constructor(
     private searchService: SearchService,
     private medicineService: MedicineService,
+    private pharmacyService: PharmacyService,
     private addressService: AddressService,
     private reviewService: ReviewService,
     private route: ActivatedRoute
@@ -342,21 +344,15 @@ export class MedicineSearchComponent implements OnInit {
 
   showPharmacyDetail = false;
   selectedResult: PrescriptionSearchResult | null = null;
-  selectedPharmacy: any = null;
+  selectedPharmacy: Pharmacy | null = null;
 
   openPharmacyDetail(result: PrescriptionSearchResult): void {
     this.selectedResult = result;
-    this.selectedPharmacy = {
-      pharmacyId: result.pharmacyId,
-      pharmacyName: result.pharmacyName,
-      address: result.address,
-      city: result.city,
-      phone: result.phone,
-      latitude: result.latitude,
-      longitude: result.longitude,
-      ownerName: ''
-    };
-    this.showPharmacyDetail = true;
+    // Fetch full pharmacy details from backend (includes ownerName, state, pincode, etc.)
+    this.pharmacyService.getPharmacyById(result.pharmacyId).subscribe(pharmacy => {
+      this.selectedPharmacy = pharmacy;
+      this.showPharmacyDetail = true;
+    });
   }
 
   closePharmacyDetail(): void {
