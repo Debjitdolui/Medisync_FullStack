@@ -159,77 +159,46 @@
           <p>Try adjusting your filters, checking the medicine name, or increasing the distance.</p>
         </div>
 
-        <!-- Result Cards -->
-        <div class="results-list">
-          <div *ngFor="let result of paginatedResults" class="result-card">
-            <!-- Card Header -->
-            <div class="card-header" (click)="toggleExpand(result.pharmacyId)">
-              <div class="pharmacy-info-row">
+        <!-- Result Cards (Prescription Style) -->
+        <div class="prescription-results">
+          <div *ngFor="let result of paginatedResults" class="prescription-card">
+            <div class="presc-top">
+              <div class="presc-pharmacy">
                 <div class="pharmacy-avatar">
                   <i class="ti ti-building-hospital"></i>
                 </div>
-                <div class="pharmacy-details">
-                  <div class="pharmacy-name-row">
-                    <h4>{{ result.pharmacyName }}</h4>
-                    <div class="rating-badge" *ngIf="getPharmacyRating(result.pharmacyId).total > 0">
-                      <i class="ti ti-star-filled"></i>
-                      {{ getPharmacyRating(result.pharmacyId).average }}
-                      <span>({{ getPharmacyRating(result.pharmacyId).total }})</span>
-                    </div>
-                  </div>
-                  <div class="pharmacy-meta-row">
-                    <span class="meta-distance" *ngIf="result.distanceKm > 0">
-                      <i class="ti ti-map-pin"></i> {{ result.distanceKm.toFixed(1) }} km
-                    </span>
-                    <span class="meta-address" *ngIf="result.address">
-                      {{ result.address }}, {{ result.city }}
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <div class="card-right">
-                <span class="total-price">₹{{ result.totalPrice }}</span>
-                <div class="availability-info">
-                  <div class="availability-bar">
-                    <div class="bar-fill" [style.width.%]="(result.medicinesFound / result.totalSearched) * 100"></div>
-                  </div>
-                  <span class="found-label" [ngClass]="{'all-found': result.hasAllMedicines}">
-                    {{ result.medicinesFound }}/{{ result.totalSearched }}
-                    <i class="ti ti-circle-check" *ngIf="result.hasAllMedicines"></i>
+                <div>
+                  <h4>{{ result.pharmacyName }}</h4>
+                  <span class="presc-distance" *ngIf="result.distanceKm > 0">
+                    <i class="ti ti-map-pin"></i> {{ result.distanceKm.toFixed(1) }} km away
+                  </span>
+                  <span class="presc-address" *ngIf="result.address">
+                    {{ result.address }}, {{ result.city }}
                   </span>
                 </div>
-                <i class="ti expand-icon" [ngClass]="expandedPharmacyId === result.pharmacyId ? 'ti-chevron-up' : 'ti-chevron-down'"></i>
+              </div>
+              <div class="presc-price">₹{{ result.totalPrice }}</div>
+            </div>
+            <div class="presc-bottom">
+              <div class="availability-bar">
+                <div class="bar-fill" [style.width.%]="(result.medicinesFound / result.totalSearched) * 100"></div>
+              </div>
+              <div class="presc-meta">
+                <span class="found-count" [ngClass]="{'all-found': result.hasAllMedicines}">
+                  {{ result.medicinesFound }}/{{ result.totalSearched }} medicines available
+                </span>
+                <span class="all-badge" *ngIf="result.hasAllMedicines">
+                  <i class="ti ti-circle-check"></i> All Available
+                </span>
               </div>
             </div>
-
-            <!-- Expanded: Medicine List -->
-            <div class="card-body" *ngIf="expandedPharmacyId === result.pharmacyId">
-              <div class="medicines-table">
-                <div class="medicine-row header-row">
-                  <span>Medicine</span>
-                  <span>Manufacturer</span>
-                  <span>Price</span>
-                  <span>Stock</span>
-                </div>
-                <div class="medicine-row" *ngFor="let med of result.medicines">
-                  <span class="med-name">{{ med.medicineName }}</span>
-                  <span class="med-mfg">{{ med.manufacturer || '-' }}</span>
-                  <span class="med-price">₹{{ med.price }}</span>
-                  <span class="med-stock" [ngClass]="med.stockQuantity > 10 ? 'in-stock' : 'low-stock'">
-                    {{ med.stockQuantity }} units
-                  </span>
-                </div>
-              </div>
-
-              <!-- Actions -->
-              <div class="card-actions">
-                <a class="btn-directions" [href]="getDirectionsUrl(result)" target="_blank">
-                  <i class="ti ti-navigation"></i> Get Directions
-                </a>
-                <a class="btn-call" *ngIf="result.phone" [href]="'tel:' + result.phone">
-                  <i class="ti ti-phone"></i> Call
-                </a>
-              </div>
+            <div class="presc-actions">
+              <button class="btn-view-detail" (click)="openPharmacyDetail(result)">
+                <i class="ti ti-eye"></i> View Details
+              </button>
+              <a class="btn-directions" [href]="getDirectionsUrl(result)" target="_blank" (click)="$event.stopPropagation()">
+                <i class="ti ti-navigation"></i> Get Directions
+              </a>
             </div>
           </div>
         </div>
@@ -245,4 +214,14 @@
       </div>
     </main>
   </div>
+
+  <!-- Pharmacy Detail Modal -->
+  <app-pharmacy-detail
+    *ngIf="showPharmacyDetail && selectedPharmacy"
+    [pharmacy]="selectedPharmacy"
+    [rating]="getPharmacyRating(selectedPharmacy.pharmacyId)"
+    [userLatitude]="userLatitude"
+    [userLongitude]="userLongitude"
+    (close)="closePharmacyDetail()">
+  </app-pharmacy-detail>
 </div>

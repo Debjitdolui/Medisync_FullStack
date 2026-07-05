@@ -342,15 +342,27 @@ export class MedicineSearchComponent implements OnInit {
 
   showPharmacyDetail = false;
   selectedResult: PrescriptionSearchResult | null = null;
+  selectedPharmacy: any = null;
 
   openPharmacyDetail(result: PrescriptionSearchResult): void {
     this.selectedResult = result;
+    this.selectedPharmacy = {
+      pharmacyId: result.pharmacyId,
+      pharmacyName: result.pharmacyName,
+      address: result.address,
+      city: result.city,
+      phone: result.phone,
+      latitude: result.latitude,
+      longitude: result.longitude,
+      ownerName: ''
+    };
     this.showPharmacyDetail = true;
   }
 
   closePharmacyDetail(): void {
     this.showPharmacyDetail = false;
     this.selectedResult = null;
+    this.selectedPharmacy = null;
   }
 
   // ─── LocalStorage ─────────────────────────────────────────────────────────────
