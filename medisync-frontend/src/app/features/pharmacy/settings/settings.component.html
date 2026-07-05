@@ -182,5 +182,48 @@
         </div>
       </div>
     </div>
+
+    <!-- Pharmacy Images Section -->
+    <div class="settings-card">
+      <div class="card-header">
+        <div class="card-header-icon purple">
+          <i class="ti ti-photo"></i>
+        </div>
+        <div>
+          <h3>Pharmacy Images</h3>
+          <p>Upload photos of your pharmacy (max {{ maxImages }} images, 2MB each)</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <!-- Current Images -->
+        <div class="images-grid" *ngIf="pharmacyImages.length > 0">
+          <div class="image-card" *ngFor="let img of pharmacyImages">
+            <img [src]="getImageUrl(img)" [alt]="'Pharmacy image ' + img.displayOrder" />
+            <button class="image-delete-btn" (click)="deleteImage(img)">
+              <i class="ti ti-trash"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="no-images" *ngIf="pharmacyImages.length === 0">
+          <i class="ti ti-photo-off"></i>
+          <p>No images uploaded yet</p>
+        </div>
+
+        <!-- Upload Button -->
+        <div class="upload-area" *ngIf="pharmacyImages.length < maxImages">
+          <label class="upload-btn" [class.disabled]="isUploading">
+            <i class="ti ti-upload"></i>
+            {{ isUploading ? 'Uploading...' : 'Upload Image' }}
+            <input type="file" accept="image/jpeg,image/png,image/webp" (change)="onFileSelected($event)" [disabled]="isUploading" hidden />
+          </label>
+          <span class="upload-hint">JPG, PNG, or WebP • Max 2MB</span>
+        </div>
+
+        <div class="upload-error" *ngIf="uploadError">
+          <i class="ti ti-alert-circle"></i> {{ uploadError }}
+        </div>
+      </div>
+    </div>
   </div>
 </div>

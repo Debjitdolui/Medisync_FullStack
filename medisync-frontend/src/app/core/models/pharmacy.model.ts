@@ -36,3 +36,11 @@ export interface PharmacyDashboard {
   pharmacy: Pharmacy;
   medicineCount: number;
 }
+
+export interface PharmacyImage {
+  imageId: number;
+  pharmacy: Pharmacy;
+  imageUrl: string;
+  displayOrder: number;
+  createdAt: string;
+}

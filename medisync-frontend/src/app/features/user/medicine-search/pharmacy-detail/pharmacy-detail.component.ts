@@ -1,6 +1,8 @@
-import { Component, Input, Output, EventEmitter, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, Input, Output, EventEmitter, AfterViewInit, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Pharmacy, Medicine } from '../../../../core/models';
+import { Pharmacy, Medicine, PharmacyImage } from '../../../../core/models';
+import { PharmacyService } from '../../../../core/services/pharmacy.service';
+import { environment } from '../../../../../environments/environment';
 import * as L from 'leaflet';
 
 @Component({
@@ -10,13 +12,51 @@ import * as L from 'leaflet';
   templateUrl: './pharmacy-detail.component.html',
   styleUrl: './pharmacy-detail.component.scss'
 })
-export class PharmacyDetailComponent implements AfterViewInit, OnDestroy {
+export class PharmacyDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() pharmacy!: Pharmacy;
   @Input() medicine: Medicine | null = null;
   @Input() rating: { average: number; total: number } = { average: 0, total: 0 };
   @Input() userLatitude: number | null = null;
   @Input() userLongitude: number | null = null;
   @Output() close = new EventEmitter<void>();
+
+  pharmacyImages: PharmacyImage[] = [];
+  currentImageIndex = 0;
+
+  constructor(private pharmacyService: PharmacyService) {}
+
+  ngOnInit(): void {
+    this.loadImages();
+  }
+
+  private loadImages(): void {
+    if (this.pharmacy?.pharmacyId) {
+      this.pharmacyService.getImages(this.pharmacy.pharmacyId).subscribe(images => {
+        this.pharmacyImages = images;
+      });
+    }
+  }
+
+  getImageUrl(image: PharmacyImage): string {
+    const baseUrl = environment.apiUrl.replace('/api', '');
+    return baseUrl + image.imageUrl;
+  }
+
+  nextImage(): void {
+    if (this.currentImageIndex < this.pharmacyImages.length - 1) {
+      this.currentImageIndex++;
+    } else {
+      this.currentImageIndex = 0;
+    }
+  }
+
+  prevImage(): void {
+    if (this.currentImageIndex > 0) {
+      this.currentImageIndex--;
+    } else {
+      this.currentImageIndex = this.pharmacyImages.length - 1;
+    }
+  }
 
   mapId = 'pharmacy-map-' + Math.random().toString(36).substring(2, 9);
   private map: L.Map | null = null;

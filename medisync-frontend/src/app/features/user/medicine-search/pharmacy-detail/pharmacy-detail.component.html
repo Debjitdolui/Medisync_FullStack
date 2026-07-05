@@ -54,6 +54,27 @@
       </div>
     </div>
 
+    <!-- Pharmacy Images Gallery -->
+    <div class="section images-section" *ngIf="pharmacyImages.length > 0">
+      <div class="image-gallery">
+        <img [src]="getImageUrl(pharmacyImages[currentImageIndex])" alt="Pharmacy photo" class="gallery-image" />
+        <div class="gallery-nav" *ngIf="pharmacyImages.length > 1">
+          <button class="gallery-btn prev" (click)="prevImage()">
+            <i class="ti ti-chevron-left"></i>
+          </button>
+          <button class="gallery-btn next" (click)="nextImage()">
+            <i class="ti ti-chevron-right"></i>
+          </button>
+        </div>
+        <div class="gallery-dots" *ngIf="pharmacyImages.length > 1">
+          <span *ngFor="let img of pharmacyImages; let i = index"
+                class="dot"
+                [class.active]="i === currentImageIndex"
+                (click)="currentImageIndex = i"></span>
+        </div>
+      </div>
+    </div>
+
     <!-- Pharmacy Details -->
     <div class="section details-section">
       <div class="section-label">

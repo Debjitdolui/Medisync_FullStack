@@ -37,7 +37,8 @@ public class SecurityConfig {
                     "/api/pharmacies/login",
                     "/api/nurses/register",
                     "/api/nurses/login",
-                    "/api/search/**"
+                    "/api/search/**",
+                    "/uploads/**"
                 ).permitAll()
                 // Admin endpoints
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")

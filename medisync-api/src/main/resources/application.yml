@@ -10,6 +10,16 @@ spring:
       hibernate:
         default_schema: dev
     show-sql: true
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 2MB
+      max-request-size: 5MB
+  web:
+    resources:
+      static-locations: classpath:/static/, file:./uploads/
+      cache:
+        period: 3600
 
 # JWT Configuration
 jwt:
