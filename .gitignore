@@ -85,3 +85,6 @@ testem.log
 *.tgz
 *.zip
 *.tar.gz
+
+# ─── Uploaded Files (served from filesystem) ─────────────────────
+uploads/
