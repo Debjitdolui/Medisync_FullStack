@@ -41,4 +41,8 @@ export class PharmacyService {
   deleteImage(imageId: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/images/${imageId}`);
   }
+
+  changePassword(currentPassword: string, newPassword: string): Observable<any> {
+    return this.http.put(`${this.apiUrl}/change-password`, { currentPassword, newPassword });
+  }
 }

@@ -44,8 +44,9 @@ export class NurseSettingsComponent implements OnInit {
   }
 
   private loadNurseData(): void {
-    this.nurseService.getNurseById(this.nurseId).subscribe(nurse => {
+    this.nurseService.getMyProfile().subscribe(nurse => {
       this.nurse = nurse;
+      this.nurseId = nurse.nurseId;
       this.nurseInitial = nurse.fullName.charAt(0).toUpperCase();
       this.editForm = {
         fullName: nurse.fullName,
@@ -69,22 +70,27 @@ export class NurseSettingsComponent implements OnInit {
 
   saveProfile(): void {
     this.isSaving = true;
-    // TODO: Call API to update nurse profile
-    setTimeout(() => {
-      if (this.nurse) {
-        this.nurse.fullName = this.editForm.fullName;
-        this.nurse.phone = this.editForm.phone;
-        this.nurse.qualification = this.editForm.qualification;
-        this.nurse.specialization = this.editForm.specialization;
-        this.nurseInitial = this.nurse.fullName.charAt(0).toUpperCase();
+    this.nurseService.updateProfile(this.editForm).subscribe({
+      next: (nurse) => {
+        this.nurse = nurse;
+        this.nurseInitial = nurse.fullName.charAt(0).toUpperCase();
+        this.isSaving = false;
+      },
+      error: () => {
+        this.isSaving = false;
       }
-      this.isSaving = false;
-    }, 500);
+    });
   }
 
   changePassword(): void {
     if (this.passwordForm.newPass !== this.passwordForm.confirm) return;
-    // TODO: Call password change API
-    this.passwordForm = { current: '', newPass: '', confirm: '' };
+    this.nurseService.changePassword(this.passwordForm.current, this.passwordForm.newPass).subscribe({
+      next: () => {
+        this.passwordForm = { current: '', newPass: '', confirm: '' };
+      },
+      error: () => {
+        // Handle error
+      }
+    });
   }
 }

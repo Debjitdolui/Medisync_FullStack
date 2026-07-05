@@ -90,4 +90,8 @@ public class MedicineService {
     public Page<Medicine> searchByName(String name, Pageable pageable) {
         return medicineRepository.searchByName(name, pageable);
     }
+
+    public List<String> getAllMedicineNames() {
+        return medicineRepository.findAllDistinctMedicineNames();
+    }
 }

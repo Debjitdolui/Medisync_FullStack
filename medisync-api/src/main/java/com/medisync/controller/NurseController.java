@@ -48,4 +48,20 @@ public class NurseController {
     public ResponseEntity<?> getServices() {
         return ResponseEntity.ok(nurseModuleService.getServices());
     }
+
+    @GetMapping("/me")
+    public ResponseEntity<?> getMyProfile(Authentication auth) {
+        return ResponseEntity.ok(nurseModuleService.getProfile(auth.getName()));
+    }
+
+    @PutMapping("/profile")
+    public ResponseEntity<?> updateProfile(Authentication auth, @RequestBody java.util.Map<String, String> body) {
+        return ResponseEntity.ok(nurseModuleService.updateProfile(auth.getName(), body));
+    }
+
+    @PutMapping("/change-password")
+    public ResponseEntity<?> changePassword(Authentication auth, @RequestBody java.util.Map<String, String> body) {
+        nurseModuleService.changePassword(auth.getName(), body.get("currentPassword"), body.get("newPassword"));
+        return ResponseEntity.ok(java.util.Map.of("message", "Password changed successfully"));
+    }
 }

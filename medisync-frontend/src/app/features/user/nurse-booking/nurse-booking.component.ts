@@ -112,9 +112,7 @@ export class NurseBookingComponent implements OnInit {
   }
 
   getDistance(nurseId: number): string {
-    // Mock distances based on nurse ID
-    const distances = [1.2, 2.1, 3.4, 1.8, 2.7];
-    return distances[nurseId % distances.length].toFixed(1);
+    return 'Home Visit';
   }
 
   openBooking(nurse: Nurse): void {

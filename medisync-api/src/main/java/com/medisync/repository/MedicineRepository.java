@@ -20,4 +20,7 @@ public interface MedicineRepository extends JpaRepository<Medicine, Long> {
 
     @Query("SELECT m FROM Medicine m JOIN FETCH m.pharmacy p WHERE LOWER(m.medicineName) IN :names AND m.stockQuantity > 0 AND p.approvalStatus = 'approved'")
     List<Medicine> findByMedicineNameInAndInStock(@Param("names") List<String> names);
+
+    @Query("SELECT DISTINCT m.medicineName FROM Medicine m WHERE m.stockQuantity > 0 ORDER BY m.medicineName")
+    List<String> findAllDistinctMedicineNames();
 }

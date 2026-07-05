@@ -25,4 +25,16 @@ export class NurseApiService {
   updateAvailability(status: 'online' | 'offline'): Observable<Nurse> {
     return this.http.put<Nurse>(`${this.apiUrl}/availability?status=${status}`, {});
   }
+
+  getMyProfile(): Observable<Nurse> {
+    return this.http.get<Nurse>(`${this.apiUrl}/me`);
+  }
+
+  updateProfile(data: { fullName?: string; phone?: string; qualification?: string; specialization?: string }): Observable<Nurse> {
+    return this.http.put<Nurse>(`${this.apiUrl}/profile`, data);
+  }
+
+  changePassword(currentPassword: string, newPassword: string): Observable<any> {
+    return this.http.put(`${this.apiUrl}/change-password`, { currentPassword, newPassword });
+  }
 }

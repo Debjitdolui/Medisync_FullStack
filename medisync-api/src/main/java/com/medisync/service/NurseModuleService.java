@@ -115,4 +115,29 @@ public class NurseModuleService {
 
         return saved;
     }
+
+    public Nurse getProfile(String email) {
+        return nurseRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Nurse not found"));
+    }
+
+    public Nurse updateProfile(String email, java.util.Map<String, String> fields) {
+        Nurse nurse = nurseRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Nurse not found"));
+        if (fields.containsKey("fullName")) nurse.setFullName(fields.get("fullName"));
+        if (fields.containsKey("phone")) nurse.setPhone(fields.get("phone"));
+        if (fields.containsKey("qualification")) nurse.setQualification(fields.get("qualification"));
+        if (fields.containsKey("specialization")) nurse.setSpecialization(fields.get("specialization"));
+        return nurseRepository.save(nurse);
+    }
+
+    public void changePassword(String email, String currentPassword, String newPassword) {
+        Nurse nurse = nurseRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Nurse not found"));
+        if (!passwordEncoder.matches(currentPassword, nurse.getPasswordHash())) {
+            throw new RuntimeException("Current password is incorrect");
+        }
+        nurse.setPasswordHash(passwordEncoder.encode(newPassword));
+        nurseRepository.save(nurse);
+    }
 }

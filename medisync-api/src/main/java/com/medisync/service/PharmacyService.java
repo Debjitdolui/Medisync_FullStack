@@ -76,4 +76,14 @@ public class PharmacyService {
     public List<Pharmacy> listApproved() {
         return pharmacyRepository.findByApprovalStatus("approved");
     }
+
+    public void changePassword(String email, String currentPassword, String newPassword) {
+        Pharmacy pharmacy = pharmacyRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Pharmacy not found"));
+        if (!passwordEncoder.matches(currentPassword, pharmacy.getPasswordHash())) {
+            throw new RuntimeException("Current password is incorrect");
+        }
+        pharmacy.setPasswordHash(passwordEncoder.encode(newPassword));
+        pharmacyRepository.save(pharmacy);
+    }
 }

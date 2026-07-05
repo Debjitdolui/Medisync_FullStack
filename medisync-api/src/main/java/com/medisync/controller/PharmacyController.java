@@ -52,4 +52,10 @@ public class PharmacyController {
     public ResponseEntity<List<Pharmacy>> listApproved() {
         return ResponseEntity.ok(pharmacyService.listApproved());
     }
+
+    @PutMapping("/change-password")
+    public ResponseEntity<?> changePassword(Authentication auth, @RequestBody Map<String, String> body) {
+        pharmacyService.changePassword(auth.getName(), body.get("currentPassword"), body.get("newPassword"));
+        return ResponseEntity.ok(Map.of("message", "Password changed successfully"));
+    }
 }

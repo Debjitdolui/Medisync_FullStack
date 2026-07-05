@@ -9,6 +9,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/medicines")
 @RequiredArgsConstructor
@@ -45,5 +47,10 @@ public class MedicineController {
     @GetMapping("/categories")
     public ResponseEntity<?> getCategories() {
         return ResponseEntity.ok(medicineService.getCategories());
+    }
+
+    @GetMapping("/names")
+    public ResponseEntity<List<String>> getAllMedicineNames() {
+        return ResponseEntity.ok(medicineService.getAllMedicineNames());
     }
 }

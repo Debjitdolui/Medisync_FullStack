@@ -6,7 +6,6 @@ import { ReviewService } from '../../../core/services/review.service';
 import { PharmacyService } from '../../../core/services/pharmacy.service';
 import { NurseRequestService } from '../../../core/services/nurse-request.service';
 import { Pharmacy, PharmacyReview, NurseRequest } from '../../../core/models';
-import { MOCK_PHARMACY_REVIEWS } from '../../../core/mock/mock-data';
 
 @Component({
   selector: 'app-feedback-rating',
@@ -42,9 +41,11 @@ export class FeedbackRatingComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.pharmacyService.getApprovedPharmacies().subscribe(p => this.pharmacies = p);
+    this.pharmacyService.getApprovedPharmacies().subscribe(p => {
+      this.pharmacies = p;
+      this.loadReviews();
+    });
     this.loadCompletedBookings();
-    this.loadReviews();
   }
 
   private loadCompletedBookings(): void {
@@ -54,8 +55,13 @@ export class FeedbackRatingComponent implements OnInit {
   }
 
   private loadReviews(): void {
-    this.allReviews = [...MOCK_PHARMACY_REVIEWS];
-    this.recentReviews = this.allReviews.slice(0, 3);
+    // Load reviews from the first pharmacy by default
+    if (this.pharmacies.length > 0) {
+      this.reviewService.getPharmacyReviews(this.pharmacies[0].pharmacyId, { page: 0, size: 20 }).subscribe(page => {
+        this.allReviews = page.content;
+        this.recentReviews = this.allReviews.slice(0, 3);
+      });
+    }
   }
 
   selectType(type: 'platform' | 'pharmacy' | 'nurse'): void {

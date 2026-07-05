@@ -35,6 +35,7 @@ public class SecurityConfig {
                     "/api/auth/**",
                     "/api/pharmacies/register",
                     "/api/pharmacies/login",
+                    "/api/pharmacies/*/images",
                     "/api/nurses/register",
                     "/api/nurses/login",
                     "/api/search/**",

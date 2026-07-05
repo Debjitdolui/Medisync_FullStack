@@ -149,11 +149,13 @@ export class SettingsComponent implements OnInit {
     if (!this.passwordForm.currentPassword || !this.passwordForm.newPassword) return;
     if (this.passwordForm.newPassword !== this.passwordForm.confirmPassword) return;
 
-    // TODO: Call password change API
-    this.passwordForm = {
-      currentPassword: '',
-      newPassword: '',
-      confirmPassword: ''
-    };
+    this.pharmacyService.changePassword(this.passwordForm.currentPassword, this.passwordForm.newPassword).subscribe({
+      next: () => {
+        this.passwordForm = { currentPassword: '', newPassword: '', confirmPassword: '' };
+      },
+      error: () => {
+        // Handle error
+      }
+    });
   }
 }
