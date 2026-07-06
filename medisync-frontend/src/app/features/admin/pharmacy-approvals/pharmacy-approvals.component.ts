@@ -29,7 +29,7 @@ export class PharmacyApprovalsComponent implements OnInit {
   ngOnInit(): void { this.loadPharmacies(); }
 
   loadPharmacies(): void {
-    this.adminService.getAllPharmacies().subscribe(page => { this.pharmacies = page.content; });
+    this.adminService.getAllPharmacies().subscribe(page => { this.pharmacies = [...page.content]; });
   }
 
   get filteredPharmacies(): Pharmacy[] {
@@ -86,10 +86,16 @@ export class PharmacyApprovalsComponent implements OnInit {
       : this.adminService.unblockPharmacy(id);
 
     action$.subscribe({
-      next: () => {
+      next: (updatedPharmacy) => {
+        // Update local array directly — no need to refetch
+        const index = this.pharmacies.findIndex(p => p.pharmacyId === id);
+        if (index > -1) {
+          this.pharmacies[index] = { ...this.pharmacies[index], isBlocked: this.modalAction === 'block' };
+        }
+        // Force Angular to detect changes by reassigning array
+        this.pharmacies = [...this.pharmacies];
         this.isProcessing = false;
         this.closeModal();
-        this.loadPharmacies();
       },
       error: () => {
         this.isProcessing = false;

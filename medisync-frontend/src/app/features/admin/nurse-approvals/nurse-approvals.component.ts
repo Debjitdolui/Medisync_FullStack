@@ -29,7 +29,7 @@ export class NurseApprovalsComponent implements OnInit {
   ngOnInit(): void { this.loadNurses(); }
 
   loadNurses(): void {
-    this.adminService.getAllNurses().subscribe(page => { this.nurses = page.content; });
+    this.adminService.getAllNurses().subscribe(page => { this.nurses = [...page.content]; });
   }
 
   get filteredNurses(): Nurse[] {
@@ -86,10 +86,16 @@ export class NurseApprovalsComponent implements OnInit {
       : this.adminService.unblockNurse(id);
 
     action$.subscribe({
-      next: () => {
+      next: (updatedNurse) => {
+        // Update local array directly — no need to refetch
+        const index = this.nurses.findIndex(n => n.nurseId === id);
+        if (index > -1) {
+          this.nurses[index] = { ...this.nurses[index], isBlocked: this.modalAction === 'block' };
+        }
+        // Force Angular to detect changes by reassigning array
+        this.nurses = [...this.nurses];
         this.isProcessing = false;
         this.closeModal();
-        this.loadNurses();
       },
       error: () => {
         this.isProcessing = false;
