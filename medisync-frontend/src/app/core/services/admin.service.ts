@@ -62,6 +62,19 @@ export class AdminService {
     return this.http.put<Nurse>(`${this.apiUrl}/nurses/${id}/approve?status=${status}`, {});
   }
 
+  // Report data for Excel export
+  getUsersReportData(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/reports/users`);
+  }
+
+  getPharmaciesReportData(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/reports/pharmacies`);
+  }
+
+  getNursesReportData(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/reports/nurses`);
+  }
+
   blockNurse(id: number): Observable<Nurse> {
     return this.http.put<Nurse>(`${this.apiUrl}/nurses/${id}/block`, {});
   }

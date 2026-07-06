@@ -76,4 +76,47 @@
       </div>
     </div>
   </div>
+
+  <!-- Download Reports Section -->
+  <div class="download-section">
+    <div class="download-header">
+      <h3><i class="ti ti-download"></i> Download Reports</h3>
+      <p>Export detailed data as Excel files</p>
+    </div>
+    <div class="download-grid">
+      <div class="download-card">
+        <div class="download-icon blue"><i class="ti ti-users"></i></div>
+        <div class="download-info">
+          <h4>Users Report</h4>
+          <p>All users with bookings and status</p>
+        </div>
+        <button class="download-btn" (click)="downloadUsersReport()" [disabled]="isDownloading === 'users'">
+          <i class="ti" [ngClass]="isDownloading === 'users' ? 'ti-loader' : 'ti-file-spreadsheet'"></i>
+          {{ isDownloading === 'users' ? 'Generating...' : 'Download .xlsx' }}
+        </button>
+      </div>
+      <div class="download-card">
+        <div class="download-icon green"><i class="ti ti-building-store"></i></div>
+        <div class="download-info">
+          <h4>Pharmacies Report</h4>
+          <p>All pharmacies with medicines, ratings</p>
+        </div>
+        <button class="download-btn" (click)="downloadPharmaciesReport()" [disabled]="isDownloading === 'pharmacies'">
+          <i class="ti" [ngClass]="isDownloading === 'pharmacies' ? 'ti-loader' : 'ti-file-spreadsheet'"></i>
+          {{ isDownloading === 'pharmacies' ? 'Generating...' : 'Download .xlsx' }}
+        </button>
+      </div>
+      <div class="download-card">
+        <div class="download-icon cyan"><i class="ti ti-nurse"></i></div>
+        <div class="download-info">
+          <h4>Nurses Report</h4>
+          <p>All nurses with requests, earnings, ratings</p>
+        </div>
+        <button class="download-btn" (click)="downloadNursesReport()" [disabled]="isDownloading === 'nurses'">
+          <i class="ti" [ngClass]="isDownloading === 'nurses' ? 'ti-loader' : 'ti-file-spreadsheet'"></i>
+          {{ isDownloading === 'nurses' ? 'Generating...' : 'Download .xlsx' }}
+        </button>
+      </div>
+    </div>
+  </div>
 </div>

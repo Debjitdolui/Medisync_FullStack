@@ -19,6 +19,9 @@ public class AdminService {
     private final MedicineRepository medicineRepository;
     private final AdminActivityLogRepository adminActivityLogRepository;
     private final NotificationService notificationService;
+    private final NurseRequestRepository nurseRequestRepository;
+    private final PharmacyReviewRepository pharmacyReviewRepository;
+    private final NurseReviewRepository nurseReviewRepository;
 
     public List<Pharmacy> getAllPharmacies() {
         return pharmacyRepository.findAll();
@@ -129,6 +132,77 @@ public class AdminService {
         reports.put("pendingNurses", nurseRepository.findByApprovalStatus("pending").size());
         reports.put("totalMedicines", medicineRepository.count());
         return reports;
+    }
+
+    // ─── Report Data for Excel Export ─────────────────────────────────────────────
+
+    public List<Map<String, Object>> getUsersReportData() {
+        List<User> users = userRepository.findAll();
+        List<Map<String, Object>> data = new ArrayList<>();
+        for (User u : users) {
+            Map<String, Object> row = new LinkedHashMap<>();
+            row.put("userId", u.getUserId());
+            row.put("username", u.getUsername());
+            row.put("email", u.getEmail());
+            row.put("phone", u.getPhone());
+            row.put("role", u.getRole());
+            row.put("status", u.getStatus());
+            row.put("totalBookings", nurseRequestRepository.findByPatientUserId(u.getUserId()).size());
+            row.put("registeredOn", u.getCreatedAt() != null ? u.getCreatedAt().toString() : "");
+            data.add(row);
+        }
+        return data;
+    }
+
+    public List<Map<String, Object>> getPharmaciesReportData() {
+        List<Pharmacy> pharmacies = pharmacyRepository.findAll();
+        List<Map<String, Object>> data = new ArrayList<>();
+        for (Pharmacy p : pharmacies) {
+            Map<String, Object> row = new LinkedHashMap<>();
+            row.put("pharmacyId", p.getPharmacyId());
+            row.put("pharmacyName", p.getPharmacyName());
+            row.put("ownerName", p.getOwnerName());
+            row.put("email", p.getEmail());
+            row.put("city", p.getCity());
+            row.put("phone", p.getPhone());
+            row.put("approvalStatus", p.getApprovalStatus());
+            row.put("blocked", Boolean.TRUE.equals(p.getIsBlocked()) ? "Yes" : "No");
+            row.put("totalMedicines", medicineRepository.findByPharmacyPharmacyId(p.getPharmacyId()).size());
+            List<PharmacyReview> reviews = pharmacyReviewRepository.findByPharmacyPharmacyId(p.getPharmacyId());
+            double avgRating = reviews.isEmpty() ? 0 : reviews.stream().mapToInt(PharmacyReview::getRating).average().orElse(0);
+            row.put("averageRating", Math.round(avgRating * 10.0) / 10.0);
+            row.put("totalReviews", reviews.size());
+            row.put("registeredOn", p.getCreatedAt() != null ? p.getCreatedAt().toString() : "");
+            data.add(row);
+        }
+        return data;
+    }
+
+    public List<Map<String, Object>> getNursesReportData() {
+        List<Nurse> nurses = nurseRepository.findAll();
+        List<Map<String, Object>> data = new ArrayList<>();
+        for (Nurse n : nurses) {
+            Map<String, Object> row = new LinkedHashMap<>();
+            row.put("nurseId", n.getNurseId());
+            row.put("fullName", n.getFullName());
+            row.put("email", n.getEmail());
+            row.put("phone", n.getPhone());
+            row.put("specialization", n.getSpecialization());
+            row.put("qualification", n.getQualification());
+            row.put("approvalStatus", n.getApprovalStatus());
+            row.put("blocked", Boolean.TRUE.equals(n.getIsBlocked()) ? "Yes" : "No");
+            row.put("availability", n.getAvailabilityStatus());
+            List<NurseRequest> requests = nurseRequestRepository.findByNurseNurseId(n.getNurseId());
+            row.put("totalRequests", requests.size());
+            long completed = requests.stream().filter(r -> "completed".equals(r.getRequestStatus())).count();
+            row.put("completedRequests", completed);
+            List<NurseReview> reviews = nurseReviewRepository.findByNurseNurseId(n.getNurseId());
+            double avgRating = reviews.isEmpty() ? 0 : reviews.stream().mapToInt(NurseReview::getRating).average().orElse(0);
+            row.put("averageRating", Math.round(avgRating * 10.0) / 10.0);
+            row.put("registeredOn", n.getCreatedAt() != null ? n.getCreatedAt().toString() : "");
+            data.add(row);
+        }
+        return data;
     }
 
     // ─── Block/Unblock Pharmacy ─────────────────────────────────────────────────

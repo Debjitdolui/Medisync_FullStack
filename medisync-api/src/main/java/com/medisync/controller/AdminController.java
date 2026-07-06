@@ -85,4 +85,19 @@ public class AdminController {
     public ResponseEntity<?> getReports() {
         return ResponseEntity.ok(adminService.getReports());
     }
+
+    @GetMapping("/reports/users")
+    public ResponseEntity<?> getUsersReport() {
+        return ResponseEntity.ok(adminService.getUsersReportData());
+    }
+
+    @GetMapping("/reports/pharmacies")
+    public ResponseEntity<?> getPharmaciesReport() {
+        return ResponseEntity.ok(adminService.getPharmaciesReportData());
+    }
+
+    @GetMapping("/reports/nurses")
+    public ResponseEntity<?> getNursesReport() {
+        return ResponseEntity.ok(adminService.getNursesReportData());
+    }
 }
