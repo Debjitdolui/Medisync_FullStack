@@ -27,6 +27,7 @@ export class NurseDashboardComponent implements OnInit {
   totalRequests = 0;
   pendingRequests = 0;
   completedRequests = 0;
+  totalEarnings = 0;
   averageRating = '0.0';
   totalReviews = 0;
 
@@ -43,11 +44,11 @@ export class NurseDashboardComponent implements OnInit {
   ngOnInit(): void {
     this.loadNurseData();
     this.loadRequests();
-    this.loadRating();
   }
 
   private loadNurseData(): void {
-    this.nurseService.getNurseById(this.nurseId).subscribe(nurse => {
+    this.nurseService.getMyProfile().subscribe(nurse => {
+      this.nurseId = nurse.nurseId;
       this.nurseName = nurse.fullName;
       this.nurseInitial = nurse.fullName.charAt(0).toUpperCase();
       this.specialization = nurse.specialization;
@@ -60,6 +61,7 @@ export class NurseDashboardComponent implements OnInit {
         month: 'short',
         year: 'numeric'
       });
+      this.loadRating();
     });
   }
 
@@ -68,6 +70,9 @@ export class NurseDashboardComponent implements OnInit {
       this.totalRequests = requests.length;
       this.pendingRequests = requests.filter(r => r.requestStatus === 'pending').length;
       this.completedRequests = requests.filter(r => r.requestStatus === 'completed').length;
+      this.totalEarnings = requests
+        .filter(r => r.requestStatus === 'completed')
+        .reduce((sum, r) => sum + (r.service?.basePrice || 0), 0);
       this.recentRequests = requests.slice(0, 4);
     });
   }

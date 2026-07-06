@@ -1,0 +1,56 @@
+<div class="nurse-reviews">
+  <div class="page-header">
+    <h1><i class="ti ti-star"></i> My Reviews</h1>
+    <p class="subtitle">See what patients say about your service</p>
+  </div>
+
+  <!-- Rating Summary -->
+  <div class="rating-summary">
+    <div class="rating-big">
+      <span class="rating-number">{{ averageRating }}</span>
+      <div class="rating-stars">
+        <i *ngFor="let s of getStars(averageRating)" class="ti"
+           [ngClass]="s ? 'ti-star-filled' : 'ti-star'"></i>
+      </div>
+      <span class="rating-count">{{ totalReviews }} review{{ totalReviews !== 1 ? 's' : '' }}</span>
+    </div>
+  </div>
+
+  <!-- Reviews List -->
+  <div class="reviews-list">
+    <div class="review-card" *ngFor="let review of paginatedReviews">
+      <div class="review-header">
+        <div class="reviewer-info">
+          <div class="reviewer-avatar">{{ review.user.username.charAt(0).toUpperCase() }}</div>
+          <div>
+            <span class="reviewer-name">{{ review.user.username }}</span>
+            <span class="review-date">{{ getTimeAgo(review.createdAt) }}</span>
+          </div>
+        </div>
+        <div class="review-rating">
+          <i *ngFor="let s of getStars(review.rating)" class="ti"
+             [ngClass]="s ? 'ti-star-filled' : 'ti-star'"></i>
+        </div>
+      </div>
+      <p class="review-text" *ngIf="review.reviewText">{{ review.reviewText }}</p>
+      <span class="review-service" *ngIf="review.request">
+        <i class="ti ti-stethoscope"></i> {{ review.request.service?.serviceName || 'Service' }}
+      </span>
+    </div>
+
+    <div class="empty-state" *ngIf="reviews.length === 0">
+      <i class="ti ti-star-off"></i>
+      <h3>No reviews yet</h3>
+      <p>Reviews will appear here after patients rate your service.</p>
+    </div>
+  </div>
+
+  <app-pagination
+    *ngIf="reviews.length > pageSize"
+    [totalItems]="reviews.length"
+    [pageSize]="pageSize"
+    [currentPage]="currentPage"
+    (pageChange)="onPageChange($event)"
+    (pageSizeChange)="onPageSizeChange($event)">
+  </app-pagination>
+</div>

@@ -33,6 +33,7 @@ bazel-out/
 npm-debug.log
 yarn-error.log
 .angular/cache/
+docs/
 
 # ─── IDE / Editors ───────────────────────────────────────────────
 # IntelliJ IDEA

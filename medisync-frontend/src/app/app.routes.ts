@@ -47,6 +47,7 @@ export const routes: Routes = [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'dashboard', loadComponent: () => import('./features/nurse-panel/dashboard/nurse-dashboard.component').then(m => m.NurseDashboardComponent) },
       { path: 'requests', loadComponent: () => import('./features/nurse-panel/requests/nurse-requests.component').then(m => m.NurseRequestsComponent) },
+      { path: 'reviews', loadComponent: () => import('./features/nurse-panel/reviews/nurse-reviews.component').then(m => m.NurseReviewsComponent) },
       { path: 'availability', loadComponent: () => import('./features/nurse-panel/availability/availability.component').then(m => m.AvailabilityComponent) },
       { path: 'settings', loadComponent: () => import('./features/nurse-panel/settings/nurse-settings.component').then(m => m.NurseSettingsComponent) },
     ]
