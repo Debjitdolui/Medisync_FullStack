@@ -81,26 +81,33 @@ export class PharmacyApprovalsComponent implements OnInit {
     this.isProcessing = true;
 
     const id = this.modalTarget.pharmacyId;
-    const action$ = this.modalAction === 'block'
-      ? this.adminService.blockPharmacy(id)
-      : this.adminService.unblockPharmacy(id);
 
-    action$.subscribe({
-      next: (updatedPharmacy) => {
-        // Update local array directly — no need to refetch
-        const index = this.pharmacies.findIndex(p => p.pharmacyId === id);
-        if (index > -1) {
-          this.pharmacies[index] = { ...this.pharmacies[index], isBlocked: this.modalAction === 'block' };
-        }
-        // Force Angular to detect changes by reassigning array
-        this.pharmacies = [...this.pharmacies];
-        this.isProcessing = false;
-        this.closeModal();
-      },
-      error: () => {
-        this.isProcessing = false;
-        this.closeModal();
-      }
-    });
+    if (this.modalAction === 'block') {
+      this.adminService.blockPharmacy(id).subscribe({
+        next: (updated) => {
+          const pharmacy = this.pharmacies.find(p => p.pharmacyId === id);
+          if (pharmacy) {
+            pharmacy.isBlocked = true;
+          }
+          this.isProcessing = false;
+          this.showModal = false;
+          this.modalTarget = null;
+        },
+        error: () => { this.isProcessing = false; this.showModal = false; }
+      });
+    } else {
+      this.adminService.unblockPharmacy(id).subscribe({
+        next: (updated) => {
+          const pharmacy = this.pharmacies.find(p => p.pharmacyId === id);
+          if (pharmacy) {
+            pharmacy.isBlocked = false;
+          }
+          this.isProcessing = false;
+          this.showModal = false;
+          this.modalTarget = null;
+        },
+        error: () => { this.isProcessing = false; this.showModal = false; }
+      });
+    }
   }
 }

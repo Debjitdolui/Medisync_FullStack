@@ -81,26 +81,34 @@ export class NurseApprovalsComponent implements OnInit {
     this.isProcessing = true;
 
     const id = this.modalTarget.nurseId;
-    const action$ = this.modalAction === 'block'
-      ? this.adminService.blockNurse(id)
-      : this.adminService.unblockNurse(id);
 
-    action$.subscribe({
-      next: (updatedNurse) => {
-        // Update local array directly — no need to refetch
-        const index = this.nurses.findIndex(n => n.nurseId === id);
-        if (index > -1) {
-          this.nurses[index] = { ...this.nurses[index], isBlocked: this.modalAction === 'block' };
-        }
-        // Force Angular to detect changes by reassigning array
-        this.nurses = [...this.nurses];
-        this.isProcessing = false;
-        this.closeModal();
-      },
-      error: () => {
-        this.isProcessing = false;
-        this.closeModal();
-      }
-    });
+    if (this.modalAction === 'block') {
+      this.adminService.blockNurse(id).subscribe({
+        next: (updated) => {
+          // Directly mutate the item in array
+          const nurse = this.nurses.find(n => n.nurseId === id);
+          if (nurse) {
+            nurse.isBlocked = true;
+          }
+          this.isProcessing = false;
+          this.showModal = false;
+          this.modalTarget = null;
+        },
+        error: () => { this.isProcessing = false; this.showModal = false; }
+      });
+    } else {
+      this.adminService.unblockNurse(id).subscribe({
+        next: (updated) => {
+          const nurse = this.nurses.find(n => n.nurseId === id);
+          if (nurse) {
+            nurse.isBlocked = false;
+          }
+          this.isProcessing = false;
+          this.showModal = false;
+          this.modalTarget = null;
+        },
+        error: () => { this.isProcessing = false; this.showModal = false; }
+      });
+    }
   }
 }
