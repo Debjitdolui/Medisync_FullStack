@@ -18,6 +18,12 @@ export class PharmacyApprovalsComponent implements OnInit {
   currentPage = 1;
   pageSize = 10;
 
+  // Confirmation modal
+  showModal = false;
+  modalAction: 'block' | 'unblock' | '' = '';
+  modalTarget: Pharmacy | null = null;
+  isProcessing = false;
+
   constructor(private adminService: AdminService) {}
 
   ngOnInit(): void { this.loadPharmacies(); }
@@ -36,14 +42,8 @@ export class PharmacyApprovalsComponent implements OnInit {
     return this.filteredPharmacies.slice(start, start + this.pageSize);
   }
 
-  onPageChange(page: number) {
-    this.currentPage = page;
-  }
-
-  onPageSizeChange(size: number) {
-    this.pageSize = size;
-    this.currentPage = 1;
-  }
+  onPageChange(page: number) { this.currentPage = page; }
+  onPageSizeChange(size: number) { this.pageSize = size; this.currentPage = 1; }
 
   getCount(status: string): number {
     return this.pharmacies.filter(p => p.approvalStatus === status).length;
@@ -57,11 +57,44 @@ export class PharmacyApprovalsComponent implements OnInit {
     this.adminService.approvePharmacy(id, 'rejected').subscribe(() => this.loadPharmacies());
   }
 
-  block(id: number): void {
-    this.adminService.blockPharmacy(id).subscribe(() => this.loadPharmacies());
+  // Modal actions
+  openBlockModal(pharmacy: Pharmacy): void {
+    this.modalTarget = pharmacy;
+    this.modalAction = 'block';
+    this.showModal = true;
   }
 
-  unblock(id: number): void {
-    this.adminService.unblockPharmacy(id).subscribe(() => this.loadPharmacies());
+  openUnblockModal(pharmacy: Pharmacy): void {
+    this.modalTarget = pharmacy;
+    this.modalAction = 'unblock';
+    this.showModal = true;
+  }
+
+  closeModal(): void {
+    this.showModal = false;
+    this.modalTarget = null;
+    this.modalAction = '';
+  }
+
+  confirmAction(): void {
+    if (!this.modalTarget) return;
+    this.isProcessing = true;
+
+    const id = this.modalTarget.pharmacyId;
+    const action$ = this.modalAction === 'block'
+      ? this.adminService.blockPharmacy(id)
+      : this.adminService.unblockPharmacy(id);
+
+    action$.subscribe({
+      next: () => {
+        this.isProcessing = false;
+        this.closeModal();
+        this.loadPharmacies();
+      },
+      error: () => {
+        this.isProcessing = false;
+        this.closeModal();
+      }
+    });
   }
 }

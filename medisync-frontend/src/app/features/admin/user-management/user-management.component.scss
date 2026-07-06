@@ -308,3 +308,78 @@ tr {
     width: 100%;
   }
 }
+
+
+// ─── Confirmation Modal ───────────────────────────────────
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-box {
+  background: #fff;
+  border-radius: 16px;
+  padding: 32px;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.2);
+
+  h3 { font-size: 18px; font-weight: 700; color: #0f172a; margin-bottom: 8px; }
+  p { font-size: 14px; color: #64748b; line-height: 1.5; margin-bottom: 24px; }
+  strong { color: #0f172a; }
+}
+
+.modal-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+  font-size: 24px;
+
+  &.block { background: #fef3c7; color: #d97706; }
+  &.unblock { background: #e0f2fe; color: #0284c7; }
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.btn-cancel {
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  color: #64748b;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &:hover { background: #f8fafc; border-color: #cbd5e1; }
+}
+
+.btn-confirm {
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &.block { background: #d97706; color: #fff; &:hover { background: #b45309; } }
+  &.unblock { background: #0284c7; color: #fff; &:hover { background: #0369a1; } }
+  &:disabled { opacity: 0.6; cursor: not-allowed; }
+}

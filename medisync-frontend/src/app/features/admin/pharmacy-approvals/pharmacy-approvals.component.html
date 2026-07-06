@@ -46,10 +46,10 @@
               <button class="btn-reject" *ngIf="p.approvalStatus === 'pending'" (click)="reject(p.pharmacyId)">
                 <i class="ti ti-x"></i> Reject
               </button>
-              <button class="btn-block" *ngIf="p.approvalStatus === 'approved' && !p.isBlocked" (click)="block(p.pharmacyId)">
+              <button class="btn-block" *ngIf="p.approvalStatus === 'approved' && !p.isBlocked" (click)="openBlockModal(p)">
                 <i class="ti ti-ban"></i> Block
               </button>
-              <button class="btn-unblock" *ngIf="p.isBlocked" (click)="unblock(p.pharmacyId)">
+              <button class="btn-unblock" *ngIf="p.isBlocked" (click)="openUnblockModal(p)">
                 <i class="ti ti-lock-open"></i> Unblock
               </button>
               <span class="blocked-badge" *ngIf="p.isBlocked">
@@ -72,4 +72,28 @@
     (pageChange)="onPageChange($event)"
     (pageSizeChange)="onPageSizeChange($event)">
   </app-pagination>
+
+  <!-- Confirmation Modal -->
+  <div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+    <div class="modal-box" (click)="$event.stopPropagation()">
+      <div class="modal-icon" [ngClass]="modalAction">
+        <i class="ti" [ngClass]="modalAction === 'block' ? 'ti-ban' : 'ti-lock-open'"></i>
+      </div>
+      <h3>{{ modalAction === 'block' ? 'Block' : 'Unblock' }} Pharmacy?</h3>
+      <p *ngIf="modalAction === 'block'">
+        Are you sure you want to block <strong>{{ modalTarget?.pharmacyName }}</strong>?
+        They will not be able to login or manage inventory.
+      </p>
+      <p *ngIf="modalAction === 'unblock'">
+        Are you sure you want to unblock <strong>{{ modalTarget?.pharmacyName }}</strong>?
+        They will be able to login and manage inventory again.
+      </p>
+      <div class="modal-actions">
+        <button class="btn-cancel" (click)="closeModal()">Cancel</button>
+        <button class="btn-confirm" [ngClass]="modalAction" (click)="confirmAction()" [disabled]="isProcessing">
+          {{ isProcessing ? 'Processing...' : (modalAction === 'block' ? 'Block' : 'Unblock') }}
+        </button>
+      </div>
+    </div>
+  </div>
 </div>

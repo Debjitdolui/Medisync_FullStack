@@ -21,6 +21,12 @@ export class UserManagementComponent implements OnInit {
   currentPage = 1;
   pageSize = 10;
 
+  // Confirmation modal
+  showModal = false;
+  modalAction: 'block' | 'unblock' | '' = '';
+  modalTarget: User | null = null;
+  isProcessing = false;
+
   constructor(private adminService: AdminService) {}
 
   ngOnInit(): void { this.loadUsers(); }
@@ -45,20 +51,47 @@ export class UserManagementComponent implements OnInit {
     return this.filteredUsers.slice(start, start + this.pageSize);
   }
 
-  onPageChange(page: number) {
-    this.currentPage = page;
+  onPageChange(page: number) { this.currentPage = page; }
+  onPageSizeChange(size: number) { this.pageSize = size; this.currentPage = 1; }
+
+  // Modal actions
+  openBlockModal(user: User): void {
+    this.modalTarget = user;
+    this.modalAction = 'block';
+    this.showModal = true;
   }
 
-  onPageSizeChange(size: number) {
-    this.pageSize = size;
-    this.currentPage = 1;
+  openUnblockModal(user: User): void {
+    this.modalTarget = user;
+    this.modalAction = 'unblock';
+    this.showModal = true;
   }
 
-  blockUser(id: number): void {
-    this.adminService.blockUser(id).subscribe(() => this.loadUsers());
+  closeModal(): void {
+    this.showModal = false;
+    this.modalTarget = null;
+    this.modalAction = '';
   }
 
-  unblockUser(id: number): void {
-    this.adminService.unblockUser(id).subscribe(() => this.loadUsers());
+  confirmAction(): void {
+    if (!this.modalTarget) return;
+    this.isProcessing = true;
+
+    const id = this.modalTarget.userId;
+    const action$ = this.modalAction === 'block'
+      ? this.adminService.blockUser(id)
+      : this.adminService.unblockUser(id);
+
+    action$.subscribe({
+      next: () => {
+        this.isProcessing = false;
+        this.closeModal();
+        this.loadUsers();
+      },
+      error: () => {
+        this.isProcessing = false;
+        this.closeModal();
+      }
+    });
   }
 }

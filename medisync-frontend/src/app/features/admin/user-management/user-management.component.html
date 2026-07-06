@@ -45,10 +45,10 @@
             <td><span class="status-badge" [ngClass]="u.status">{{ u.status }}</span></td>
             <td class="date-cell">{{ u.createdAt | date:'mediumDate' }}</td>
             <td class="actions-cell">
-              <button class="btn-block" *ngIf="u.status !== 'blocked'" (click)="blockUser(u.userId)">
+              <button class="btn-block" *ngIf="u.status !== 'blocked'" (click)="openBlockModal(u)">
                 <i class="ti ti-lock"></i> Block
               </button>
-              <button class="btn-unblock" *ngIf="u.status === 'blocked'" (click)="unblockUser(u.userId)">
+              <button class="btn-unblock" *ngIf="u.status === 'blocked'" (click)="openUnblockModal(u)">
                 <i class="ti ti-lock-open"></i> Unblock
               </button>
             </td>
@@ -67,4 +67,28 @@
     (pageChange)="onPageChange($event)"
     (pageSizeChange)="onPageSizeChange($event)">
   </app-pagination>
+
+  <!-- Confirmation Modal -->
+  <div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+    <div class="modal-box" (click)="$event.stopPropagation()">
+      <div class="modal-icon" [ngClass]="modalAction">
+        <i class="ti" [ngClass]="modalAction === 'block' ? 'ti-ban' : 'ti-lock-open'"></i>
+      </div>
+      <h3>{{ modalAction === 'block' ? 'Block' : 'Unblock' }} User?</h3>
+      <p *ngIf="modalAction === 'block'">
+        Are you sure you want to block <strong>{{ modalTarget?.username }}</strong> ({{ modalTarget?.email }})?
+        They will not be able to login.
+      </p>
+      <p *ngIf="modalAction === 'unblock'">
+        Are you sure you want to unblock <strong>{{ modalTarget?.username }}</strong>?
+        They will be able to login again.
+      </p>
+      <div class="modal-actions">
+        <button class="btn-cancel" (click)="closeModal()">Cancel</button>
+        <button class="btn-confirm" [ngClass]="modalAction" (click)="confirmAction()" [disabled]="isProcessing">
+          {{ isProcessing ? 'Processing...' : (modalAction === 'block' ? 'Block' : 'Unblock') }}
+        </button>
+      </div>
+    </div>
+  </div>
 </div>

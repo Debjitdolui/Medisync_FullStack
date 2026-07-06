@@ -18,6 +18,12 @@ export class NurseApprovalsComponent implements OnInit {
   currentPage = 1;
   pageSize = 10;
 
+  // Confirmation modal
+  showModal = false;
+  modalAction: 'block' | 'unblock' | '' = '';
+  modalTarget: Nurse | null = null;
+  isProcessing = false;
+
   constructor(private adminService: AdminService) {}
 
   ngOnInit(): void { this.loadNurses(); }
@@ -36,14 +42,8 @@ export class NurseApprovalsComponent implements OnInit {
     return this.filteredNurses.slice(start, start + this.pageSize);
   }
 
-  onPageChange(page: number) {
-    this.currentPage = page;
-  }
-
-  onPageSizeChange(size: number) {
-    this.pageSize = size;
-    this.currentPage = 1;
-  }
+  onPageChange(page: number) { this.currentPage = page; }
+  onPageSizeChange(size: number) { this.pageSize = size; this.currentPage = 1; }
 
   getCount(status: string): number {
     return this.nurses.filter(n => n.approvalStatus === status).length;
@@ -57,11 +57,44 @@ export class NurseApprovalsComponent implements OnInit {
     this.adminService.approveNurse(id, 'rejected').subscribe(() => this.loadNurses());
   }
 
-  block(id: number): void {
-    this.adminService.blockNurse(id).subscribe(() => this.loadNurses());
+  // Modal actions
+  openBlockModal(nurse: Nurse): void {
+    this.modalTarget = nurse;
+    this.modalAction = 'block';
+    this.showModal = true;
   }
 
-  unblock(id: number): void {
-    this.adminService.unblockNurse(id).subscribe(() => this.loadNurses());
+  openUnblockModal(nurse: Nurse): void {
+    this.modalTarget = nurse;
+    this.modalAction = 'unblock';
+    this.showModal = true;
+  }
+
+  closeModal(): void {
+    this.showModal = false;
+    this.modalTarget = null;
+    this.modalAction = '';
+  }
+
+  confirmAction(): void {
+    if (!this.modalTarget) return;
+    this.isProcessing = true;
+
+    const id = this.modalTarget.nurseId;
+    const action$ = this.modalAction === 'block'
+      ? this.adminService.blockNurse(id)
+      : this.adminService.unblockNurse(id);
+
+    action$.subscribe({
+      next: () => {
+        this.isProcessing = false;
+        this.closeModal();
+        this.loadNurses();
+      },
+      error: () => {
+        this.isProcessing = false;
+        this.closeModal();
+      }
+    });
   }
 }
