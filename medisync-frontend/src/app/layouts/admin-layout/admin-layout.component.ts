@@ -20,6 +20,7 @@ export class AdminLayoutComponent implements OnInit {
   showProfileMenu = false;
   showNotifications = false;
   unreadCount = 0;
+  sidebarOpen = false;
 
   constructor(
     private authService: AuthService,
@@ -94,6 +95,10 @@ export class AdminLayoutComponent implements OnInit {
       case 'admin': return '/admin/dashboard';
       default: return '/';
     }
+  }
+
+  toggleSidebar(): void {
+    this.sidebarOpen = !this.sidebarOpen;
   }
 
   toggleNotifications(): void {

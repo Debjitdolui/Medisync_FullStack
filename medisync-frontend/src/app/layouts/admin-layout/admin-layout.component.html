@@ -1,6 +1,9 @@
 <div class="admin-wrapper">
+  <!-- Mobile Sidebar Overlay -->
+  <div class="sidebar-overlay" [class.open]="sidebarOpen" (click)="sidebarOpen = false"></div>
+
   <!-- Sidebar -->
-  <aside class="sidebar">
+  <aside class="sidebar" [class.open]="sidebarOpen">
     <div class="sidebar-logo">
       <div class="logo-icon">
         <i class="ti ti-heartbeat"></i>
@@ -9,13 +12,17 @@
         <span class="logo-name">MediSync</span>
         <span class="logo-tag">{{ roleLabel }}</span>
       </div>
+      <button class="sidebar-close" (click)="sidebarOpen = false">
+        <i class="ti ti-x"></i>
+      </button>
     </div>
 
     <nav class="sidebar-nav">
       <a *ngFor="let item of navItems"
          [routerLink]="item.route"
          routerLinkActive="active"
-         class="nav-item">
+         class="nav-item"
+         (click)="sidebarOpen = false">
         <i class="ti {{item.icon}}"></i>
         <span>{{item.label}}</span>
       </a>
@@ -39,7 +46,12 @@
   <!-- Main Area -->
   <div class="main-area">
     <header class="topbar">
-      <span class="topbar-date">{{today}}</span>
+      <div class="topbar-left">
+        <button class="hamburger-btn" (click)="toggleSidebar()">
+          <i class="ti ti-menu-2"></i>
+        </button>
+        <span class="topbar-date">{{today}}</span>
+      </div>
       <div class="topbar-actions">
         <!-- Notification Bell (visible for nurse and pharmacy only) -->
         <div class="notification-wrapper" *ngIf="role !== 'admin'">
