@@ -34,7 +34,7 @@ export class ProfileComponent implements OnInit {
 
   // Address form
   showAddressForm = false;
-  newAddress = { addressLine: '', city: '', state: '', pincode: '' };
+  newAddress = { addressLine: '', city: '', state: '', pincode: '', isDefault: false };
 
   constructor(
     private userService: UserService,
@@ -80,16 +80,33 @@ export class ProfileComponent implements OnInit {
     });
   }
 
+  setDefaultAddress(addr: UserAddress): void {
+    this.addressService.updateAddress(addr.addressId, {
+      addressLine: addr.addressLine,
+      city: addr.city,
+      state: addr.state,
+      pincode: addr.pincode,
+      isDefault: true
+    }).subscribe(() => {
+      this.addresses.forEach(a => a.isDefault = false);
+      addr.isDefault = true;
+    });
+  }
+
   addAddress(): void {
     this.addressService.addAddress({
       addressLine: this.newAddress.addressLine,
       city: this.newAddress.city,
       state: this.newAddress.state,
-      pincode: this.newAddress.pincode
+      pincode: this.newAddress.pincode,
+      isDefault: this.newAddress.isDefault
     }).subscribe(addr => {
+      if (addr.isDefault) {
+        this.addresses.forEach(a => a.isDefault = false);
+      }
       this.addresses.push(addr);
       this.showAddressForm = false;
-      this.newAddress = { addressLine: '', city: '', state: '', pincode: '' };
+      this.newAddress = { addressLine: '', city: '', state: '', pincode: '', isDefault: false };
     });
   }
 

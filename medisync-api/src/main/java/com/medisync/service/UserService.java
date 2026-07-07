@@ -60,6 +60,13 @@ public class UserService {
 
     public UserAddress addAddress(String email, AddressRequest req) {
         User user = getProfile(email);
+
+        // If this address is set as default, unset others
+        if (Boolean.TRUE.equals(req.getIsDefault())) {
+            List<UserAddress> existing = addressRepo.findByUserUserId(user.getUserId());
+            existing.forEach(a -> { a.setIsDefault(false); addressRepo.save(a); });
+        }
+
         UserAddress addr = new UserAddress();
         addr.setUser(user);
         addr.setAddressLine(req.getAddressLine());
@@ -87,6 +94,18 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("Address not found"));
         if (!addr.getUser().getUserId().equals(user.getUserId()))
             throw new RuntimeException("Access denied");
+
+        // If this address is set as default, unset others
+        if (Boolean.TRUE.equals(req.getIsDefault())) {
+            List<UserAddress> existing = addressRepo.findByUserUserId(user.getUserId());
+            existing.forEach(a -> {
+                if (!a.getAddressId().equals(addressId)) {
+                    a.setIsDefault(false);
+                    addressRepo.save(a);
+                }
+            });
+        }
+
         addr.setAddressLine(req.getAddressLine());
         addr.setCity(req.getCity());
         addr.setState(req.getState());

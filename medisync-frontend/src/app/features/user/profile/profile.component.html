@@ -73,6 +73,9 @@
             <input class="form-input" placeholder="State" [(ngModel)]="newAddress.state">
             <input class="form-input" placeholder="Pincode" [(ngModel)]="newAddress.pincode">
           </div>
+          <label class="checkbox-label">
+            <input type="checkbox" [(ngModel)]="newAddress.isDefault"> Set as default address
+          </label>
           <button class="btn-primary-full" (click)="addAddress()">Save Address</button>
         </div>
 
@@ -83,7 +86,10 @@
               <p class="addr-detail">{{ addr.city }}, {{ addr.state }} - {{ addr.pincode }}</p>
               <span class="default-badge" *ngIf="addr.isDefault">Default</span>
             </div>
-            <button class="delete-btn" (click)="deleteAddress(addr.addressId)"><i class="ti ti-trash"></i></button>
+            <div class="addr-actions">
+              <button class="set-default-btn" *ngIf="!addr.isDefault" (click)="setDefaultAddress(addr)">Set Default</button>
+              <button class="delete-btn" (click)="deleteAddress(addr.addressId)"><i class="ti ti-trash"></i></button>
+            </div>
           </div>
           <p *ngIf="addresses.length === 0" class="empty">No addresses saved yet</p>
         </div>
