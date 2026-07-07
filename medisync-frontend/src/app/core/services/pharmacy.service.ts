@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { Pharmacy, PharmacyDashboard, PharmacyRegisterRequest, PharmacyImage } from '../models';
+import { Pharmacy, PharmacyDashboard, PharmacyImage } from '../models';
 
 @Injectable({ providedIn: 'root' })
 export class PharmacyService {
@@ -18,7 +18,7 @@ export class PharmacyService {
     return this.http.get<Pharmacy>(`${this.apiUrl}/${id}`);
   }
 
-  updatePharmacy(id: number, request: PharmacyRegisterRequest): Observable<Pharmacy> {
+  updatePharmacy(id: number, request: any): Observable<Pharmacy> {
     return this.http.put<Pharmacy>(`${this.apiUrl}/${id}`, request);
   }
 

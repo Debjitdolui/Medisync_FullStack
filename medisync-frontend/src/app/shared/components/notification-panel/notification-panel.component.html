@@ -4,7 +4,7 @@
     <button class="notif-mark-all" (click)="markAllAsRead()">Mark all as read</button>
   </div>
 
-  <div class="notif-list">
+  <div class="notif-list" [class.show-all]="showAll">
     <div *ngFor="let notif of notifications"
          class="notif-item"
          [class.unread]="!notif.isRead"
@@ -25,7 +25,7 @@
     </div>
   </div>
 
-  <div class="notif-footer">
-    <a href="#">View all notifications</a>
+  <div class="notif-footer" *ngIf="!showAll && allNotifications.length > 5">
+    <a (click)="viewAll()" class="view-all-link">View all notifications ({{ allNotifications.length }})</a>
   </div>
 </div>

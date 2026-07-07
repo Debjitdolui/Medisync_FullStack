@@ -171,6 +171,9 @@ export class InventoryComponent implements OnInit {
     if (!this.medicineForm.medicineName || !this.medicineForm.categoryId || !this.medicineForm.price) {
       return;
     }
+    if (this.medicineForm.price < 0 || this.medicineForm.stockQuantity < 0) {
+      return;
+    }
 
     if (this.editingMedicine) {
       this.medicineService.updateMedicine(this.editingMedicine.medicineId, this.medicineForm).subscribe(() => {

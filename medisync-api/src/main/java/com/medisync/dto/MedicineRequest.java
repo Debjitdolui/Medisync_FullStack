@@ -11,8 +11,8 @@ public class MedicineRequest {
     @NotNull private Long categoryId;
     @NotBlank private String medicineName;
     private String manufacturer;
-    @NotNull private BigDecimal price;
-    private int stockQuantity;
+    @NotNull @DecimalMin(value = "0.0", inclusive = false, message = "Price must be greater than 0") private BigDecimal price;
+    @Min(value = 0, message = "Stock quantity cannot be negative") private int stockQuantity;
     private LocalDate expiryDate;
     private String description;
 }

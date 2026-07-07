@@ -12,6 +12,8 @@ import { Notification } from '../../../core/models';
 })
 export class NotificationPanelComponent implements OnInit {
   notifications: Notification[] = [];
+  allNotifications: Notification[] = [];
+  showAll = false;
   @Output() close = new EventEmitter<void>();
 
   constructor(private notificationService: NotificationService) {}
@@ -22,8 +24,14 @@ export class NotificationPanelComponent implements OnInit {
 
   loadNotifications(): void {
     this.notificationService.getNotifications().subscribe(page => {
-      this.notifications = page.content.slice(0, 5);
+      this.allNotifications = page.content;
+      this.notifications = this.allNotifications.slice(0, 5);
     });
+  }
+
+  viewAll(): void {
+    this.showAll = true;
+    this.notifications = this.allNotifications;
   }
 
   markAsRead(notification: Notification): void {

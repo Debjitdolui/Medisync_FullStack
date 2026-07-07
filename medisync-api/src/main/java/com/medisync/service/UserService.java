@@ -19,6 +19,7 @@ public class UserService {
     private final UserRepository userRepo;
     private final UserAddressRepository addressRepo;
     private final PasswordEncoder passwordEncoder;
+    private final PincodeCoordinateService pincodeCoordinateService;
 
     public User getProfile(String email) {
         return userRepo.findByEmail(email)
@@ -65,8 +66,17 @@ public class UserService {
         addr.setCity(req.getCity());
         addr.setState(req.getState());
         addr.setPincode(req.getPincode());
-        addr.setLatitude(req.getLatitude());
-        addr.setLongitude(req.getLongitude());
+
+        // Auto-fill lat/long from pincode if not provided
+        if (req.getLatitude() != null && req.getLongitude() != null) {
+            addr.setLatitude(req.getLatitude());
+            addr.setLongitude(req.getLongitude());
+        } else if (req.getPincode() != null && !req.getPincode().isBlank()) {
+            java.math.BigDecimal[] coords = pincodeCoordinateService.getCoordinates(req.getPincode());
+            addr.setLatitude(coords[0]);
+            addr.setLongitude(coords[1]);
+        }
+
         addr.setIsDefault(req.getIsDefault());
         return addressRepo.save(addr);
     }
@@ -81,8 +91,17 @@ public class UserService {
         addr.setCity(req.getCity());
         addr.setState(req.getState());
         addr.setPincode(req.getPincode());
-        addr.setLatitude(req.getLatitude());
-        addr.setLongitude(req.getLongitude());
+
+        // Auto-fill lat/long from pincode if not provided
+        if (req.getLatitude() != null && req.getLongitude() != null) {
+            addr.setLatitude(req.getLatitude());
+            addr.setLongitude(req.getLongitude());
+        } else if (req.getPincode() != null && !req.getPincode().isBlank()) {
+            java.math.BigDecimal[] coords = pincodeCoordinateService.getCoordinates(req.getPincode());
+            addr.setLatitude(coords[0]);
+            addr.setLongitude(coords[1]);
+        }
+
         addr.setIsDefault(req.getIsDefault());
         return addressRepo.save(addr);
     }

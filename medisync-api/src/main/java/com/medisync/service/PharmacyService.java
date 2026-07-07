@@ -1,6 +1,7 @@
 package com.medisync.service;
 
 import com.medisync.dto.PharmacyRegisterRequest;
+import com.medisync.dto.PharmacyUpdateRequest;
 import com.medisync.entity.Pharmacy;
 import com.medisync.repository.MedicineRepository;
 import com.medisync.repository.PharmacyRepository;
@@ -19,6 +20,7 @@ public class PharmacyService {
     private final PharmacyRepository pharmacyRepository;
     private final MedicineRepository medicineRepository;
     private final PasswordEncoder passwordEncoder;
+    private final PincodeCoordinateService pincodeCoordinateService;
 
     public Pharmacy register(PharmacyRegisterRequest req) {
         if (pharmacyRepository.existsByEmail(req.getEmail()))
@@ -37,8 +39,17 @@ public class PharmacyService {
         pharmacy.setState(req.getState());
         pharmacy.setPincode(req.getPincode());
         pharmacy.setPhone(req.getPhone());
-        pharmacy.setLatitude(req.getLatitude());
-        pharmacy.setLongitude(req.getLongitude());
+
+        // Auto-fill lat/long from pincode if not provided
+        if (req.getLatitude() != null && req.getLongitude() != null) {
+            pharmacy.setLatitude(req.getLatitude());
+            pharmacy.setLongitude(req.getLongitude());
+        } else if (req.getPincode() != null && !req.getPincode().isBlank()) {
+            java.math.BigDecimal[] coords = pincodeCoordinateService.getCoordinates(req.getPincode());
+            pharmacy.setLatitude(coords[0]);
+            pharmacy.setLongitude(coords[1]);
+        }
+
         pharmacy.setApprovalStatus("pending");
         return pharmacyRepository.save(pharmacy);
     }
@@ -48,7 +59,7 @@ public class PharmacyService {
                 .orElseThrow(() -> new RuntimeException("Pharmacy not found"));
     }
 
-    public Pharmacy update(Long id, PharmacyRegisterRequest req) {
+    public Pharmacy update(Long id, PharmacyUpdateRequest req) {
         Pharmacy pharmacy = getById(id);
         pharmacy.setOwnerName(req.getOwnerName());
         pharmacy.setPharmacyName(req.getPharmacyName());
@@ -58,8 +69,17 @@ public class PharmacyService {
         pharmacy.setState(req.getState());
         pharmacy.setPincode(req.getPincode());
         pharmacy.setPhone(req.getPhone());
-        pharmacy.setLatitude(req.getLatitude());
-        pharmacy.setLongitude(req.getLongitude());
+
+        // Auto-fill lat/long from pincode if not provided
+        if (req.getLatitude() != null && req.getLongitude() != null) {
+            pharmacy.setLatitude(req.getLatitude());
+            pharmacy.setLongitude(req.getLongitude());
+        } else if (req.getPincode() != null && !req.getPincode().isBlank()) {
+            java.math.BigDecimal[] coords = pincodeCoordinateService.getCoordinates(req.getPincode());
+            pharmacy.setLatitude(coords[0]);
+            pharmacy.setLongitude(coords[1]);
+        }
+
         return pharmacyRepository.save(pharmacy);
     }
 

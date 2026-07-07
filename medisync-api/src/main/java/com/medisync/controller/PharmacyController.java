@@ -3,6 +3,7 @@ package com.medisync.controller;
 import com.medisync.dto.AuthResponse;
 import com.medisync.dto.LoginRequest;
 import com.medisync.dto.PharmacyRegisterRequest;
+import com.medisync.dto.PharmacyUpdateRequest;
 import com.medisync.entity.Pharmacy;
 import com.medisync.service.AuthService;
 import com.medisync.service.PharmacyService;
@@ -39,7 +40,7 @@ public class PharmacyController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Pharmacy> update(@PathVariable Long id, @Valid @RequestBody PharmacyRegisterRequest req) {
+    public ResponseEntity<Pharmacy> update(@PathVariable Long id, @Valid @RequestBody PharmacyUpdateRequest req) {
         return ResponseEntity.ok(pharmacyService.update(id, req));
     }
 

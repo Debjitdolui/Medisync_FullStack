@@ -134,13 +134,7 @@ export class SettingsComponent implements OnInit {
   saveProfile(): void {
     if (!this.pharmacy) return;
 
-    const request: any = {
-      ...this.pharmacyForm,
-      email: this.pharmacy.email,
-      password: ''
-    };
-
-    this.pharmacyService.updatePharmacy(this.pharmacy.pharmacyId, request).subscribe(() => {
+    this.pharmacyService.updatePharmacy(this.pharmacy.pharmacyId, this.pharmacyForm).subscribe(() => {
       this.loadPharmacyData();
     });
   }
