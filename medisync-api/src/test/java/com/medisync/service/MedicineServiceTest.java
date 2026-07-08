@@ -2,14 +2,8 @@ package com.medisync.service;
 
 import com.medisync.dto.MedicineRequest;
 import com.medisync.dto.StockUpdateRequest;
-import com.medisync.entity.InventoryLog;
-import com.medisync.entity.Medicine;
-import com.medisync.entity.MedicineCategory;
-import com.medisync.entity.Pharmacy;
-import com.medisync.repository.InventoryLogRepository;
-import com.medisync.repository.MedicineCategoryRepository;
-import com.medisync.repository.MedicineRepository;
-import com.medisync.repository.PharmacyRepository;
+import com.medisync.entity.*;
+import com.medisync.repository.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -17,7 +11,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -40,6 +33,9 @@ class MedicineServiceTest {
     @Mock
     private InventoryLogRepository inventoryLogRepository;
 
+    @Mock
+    private MasterMedicineRepository masterMedicineRepository;
+
     @InjectMocks
     private MedicineService medicineService;
 
@@ -52,34 +48,37 @@ class MedicineServiceTest {
         MedicineCategory category = new MedicineCategory();
         category.setCategoryId(1L);
 
+        MasterMedicine masterMedicine = new MasterMedicine();
+        masterMedicine.setMasterMedicineId(1L);
+        masterMedicine.setMedicineName("Paracetamol 500mg");
+        masterMedicine.setCategory(category);
+
         MedicineRequest request = new MedicineRequest();
         request.setPharmacyId(1L);
-        request.setCategoryId(1L);
-        request.setMedicineName("Paracetamol");
-        request.setManufacturer("PharmaCorp");
+        request.setMasterMedicineId(1L);
+        request.setBrand("Crocin");
         request.setPrice(new BigDecimal("50.00"));
         request.setStockQuantity(100);
-        request.setExpiryDate(LocalDate.of(2027, 6, 1));
         request.setDescription("Pain reliever");
 
         Medicine medicine = new Medicine();
         medicine.setMedicineId(1L);
         medicine.setPharmacy(pharmacy);
         medicine.setCategory(category);
-        medicine.setMedicineName("Paracetamol");
+        medicine.setMedicineName("Paracetamol 500mg");
         medicine.setStockQuantity(100);
 
         InventoryLog log = new InventoryLog();
         log.setLogId(1L);
 
         when(pharmacyRepository.findById(1L)).thenReturn(Optional.of(pharmacy));
-        when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
+        when(masterMedicineRepository.findById(1L)).thenReturn(Optional.of(masterMedicine));
         when(medicineRepository.save(any(Medicine.class))).thenReturn(medicine);
         when(inventoryLogRepository.save(any(InventoryLog.class))).thenReturn(log);
 
         Medicine result = medicineService.addMedicine(request);
 
-        assertEquals("Paracetamol", result.getMedicineName());
+        assertEquals("Paracetamol 500mg", result.getMedicineName());
         verify(medicineRepository).save(any(Medicine.class));
         verify(inventoryLogRepository).save(any(InventoryLog.class));
     }
@@ -127,6 +126,7 @@ class MedicineServiceTest {
     void testDeleteMedicine() {
         medicineService.deleteMedicine(1L);
 
+        verify(inventoryLogRepository).deleteByMedicineMedicineId(1L);
         verify(medicineRepository).deleteById(1L);
     }
 }
