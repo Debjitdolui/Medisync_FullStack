@@ -24,6 +24,7 @@ export class SignupComponent implements OnInit {
   // Nurse services for multi-select
   availableServices: NurseService[] = [];
   selectedServiceIds: number[] = [];
+  showServiceDropdown = false;
 
   constructor(
     private fb: FormBuilder,
@@ -72,6 +73,10 @@ export class SignupComponent implements OnInit {
     } else {
       this.selectedServiceIds.push(serviceId);
     }
+  }
+
+  getServiceName(serviceId: number): string {
+    return this.availableServices.find(s => s.serviceId === serviceId)?.serviceName || '';
   }
 
   get f() { return this.signupForm.controls; }
