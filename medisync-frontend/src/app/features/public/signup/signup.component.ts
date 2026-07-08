@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { ReactiveFormsModule, FormGroup, FormBuilder, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth.service';
+import { NurseApiService } from '../../../core/services/nurse.service';
+import { NurseService } from '../../../core/models';
 
 @Component({
   selector: 'app-signup',
@@ -19,9 +21,14 @@ export class SignupComponent implements OnInit {
   successMessage = '';
   submitted = false;
 
+  // Nurse services for multi-select
+  availableServices: NurseService[] = [];
+  selectedServiceIds: number[] = [];
+
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
+    private nurseApiService: NurseApiService,
     private router: Router
   ) {}
 
@@ -51,6 +58,20 @@ export class SignupComponent implements OnInit {
     this.signupForm.get('selectedRole')!.valueChanges.subscribe(role => {
       this.onRoleChange(role);
     });
+
+    // Load nurse services for multi-select
+    this.nurseApiService.getServices().subscribe(services => {
+      this.availableServices = services;
+    });
+  }
+
+  toggleServiceSelection(serviceId: number): void {
+    const idx = this.selectedServiceIds.indexOf(serviceId);
+    if (idx > -1) {
+      this.selectedServiceIds.splice(idx, 1);
+    } else {
+      this.selectedServiceIds.push(serviceId);
+    }
   }
 
   get f() { return this.signupForm.controls; }
@@ -75,7 +96,7 @@ export class SignupComponent implements OnInit {
 
   onRoleChange(role: string): void {
     const pharmacyFields = ['pharmacyName', 'licenseNumber', 'address', 'city', 'state', 'pincode'];
-    const nurseFields = ['qualification', 'nurseLicense', 'specialization'];
+    const nurseFields = ['qualification', 'nurseLicense'];
 
     // Clear all role-specific validators
     [...pharmacyFields, ...nurseFields].forEach(field => {
@@ -179,7 +200,8 @@ export class SignupComponent implements OnInit {
           phone: formValue.phone,
           qualification: formValue.qualification,
           licenseNumber: formValue.nurseLicense,
-          specialization: formValue.specialization
+          specialization: formValue.specialization,
+          serviceIds: this.selectedServiceIds
         }).subscribe({
           next: () => {
             this.isLoading = false;

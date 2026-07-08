@@ -1,13 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 import { AdminService } from '../../../core/services/admin.service';
-import { Nurse } from '../../../core/models';
+import { Nurse, NurseService } from '../../../core/models';
 import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-nurse-approvals',
   standalone: true,
-  imports: [CommonModule, PaginationComponent],
+  imports: [CommonModule, FormsModule, PaginationComponent],
   templateUrl: './nurse-approvals.component.html',
   styleUrl: './nurse-approvals.component.scss'
 })
@@ -24,9 +27,37 @@ export class NurseApprovalsComponent implements OnInit {
   modalTarget: Nurse | null = null;
   isProcessing = false;
 
-  constructor(private adminService: AdminService) {}
+  // Services modal
+  showServicesModal = false;
+  nurseServices: NurseService[] = [];
+  newService = { serviceName: '', description: '', basePrice: 0 };
 
-  ngOnInit(): void { this.loadNurses(); }
+  constructor(private adminService: AdminService, private http: HttpClient) {}
+
+  ngOnInit(): void {
+    this.loadNurses();
+    this.loadServices();
+  }
+
+  private loadServices(): void {
+    this.http.get<NurseService[]>(`${environment.apiUrl}/admin/nurse-services`).subscribe(s => {
+      this.nurseServices = s;
+    });
+  }
+
+  addService(): void {
+    if (!this.newService.serviceName.trim()) return;
+    this.http.post<NurseService>(`${environment.apiUrl}/admin/nurse-services`, this.newService).subscribe(s => {
+      this.nurseServices.push(s);
+      this.newService = { serviceName: '', description: '', basePrice: 0 };
+    });
+  }
+
+  deleteService(id: number): void {
+    this.http.delete(`${environment.apiUrl}/admin/nurse-services/${id}`).subscribe(() => {
+      this.nurseServices = this.nurseServices.filter(s => s.serviceId !== id);
+    });
+  }
 
   loadNurses(): void {
     this.adminService.getAllNurses().subscribe(page => { this.nurses = [...page.content]; });

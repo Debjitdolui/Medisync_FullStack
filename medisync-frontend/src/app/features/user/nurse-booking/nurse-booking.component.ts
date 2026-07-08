@@ -30,13 +30,6 @@ export class NurseBookingComponent implements OnInit {
   bookingSuccess = false;
   minBookingDate = '';
 
-  // Service → Specialization mapping for filtering
-  private serviceSpecMap: { [key: string]: string[] } = {
-    'Home Injection': ['Home Care', 'IV Therapy'],
-    'Wound Dressing': ['Wound Care', 'Home Care'],
-    'Vital Monitoring': ['Elderly Care', 'Home Care']
-  };
-
   constructor(
     private nurseService: NurseApiService,
     private nurseRequestService: NurseRequestService,
@@ -73,24 +66,9 @@ export class NurseBookingComponent implements OnInit {
   }
 
   private filterNursesByService(service: NurseService): void {
-    const matchingSpecs = this.serviceSpecMap[service.serviceName] || [];
-
-    if (matchingSpecs.length === 0) {
-      // No mapping found, show all
-      this.filteredNurses = [...this.allNurses];
-      return;
-    }
-
-    this.filteredNurses = this.allNurses.filter(nurse =>
-      matchingSpecs.some(spec =>
-        nurse.specialization.toLowerCase().includes(spec.toLowerCase())
-      )
-    );
-
-    // If no nurses match, show all (better UX than empty)
-    if (this.filteredNurses.length === 0) {
-      this.filteredNurses = [...this.allNurses];
-    }
+    this.nurseService.getAvailableNurses(service.serviceId).subscribe(nurses => {
+      this.filteredNurses = nurses;
+    });
   }
 
   // Ratings cache

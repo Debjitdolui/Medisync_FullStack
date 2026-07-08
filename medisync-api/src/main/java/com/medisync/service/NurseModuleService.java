@@ -8,7 +8,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +36,13 @@ public class NurseModuleService {
         nurse.setQualification(req.getQualification());
         nurse.setLicenseNumber(req.getLicenseNumber());
         nurse.setSpecialization(req.getSpecialization());
+
+        // Set offered services
+        if (req.getServiceIds() != null && !req.getServiceIds().isEmpty()) {
+            Set<NurseService> services = new HashSet<>(nurseServiceRepository.findAllById(req.getServiceIds()));
+            nurse.setOfferedServices(services);
+        }
+
         return nurseRepository.save(nurse);
     }
 
@@ -46,6 +55,14 @@ public class NurseModuleService {
 
     public List<Nurse> getAvailableNurses() {
         return nurseRepository.findByAvailabilityStatusAndApprovalStatus("online", "approved");
+    }
+
+    public List<Nurse> getAvailableNursesByService(Long serviceId) {
+        List<Nurse> availableNurses = nurseRepository.findByAvailabilityStatusAndApprovalStatus("online", "approved");
+        return availableNurses.stream()
+                .filter(nurse -> nurse.getOfferedServices().stream()
+                        .anyMatch(s -> s.getServiceId().equals(serviceId)))
+                .toList();
     }
 
     public Nurse getNurseById(Long id) {

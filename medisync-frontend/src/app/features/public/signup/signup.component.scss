@@ -378,3 +378,47 @@
     flex-direction: column;
   }
 }
+
+
+// Services multi-select
+.services-multiselect {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.service-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s;
+
+  i { font-size: 16px; color: #94a3b8; }
+
+  &:hover {
+    border-color: #1a73e8;
+  }
+
+  &.selected {
+    border-color: #1a73e8;
+    background: #e8f0fe;
+    i { color: #1a73e8; }
+    span { color: #1a73e8; font-weight: 500; }
+  }
+}
+
+.no-services {
+  font-size: 12px;
+  color: #94a3b8;
+  padding: 8px;
+}

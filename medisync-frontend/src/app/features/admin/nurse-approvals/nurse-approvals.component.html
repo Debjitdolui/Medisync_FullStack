@@ -1,7 +1,12 @@
 <div class="nurse-approvals">
   <div class="page-header">
-    <h1><i class="ti ti-nurse"></i> Nurse Approvals</h1>
-    <p class="subtitle">Manage nurse registration requests</p>
+    <div>
+      <h1><i class="ti ti-nurse"></i> Nurse Approvals</h1>
+      <p class="subtitle">Manage nurse registration requests</p>
+    </div>
+    <button class="btn-services" (click)="showServicesModal = true">
+      <i class="ti ti-settings"></i> Manage Services
+    </button>
   </div>
   <div class="tabs-bar">
     <button class="tab-btn" [class.active]="activeTab === 'all'" (click)="activeTab = 'all'">
@@ -93,6 +98,42 @@
         <button class="btn-confirm" [ngClass]="modalAction" (click)="confirmAction()" [disabled]="isProcessing">
           {{ isProcessing ? 'Processing...' : (modalAction === 'block' ? 'Block' : 'Unblock') }}
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Manage Services Modal -->
+  <div class="modal-overlay" *ngIf="showServicesModal" (click)="showServicesModal = false">
+    <div class="services-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Manage Nurse Services</h3>
+        <button class="modal-close-btn" (click)="showServicesModal = false"><i class="ti ti-x"></i></button>
+      </div>
+      <div class="modal-body">
+        <!-- Add new service form -->
+        <div class="service-form">
+          <input type="text" class="form-input" [(ngModel)]="newService.serviceName" placeholder="Service name (e.g., IV Drip)" />
+          <input type="text" class="form-input" [(ngModel)]="newService.description" placeholder="Description" />
+          <input type="number" class="form-input small" [(ngModel)]="newService.basePrice" placeholder="Base Price (₹)" min="0" />
+          <button class="btn-add-service" (click)="addService()">
+            <i class="ti ti-plus"></i> Add
+          </button>
+        </div>
+
+        <!-- Existing services list -->
+        <div class="services-list">
+          <div *ngFor="let svc of nurseServices" class="service-item">
+            <div class="service-info">
+              <span class="service-name">{{ svc.serviceName }}</span>
+              <span class="service-desc">{{ svc.description }}</span>
+              <span class="service-price">₹{{ svc.basePrice }}</span>
+            </div>
+            <button class="btn-delete-service" (click)="deleteService(svc.serviceId)">
+              <i class="ti ti-trash"></i>
+            </button>
+          </div>
+          <p *ngIf="nurseServices.length === 0" class="empty-text">No services added yet</p>
+        </div>
       </div>
     </div>
   </div>

@@ -35,7 +35,10 @@ public class NurseController {
     }
 
     @GetMapping("/available")
-    public ResponseEntity<?> getAvailableNurses() {
+    public ResponseEntity<?> getAvailableNurses(@RequestParam(required = false) Long serviceId) {
+        if (serviceId != null) {
+            return ResponseEntity.ok(nurseModuleService.getAvailableNursesByService(serviceId));
+        }
         return ResponseEntity.ok(nurseModuleService.getAvailableNurses());
     }
 

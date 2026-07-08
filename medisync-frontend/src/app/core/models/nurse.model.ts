@@ -6,6 +6,7 @@ export interface Nurse {
   qualification: string;
   licenseNumber: string;
   specialization: string;
+  offeredServices?: NurseService[];
   availabilityStatus: 'online' | 'offline';
   approvalStatus: 'pending' | 'approved' | 'rejected';
   isBlocked?: boolean;
@@ -20,7 +21,8 @@ export interface NurseRegisterRequest {
   phone: string;
   qualification: string;
   licenseNumber: string;
-  specialization: string;
+  specialization?: string;
+  serviceIds?: number[];
 }
 
 export interface NurseService {

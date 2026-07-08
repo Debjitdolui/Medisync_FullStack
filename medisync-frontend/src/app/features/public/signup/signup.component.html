@@ -220,15 +220,24 @@
                 </span>
               </div>
               <div class="form-group">
+                <label class="form-label">Services Offered *</label>
+                <div class="services-multiselect">
+                  <div *ngFor="let svc of availableServices" class="service-checkbox"
+                       [class.selected]="selectedServiceIds.includes(svc.serviceId)"
+                       (click)="toggleServiceSelection(svc.serviceId)">
+                    <i class="ti" [ngClass]="selectedServiceIds.includes(svc.serviceId) ? 'ti-circle-check-filled' : 'ti-circle'"></i>
+                    <span>{{ svc.serviceName }}</span>
+                  </div>
+                  <p *ngIf="availableServices.length === 0" class="no-services">No services available yet</p>
+                </div>
+              </div>
+              <div class="form-group">
                 <label class="form-label">Specialization</label>
-                <div class="input-wrapper" [class.invalid]="submitted && f['specialization'].errors">
+                <div class="input-wrapper">
                   <i class="ti ti-stethoscope"></i>
-                  <input type="text" class="form-input" placeholder="e.g., Home Care"
+                  <input type="text" class="form-input" placeholder="e.g., Home Care, Elder Care"
                          formControlName="specialization">
                 </div>
-                <span class="field-error" *ngIf="submitted && f['specialization'].errors">
-                  <span *ngIf="f['specialization'].errors['required']">Specialization is required</span>
-                </span>
               </div>
             </div>
           </ng-container>

@@ -10,8 +10,11 @@ export class NurseApiService {
 
   constructor(private http: HttpClient) {}
 
-  getAvailableNurses(): Observable<Nurse[]> {
-    return this.http.get<Nurse[]>(`${this.apiUrl}/available`);
+  getAvailableNurses(serviceId?: number): Observable<Nurse[]> {
+    const url = serviceId
+      ? `${this.apiUrl}/available?serviceId=${serviceId}`
+      : `${this.apiUrl}/available`;
+    return this.http.get<Nurse[]>(url);
   }
 
   getNurseById(id: number): Observable<Nurse> {

@@ -7,6 +7,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -41,6 +43,15 @@ public class Nurse {
 
     @Column(name = "specialization")
     private String specialization;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "nurse_offered_services",
+        schema = "dev",
+        joinColumns = @JoinColumn(name = "nurse_id"),
+        inverseJoinColumns = @JoinColumn(name = "service_id")
+    )
+    private Set<NurseService> offeredServices = new HashSet<>();
 
     @Column(name = "availability_status", columnDefinition = "varchar(255) default 'offline'")
     private String availabilityStatus = "offline";
