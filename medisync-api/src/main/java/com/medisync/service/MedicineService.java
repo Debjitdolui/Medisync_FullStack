@@ -19,16 +19,20 @@ public class MedicineService {
     private final MedicineCategoryRepository categoryRepository;
     private final PharmacyRepository pharmacyRepository;
     private final InventoryLogRepository inventoryLogRepository;
+    private final MasterMedicineRepository masterMedicineRepository;
 
     public Medicine addMedicine(MedicineRequest req) {
+        MasterMedicine master = masterMedicineRepository.findById(req.getMasterMedicineId())
+                .orElseThrow(() -> new RuntimeException("Master medicine not found"));
+
         Medicine m = new Medicine();
         m.setPharmacy(pharmacyRepository.findById(req.getPharmacyId()).orElseThrow());
-        m.setCategory(categoryRepository.findById(req.getCategoryId()).orElseThrow());
-        m.setMedicineName(req.getMedicineName());
-        m.setManufacturer(req.getManufacturer());
+        m.setMasterMedicine(master);
+        m.setCategory(master.getCategory());
+        m.setMedicineName(master.getMedicineName());
+        m.setBrand(req.getBrand());
         m.setPrice(req.getPrice());
         m.setStockQuantity(req.getStockQuantity());
-        m.setExpiryDate(req.getExpiryDate());
         m.setDescription(req.getDescription());
         Medicine saved = medicineRepository.save(m);
 
@@ -43,12 +47,16 @@ public class MedicineService {
 
     public Medicine updateMedicine(Long id, MedicineRequest req) {
         Medicine m = medicineRepository.findById(id).orElseThrow();
-        m.setCategory(categoryRepository.findById(req.getCategoryId()).orElseThrow());
-        m.setMedicineName(req.getMedicineName());
-        m.setManufacturer(req.getManufacturer());
+
+        MasterMedicine master = masterMedicineRepository.findById(req.getMasterMedicineId())
+                .orElseThrow(() -> new RuntimeException("Master medicine not found"));
+
+        m.setMasterMedicine(master);
+        m.setCategory(master.getCategory());
+        m.setMedicineName(master.getMedicineName());
+        m.setBrand(req.getBrand());
         m.setPrice(req.getPrice());
         m.setStockQuantity(req.getStockQuantity());
-        m.setExpiryDate(req.getExpiryDate());
         m.setDescription(req.getDescription());
         return medicineRepository.save(m);
     }
@@ -95,6 +103,6 @@ public class MedicineService {
     }
 
     public List<String> getAllMedicineNames() {
-        return medicineRepository.findAllDistinctMedicineNames();
+        return masterMedicineRepository.findAllMedicineNames();
     }
 }

@@ -38,6 +38,7 @@ public class SecurityConfig {
                     "/api/pharmacies/*/images",
                     "/api/nurses/register",
                     "/api/nurses/login",
+                    "/api/master-medicines/**",
                     "/api/search/**",
                     "/uploads/**"
                 ).permitAll()

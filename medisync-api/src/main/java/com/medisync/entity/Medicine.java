@@ -5,7 +5,6 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -13,7 +12,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Entity
 @Table(name = "medicines", schema = "dev", uniqueConstraints = {
-    @UniqueConstraint(columnNames = {"pharmacy_id", "medicine_name"})
+    @UniqueConstraint(columnNames = {"pharmacy_id", "master_medicine_id", "brand"})
 })
 public class Medicine {
 
@@ -27,23 +26,24 @@ public class Medicine {
     private Pharmacy pharmacy;
 
     @ManyToOne
+    @JoinColumn(name = "master_medicine_id")
+    private MasterMedicine masterMedicine;
+
+    @ManyToOne
     @JoinColumn(name = "category_id")
     private MedicineCategory category;
 
     @Column(name = "medicine_name")
     private String medicineName;
 
-    @Column(name = "manufacturer")
-    private String manufacturer;
+    @Column(name = "brand")
+    private String brand;
 
     @Column(name = "price")
     private BigDecimal price;
 
     @Column(name = "stock_quantity")
     private int stockQuantity;
-
-    @Column(name = "expiry_date")
-    private LocalDate expiryDate;
 
     @Column(name = "description")
     private String description;

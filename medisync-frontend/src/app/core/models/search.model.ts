@@ -24,7 +24,7 @@ export interface PrescriptionSearchResult {
 export interface MedicineItem {
   medicineId: number;
   medicineName: string;
-  manufacturer: string;
+  brand: string;
   price: number;
   stockQuantity: number;
   categoryName: string;

@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { SearchService } from '../../../core/services/search.service';
 import { MedicineService } from '../../../core/services/medicine.service';
+import { MasterMedicineService } from '../../../core/services/master-medicine.service';
 import { PharmacyService } from '../../../core/services/pharmacy.service';
 import { AddressService } from '../../../core/services/address.service';
 import { ReviewService } from '../../../core/services/review.service';
@@ -76,6 +77,7 @@ export class MedicineSearchComponent implements OnInit {
   constructor(
     private searchService: SearchService,
     private medicineService: MedicineService,
+    private masterMedicineService: MasterMedicineService,
     private pharmacyService: PharmacyService,
     private addressService: AddressService,
     private reviewService: ReviewService,
@@ -145,24 +147,8 @@ export class MedicineSearchComponent implements OnInit {
   }
 
   private loadMedicineNames(): void {
-    this.medicineService.getMedicinesByPharmacy(1).subscribe(page => {
-      const names = new Set<string>();
-      names.add('Paracetamol 500mg');
-      names.add('Amoxicillin 500mg');
-      names.add('Azithromycin 250mg');
-      names.add('Pantoprazole 40mg');
-      names.add('Cetirizine 10mg');
-      names.add('Metformin 500mg');
-      names.add('Omeprazole 20mg');
-      names.add('Ibuprofen 400mg');
-      names.add('Amlodipine 5mg');
-      names.add('Vitamin D3 1000IU');
-      names.add('Montelukast 10mg');
-      names.add('Ciprofloxacin 500mg');
-      names.add('Diclofenac 50mg');
-      names.add('Salbutamol Inhaler');
-      page.content.forEach(m => names.add(m.medicineName));
-      this.allMedicineNames = Array.from(names).sort();
+    this.masterMedicineService.getNames().subscribe(names => {
+      this.allMedicineNames = names.sort();
     });
   }
 
@@ -374,5 +360,21 @@ export class MedicineSearchComponent implements OnInit {
     const updated = [...terms.filter(t => !existing.includes(t)), ...existing].slice(0, 8);
     this.recentSearches = updated;
     localStorage.setItem('recentMedicineSearches', JSON.stringify(updated));
+  }
+
+  // ─── Medicine Checklist Helpers ────────────────────────────────────────────────
+
+  isMedicineFound(result: PrescriptionSearchResult, name: string): boolean {
+    return result.medicines.some(m => m.medicineName.toLowerCase() === name.toLowerCase());
+  }
+
+  getMedicinePrice(result: PrescriptionSearchResult, name: string): number {
+    const med = result.medicines.find(m => m.medicineName.toLowerCase() === name.toLowerCase());
+    return med ? med.price : 0;
+  }
+
+  getMedicineBrand(result: PrescriptionSearchResult, name: string): string {
+    const med = result.medicines.find(m => m.medicineName.toLowerCase() === name.toLowerCase());
+    return med?.brand || '';
   }
 }

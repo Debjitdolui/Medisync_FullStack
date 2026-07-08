@@ -191,6 +191,22 @@
                   <i class="ti ti-circle-check"></i> All Available
                 </span>
               </div>
+
+              <!-- Medicine Checklist -->
+              <div class="medicine-checklist">
+                <div *ngFor="let name of selectedMedicines" class="checklist-item"
+                     [ngClass]="{'found': isMedicineFound(result, name), 'not-found': !isMedicineFound(result, name)}">
+                  <i class="ti" [ngClass]="isMedicineFound(result, name) ? 'ti-circle-check' : 'ti-circle-x'"></i>
+                  <span class="checklist-name">{{ name }}</span>
+                  <span class="checklist-detail" *ngIf="isMedicineFound(result, name)">
+                    — ₹{{ getMedicinePrice(result, name) }}
+                    <span *ngIf="getMedicineBrand(result, name)"> ({{ getMedicineBrand(result, name) }})</span>
+                  </span>
+                  <span class="checklist-detail not-available" *ngIf="!isMedicineFound(result, name)">
+                    — Not available
+                  </span>
+                </div>
+              </div>
             </div>
             <div class="presc-actions">
               <button class="btn-view-detail" (click)="openPharmacyDetail(result)">

@@ -30,7 +30,7 @@ public class PharmacySearchResult {
     public static class MedicineItem {
         private Long medicineId;
         private String medicineName;
-        private String manufacturer;
+        private String brand;
         private BigDecimal price;
         private int stockQuantity;
         private String categoryName;

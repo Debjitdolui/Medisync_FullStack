@@ -35,7 +35,7 @@
         <div class="medicine-top">
           <div class="medicine-name-group">
             <span class="medicine-name">{{ medicine.medicineName }}</span>
-            <span class="medicine-mfg">by {{ medicine.manufacturer }}</span>
+            <span class="medicine-mfg">by {{ medicine.brand }}</span>
           </div>
           <span class="stock-badge" [ngClass]="medicine.stockQuantity > 0 ? 'in-stock' : 'out-stock'">
             <i class="ti" [ngClass]="medicine.stockQuantity > 0 ? 'ti-circle-check' : 'ti-circle-x'"></i>

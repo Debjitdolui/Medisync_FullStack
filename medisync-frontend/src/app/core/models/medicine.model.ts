@@ -6,16 +6,23 @@ export interface MedicineCategory {
   description?: string;
 }
 
+export interface MasterMedicine {
+  masterMedicineId: number;
+  medicineName: string;
+  category: MedicineCategory;
+  createdAt?: string;
+}
+
 export interface Medicine {
   medicineId: number;
   pharmacy: Pharmacy;
+  masterMedicine?: MasterMedicine;
   category: MedicineCategory;
   medicineName: string;
-  manufacturer?: string;
+  brand?: string;
   price: number;
   mrp?: number;
   stockQuantity: number;
-  expiryDate: string;
   description?: string;
   createdAt: string;
   updatedAt: string;
@@ -23,12 +30,10 @@ export interface Medicine {
 
 export interface MedicineRequest {
   pharmacyId: number;
-  categoryId: number;
-  medicineName: string;
-  manufacturer?: string;
+  masterMedicineId: number;
+  brand?: string;
   price: number;
   stockQuantity: number;
-  expiryDate: string;
   description?: string;
 }
 

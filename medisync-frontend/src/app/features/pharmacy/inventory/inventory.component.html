@@ -51,7 +51,7 @@
           <tr>
             <th>Medicine Name</th>
             <th>Category</th>
-            <th>Manufacturer</th>
+            <th>Brand</th>
             <th>Price (₹)</th>
             <th>Stock</th>
             <th>Actions</th>
@@ -64,9 +64,9 @@
               <span class="med-desc" *ngIf="med.description">{{ med.description }}</span>
             </td>
             <td>
-              <span class="category-chip">{{ med.category.categoryName }}</span>
+              <span class="category-chip">{{ med.category?.categoryName }}</span>
             </td>
-            <td>{{ med.manufacturer || '—' }}</td>
+            <td>{{ med.brand || '—' }}</td>
             <td class="price-cell">₹{{ med.price }}</td>
             <td>
               <span class="stock-badge" [ngClass]="{
@@ -123,20 +123,26 @@
         <div class="form-row">
           <div class="form-group full">
             <label class="form-label">Medicine Name *</label>
-            <input type="text" class="form-input" [(ngModel)]="medicineForm.medicineName" placeholder="Enter medicine name" />
+            <div class="autocomplete-wrapper">
+              <input type="text" class="form-input" [(ngModel)]="masterSearchTerm"
+                     (input)="onMasterSearch()" (blur)="hideMasterSuggestionsDelayed()"
+                     placeholder="Search medicine name..." />
+              <div class="autocomplete-dropdown" *ngIf="showMasterSuggestions && filteredMasterMedicines.length > 0">
+                <div class="autocomplete-item" *ngFor="let m of filteredMasterMedicines" (mousedown)="selectMasterMedicine(m)">
+                  <span class="item-name">{{ m.medicineName }}</span>
+                  <span class="item-category">{{ m.category?.categoryName }}</span>
+                </div>
+              </div>
+            </div>
+            <span class="form-hint" *ngIf="selectedMasterMedicine">
+              Category: {{ selectedMasterMedicine.category?.categoryName }}
+            </span>
           </div>
         </div>
         <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Category *</label>
-            <select class="form-input" [(ngModel)]="medicineForm.categoryId">
-              <option value="">Select Category</option>
-              <option *ngFor="let cat of categories" [value]="cat.categoryId">{{ cat.categoryName }}</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Manufacturer</label>
-            <input type="text" class="form-input" [(ngModel)]="medicineForm.manufacturer" placeholder="e.g., Cipla" />
+          <div class="form-group full">
+            <label class="form-label">Brand Name</label>
+            <input type="text" class="form-input" [(ngModel)]="medicineForm.brand" placeholder="e.g., Crocin, Dolo" />
           </div>
         </div>
         <div class="form-row">
@@ -216,7 +222,7 @@
       <div class="modal-body">
         <div class="delete-warning">
           <i class="ti ti-alert-triangle"></i>
-          <p>Are you sure you want to delete <strong>{{ deleteMedicine?.medicineName }}</strong>?</p>
+          <p>Are you sure you want to delete <strong>{{ deletingMedicine?.medicineName }}</strong>?</p>
           <span>This action cannot be undone.</span>
         </div>
       </div>

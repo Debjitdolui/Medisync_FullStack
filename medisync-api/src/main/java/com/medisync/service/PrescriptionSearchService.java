@@ -4,6 +4,8 @@ import com.medisync.dto.PharmacySearchResult;
 import com.medisync.dto.PrescriptionSearchRequest;
 import com.medisync.entity.Medicine;
 import com.medisync.repository.MedicineRepository;
+import com.medisync.repository.MasterMedicineRepository;
+import com.medisync.entity.MasterMedicine;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
@@ -15,12 +17,26 @@ import java.util.stream.Collectors;
 public class PrescriptionSearchService {
 
     private final MedicineRepository medicineRepository;
+    private final MasterMedicineRepository masterMedicineRepository;
 
     public List<PharmacySearchResult> search(PrescriptionSearchRequest req) {
-        List<String> lowerNames = req.getMedicineNames().stream()
+        List<String> searchedNames = req.getMedicineNames().stream()
                 .map(String::toLowerCase).collect(Collectors.toList());
 
-        List<Medicine> medicines = medicineRepository.findByMedicineNameInAndInStock(lowerNames);
+        // Find master medicine IDs for the searched names
+        List<Long> masterIds = new ArrayList<>();
+        for (String name : searchedNames) {
+            masterMedicineRepository.findByMedicineNameIgnoreCase(name)
+                    .ifPresent(m -> masterIds.add(m.getMasterMedicineId()));
+        }
+
+        // Search by master medicine IDs if we found matches, otherwise fallback to name search
+        List<Medicine> medicines;
+        if (!masterIds.isEmpty()) {
+            medicines = medicineRepository.findByMasterMedicineIdsAndInStock(masterIds);
+        } else {
+            medicines = medicineRepository.findByMedicineNameInAndInStock(searchedNames);
+        }
 
         Map<Long, List<Medicine>> grouped = medicines.stream()
                 .collect(Collectors.groupingBy(m -> m.getPharmacy().getPharmacyId()));
@@ -51,14 +67,14 @@ public class PrescriptionSearchService {
             }
 
             int medicinesFound = foundNames.size();
-            boolean hasAll = medicinesFound == lowerNames.size();
+            boolean hasAll = medicinesFound == searchedNames.size();
 
             // Build medicine items list
             List<PharmacySearchResult.MedicineItem> medicineItems = meds.stream()
                     .map(m -> new PharmacySearchResult.MedicineItem(
                             m.getMedicineId(),
                             m.getMedicineName(),
-                            m.getManufacturer(),
+                            m.getBrand(),
                             m.getPrice(),
                             m.getStockQuantity(),
                             m.getCategory() != null ? m.getCategory().getCategoryName() : null
@@ -76,7 +92,7 @@ public class PrescriptionSearchService {
             result.setTotalPrice(totalPrice);
             result.setDistanceKm(distance);
             result.setMedicinesFound(medicinesFound);
-            result.setTotalSearched(lowerNames.size());
+            result.setTotalSearched(searchedNames.size());
             result.setHasAllMedicines(hasAll);
             result.setMedicines(medicineItems);
 

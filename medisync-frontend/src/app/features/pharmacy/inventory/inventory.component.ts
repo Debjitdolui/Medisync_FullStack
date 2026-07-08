@@ -2,8 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MedicineService } from '../../../core/services/medicine.service';
+import { MasterMedicineService } from '../../../core/services/master-medicine.service';
 import { PharmacyService } from '../../../core/services/pharmacy.service';
-import { Medicine, MedicineCategory, MedicineRequest } from '../../../core/models';
+import { Medicine, MasterMedicine, MedicineRequest } from '../../../core/models';
 import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 
 @Component({
@@ -33,7 +34,7 @@ export class InventoryComponent implements OnInit {
 
   medicines: Medicine[] = [];
   filteredMedicines: Medicine[] = [];
-  categories: MedicineCategory[] = [];
+  masterMedicines: MasterMedicine[] = [];
   pharmacyId = 1;
 
   // Filters
@@ -44,16 +45,20 @@ export class InventoryComponent implements OnInit {
   // Medicine Modal
   showMedicineModal = false;
   editingMedicine: Medicine | null = null;
-  medicineForm: MedicineRequest = {
+  medicineForm = {
     pharmacyId: 1,
-    categoryId: 0,
-    medicineName: '',
-    manufacturer: '',
+    masterMedicineId: 0,
+    brand: '',
     price: 0,
     stockQuantity: 0,
-    expiryDate: '',
     description: ''
   };
+
+  // Autocomplete for master medicine
+  masterSearchTerm = '';
+  filteredMasterMedicines: MasterMedicine[] = [];
+  showMasterSuggestions = false;
+  selectedMasterMedicine: MasterMedicine | null = null;
 
   // Stock Modal
   showStockModal = false;
@@ -63,10 +68,12 @@ export class InventoryComponent implements OnInit {
 
   // Delete Modal
   showDeleteModal = false;
-  deleteMedicine: Medicine | null = null;
+  deletingMedicine: Medicine | null = null;
+  deleteError = '';
 
   constructor(
     private medicineService: MedicineService,
+    private masterMedicineService: MasterMedicineService,
     private pharmacyService: PharmacyService
   ) {}
 
@@ -85,8 +92,8 @@ export class InventoryComponent implements OnInit {
       });
     });
 
-    this.medicineService.getCategories().subscribe(cats => {
-      this.categories = cats;
+    this.masterMedicineService.getAll().subscribe(list => {
+      this.masterMedicines = list;
     });
   }
 
@@ -97,13 +104,13 @@ export class InventoryComponent implements OnInit {
       const term = this.searchTerm.toLowerCase();
       result = result.filter(m =>
         m.medicineName.toLowerCase().includes(term) ||
-        (m.manufacturer && m.manufacturer.toLowerCase().includes(term))
+        (m.brand && m.brand.toLowerCase().includes(term))
       );
     }
 
     if (this.selectedCategory) {
       const catId = Number(this.selectedCategory);
-      result = result.filter(m => m.category.categoryId === catId);
+      result = result.filter(m => m.category?.categoryId === catId);
     }
 
     if (this.stockFilter) {
@@ -124,23 +131,44 @@ export class InventoryComponent implements OnInit {
     this.currentPage = 1;
   }
 
-  isExpiringSoon(expiryDate: string): boolean {
-    const thirtyDays = new Date();
-    thirtyDays.setDate(thirtyDays.getDate() + 30);
-    return new Date(expiryDate) <= thirtyDays;
+  // ─── Master Medicine Autocomplete ─────────────────────────────────────────────
+
+  onMasterSearch(): void {
+    const term = this.masterSearchTerm.trim().toLowerCase();
+    if (term.length > 0) {
+      this.filteredMasterMedicines = this.masterMedicines
+        .filter(m => m.medicineName.toLowerCase().includes(term))
+        .slice(0, 8);
+      this.showMasterSuggestions = true;
+    } else {
+      this.filteredMasterMedicines = [];
+      this.showMasterSuggestions = false;
+    }
   }
 
-  // Add Medicine
+  selectMasterMedicine(master: MasterMedicine): void {
+    this.selectedMasterMedicine = master;
+    this.masterSearchTerm = master.medicineName;
+    this.medicineForm.masterMedicineId = master.masterMedicineId;
+    this.showMasterSuggestions = false;
+  }
+
+  hideMasterSuggestionsDelayed(): void {
+    setTimeout(() => this.showMasterSuggestions = false, 200);
+  }
+
+  // ─── Add Medicine ─────────────────────────────────────────────────────────────
+
   openAddModal(): void {
     this.editingMedicine = null;
+    this.selectedMasterMedicine = null;
+    this.masterSearchTerm = '';
     this.medicineForm = {
       pharmacyId: this.pharmacyId,
-      categoryId: 0,
-      medicineName: '',
-      manufacturer: '',
+      masterMedicineId: 0,
+      brand: '',
       price: 0,
       stockQuantity: 0,
-      expiryDate: '',
       description: ''
     };
     this.showMedicineModal = true;
@@ -149,14 +177,14 @@ export class InventoryComponent implements OnInit {
   // Edit Medicine
   openEditModal(med: Medicine): void {
     this.editingMedicine = med;
+    this.selectedMasterMedicine = med.masterMedicine || null;
+    this.masterSearchTerm = med.medicineName;
     this.medicineForm = {
       pharmacyId: this.pharmacyId,
-      categoryId: med.category.categoryId,
-      medicineName: med.medicineName,
-      manufacturer: med.manufacturer || '',
+      masterMedicineId: med.masterMedicine?.masterMedicineId || 0,
+      brand: med.brand || '',
       price: med.price,
       stockQuantity: med.stockQuantity,
-      expiryDate: med.expiryDate,
       description: med.description || ''
     };
     this.showMedicineModal = true;
@@ -168,20 +196,29 @@ export class InventoryComponent implements OnInit {
   }
 
   saveMedicine(): void {
-    if (!this.medicineForm.medicineName || !this.medicineForm.categoryId || !this.medicineForm.price) {
+    if (!this.medicineForm.masterMedicineId || !this.medicineForm.price) {
       return;
     }
     if (this.medicineForm.price < 0 || this.medicineForm.stockQuantity < 0) {
       return;
     }
 
+    const request: MedicineRequest = {
+      pharmacyId: this.medicineForm.pharmacyId,
+      masterMedicineId: this.medicineForm.masterMedicineId,
+      brand: this.medicineForm.brand,
+      price: this.medicineForm.price,
+      stockQuantity: this.medicineForm.stockQuantity,
+      description: this.medicineForm.description
+    };
+
     if (this.editingMedicine) {
-      this.medicineService.updateMedicine(this.editingMedicine.medicineId, this.medicineForm).subscribe(() => {
+      this.medicineService.updateMedicine(this.editingMedicine.medicineId, request).subscribe(() => {
         this.loadData();
         this.closeMedicineModal();
       });
     } else {
-      this.medicineService.addMedicine(this.medicineForm).subscribe(() => {
+      this.medicineService.addMedicine(request).subscribe(() => {
         this.loadData();
         this.closeMedicineModal();
       });
@@ -215,17 +252,36 @@ export class InventoryComponent implements OnInit {
 
   // Delete
   confirmDelete(med: Medicine): void {
-    this.deleteMedicine = med;
+    this.deletingMedicine = med;
     this.showDeleteModal = true;
   }
 
   deleteConfirmed(): void {
-    if (!this.deleteMedicine) return;
+    if (!this.deletingMedicine) return;
 
-    this.medicineService.deleteMedicine(this.deleteMedicine.medicineId).subscribe(() => {
-      this.loadData();
-      this.showDeleteModal = false;
-      this.deleteMedicine = null;
+    this.medicineService.deleteMedicine(this.deletingMedicine.medicineId).subscribe({
+      next: () => {
+        this.loadData();
+        this.showDeleteModal = false;
+        this.deletingMedicine = null;
+      },
+      error: () => {
+        this.showDeleteModal = false;
+        this.deletingMedicine = null;
+        this.deleteError = 'Failed to delete medicine. Please try again.';
+        setTimeout(() => this.deleteError = '', 4000);
+      }
     });
+  }
+
+  // Get unique categories from loaded medicines
+  get categories(): { categoryId: number; categoryName: string }[] {
+    const map = new Map<number, string>();
+    this.medicines.forEach(m => {
+      if (m.category) {
+        map.set(m.category.categoryId, m.category.categoryName);
+      }
+    });
+    return Array.from(map.entries()).map(([categoryId, categoryName]) => ({ categoryId, categoryName }));
   }
 }
