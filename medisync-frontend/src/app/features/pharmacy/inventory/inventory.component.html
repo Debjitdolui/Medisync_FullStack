@@ -81,9 +81,6 @@
               <button class="action-btn edit" title="Edit" (click)="openEditModal(med)">
                 <i class="ti ti-pencil"></i>
               </button>
-              <button class="action-btn stock" title="Update Stock" (click)="openStockModal(med)">
-                <i class="ti ti-package"></i>
-              </button>
               <button class="action-btn delete" title="Delete" (click)="confirmDelete(med)">
                 <i class="ti ti-trash"></i>
               </button>
@@ -124,8 +121,10 @@
           <div class="form-group full">
             <label class="form-label">Medicine Name *</label>
             <div class="autocomplete-wrapper">
-              <input type="text" class="form-input" [(ngModel)]="masterSearchTerm"
-                     (input)="onMasterSearch()" (blur)="hideMasterSuggestionsDelayed()"
+              <input type="text" class="form-input" [class.input-error]="formErrors.masterMedicine"
+                     [(ngModel)]="masterSearchTerm"
+                     (input)="onMasterSearch(); clearError('masterMedicine')"
+                     (blur)="hideMasterSuggestionsDelayed()"
                      placeholder="Search medicine name..." />
               <div class="autocomplete-dropdown" *ngIf="showMasterSuggestions && filteredMasterMedicines.length > 0">
                 <div class="autocomplete-item" *ngFor="let m of filteredMasterMedicines" (mousedown)="selectMasterMedicine(m)">
@@ -137,6 +136,7 @@
             <span class="form-hint" *ngIf="selectedMasterMedicine">
               Category: {{ selectedMasterMedicine.category?.categoryName }}
             </span>
+            <span class="field-error" *ngIf="formErrors.masterMedicine">{{ formErrors.masterMedicine }}</span>
           </div>
         </div>
         <div class="form-row">
@@ -148,11 +148,17 @@
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">Price (₹) *</label>
-            <input type="number" class="form-input" [(ngModel)]="medicineForm.price" placeholder="0.00" min="0" />
+            <input type="number" class="form-input" [class.input-error]="formErrors.price"
+                   [(ngModel)]="medicineForm.price" placeholder="0.00" min="0"
+                   (input)="clearError('price')" />
+            <span class="field-error" *ngIf="formErrors.price">{{ formErrors.price }}</span>
           </div>
           <div class="form-group">
             <label class="form-label">Stock Quantity *</label>
-            <input type="number" class="form-input" [(ngModel)]="medicineForm.stockQuantity" placeholder="0" min="0" />
+            <input type="number" class="form-input" [class.input-error]="formErrors.stockQuantity"
+                   [(ngModel)]="medicineForm.stockQuantity" placeholder="0" min="0"
+                   (input)="clearError('stockQuantity')" />
+            <span class="field-error" *ngIf="formErrors.stockQuantity">{{ formErrors.stockQuantity }}</span>
           </div>
         </div>
         <div class="form-row">
@@ -167,45 +173,6 @@
         <button class="btn-primary" (click)="saveMedicine()">
           {{ editingMedicine ? 'Update Medicine' : 'Add Medicine' }}
         </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Stock Update Modal -->
-  <div class="modal-overlay" *ngIf="showStockModal" (click)="closeStockModal()">
-    <div class="modal-card small" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h3>Update Stock</h3>
-        <button class="modal-close" (click)="closeStockModal()">
-          <i class="ti ti-x"></i>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="stock-info">
-          <span class="stock-med-name">{{ stockMedicine?.medicineName }}</span>
-          <span class="stock-current">Current Stock: <strong>{{ stockMedicine?.stockQuantity }} units</strong></span>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Quantity</label>
-          <input type="number" class="form-input" [(ngModel)]="stockQuantity" min="1" placeholder="Enter quantity" />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Action</label>
-          <div class="radio-group">
-            <label class="radio-option" [class.active]="stockAction === 'add'">
-              <input type="radio" name="stockAction" value="add" [(ngModel)]="stockAction" />
-              <i class="ti ti-plus"></i> Add Stock
-            </label>
-            <label class="radio-option" [class.active]="stockAction === 'remove'">
-              <input type="radio" name="stockAction" value="remove" [(ngModel)]="stockAction" />
-              <i class="ti ti-minus"></i> Remove Stock
-            </label>
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-outline" (click)="closeStockModal()">Cancel</button>
-        <button class="btn-primary" (click)="updateStock()">Update Stock</button>
       </div>
     </div>
   </div>

@@ -60,11 +60,8 @@ export class InventoryComponent implements OnInit {
   showMasterSuggestions = false;
   selectedMasterMedicine: MasterMedicine | null = null;
 
-  // Stock Modal
-  showStockModal = false;
-  stockMedicine: Medicine | null = null;
-  stockQuantity = 0;
-  stockAction: 'add' | 'remove' = 'add';
+  // Form validation errors
+  formErrors: { masterMedicine?: string; price?: string; stockQuantity?: string } = {};
 
   // Delete Modal
   showDeleteModal = false;
@@ -193,15 +190,36 @@ export class InventoryComponent implements OnInit {
   closeMedicineModal(): void {
     this.showMedicineModal = false;
     this.editingMedicine = null;
+    this.formErrors = {};
+  }
+
+  clearError(field: string): void {
+    delete (this.formErrors as any)[field];
   }
 
   saveMedicine(): void {
-    if (!this.medicineForm.masterMedicineId || !this.medicineForm.price) {
-      return;
+    this.formErrors = {};
+    let hasError = false;
+
+    if (!this.medicineForm.masterMedicineId) {
+      this.formErrors.masterMedicine = 'Please select a medicine from the list.';
+      hasError = true;
     }
-    if (this.medicineForm.price < 0 || this.medicineForm.stockQuantity < 0) {
-      return;
+
+    if (!this.medicineForm.price || this.medicineForm.price <= 0) {
+      this.formErrors.price = 'Price must be greater than 0.';
+      hasError = true;
+    } else if (this.medicineForm.price < 0) {
+      this.formErrors.price = 'Price cannot be negative.';
+      hasError = true;
     }
+
+    if (this.medicineForm.stockQuantity < 0) {
+      this.formErrors.stockQuantity = 'Stock quantity cannot be negative.';
+      hasError = true;
+    }
+
+    if (hasError) return;
 
     const request: MedicineRequest = {
       pharmacyId: this.medicineForm.pharmacyId,
@@ -223,31 +241,6 @@ export class InventoryComponent implements OnInit {
         this.closeMedicineModal();
       });
     }
-  }
-
-  // Stock Update
-  openStockModal(med: Medicine): void {
-    this.stockMedicine = med;
-    this.stockQuantity = 0;
-    this.stockAction = 'add';
-    this.showStockModal = true;
-  }
-
-  closeStockModal(): void {
-    this.showStockModal = false;
-    this.stockMedicine = null;
-  }
-
-  updateStock(): void {
-    if (!this.stockMedicine || this.stockQuantity <= 0) return;
-
-    this.medicineService.updateStock(this.stockMedicine.medicineId, {
-      quantity: this.stockQuantity,
-      action: this.stockAction
-    }).subscribe(() => {
-      this.loadData();
-      this.closeStockModal();
-    });
   }
 
   // Delete
