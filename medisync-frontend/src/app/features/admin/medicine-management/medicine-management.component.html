@@ -3,12 +3,18 @@
   <div class="page-header">
     <div class="header-left">
       <h1>Medicine Management</h1>
-      <p class="header-sub">Add and manage medicines available on the platform</p>
+      <p class="header-sub">Add and manage medicines and categories available on the platform</p>
     </div>
-    <button class="btn-primary add-btn" (click)="openAddModal()">
-      <i class="ti ti-plus"></i>
-      Add Medicine
-    </button>
+    <div class="header-actions">
+      <button class="btn-secondary add-btn" (click)="showCategoryModal = true">
+        <i class="ti ti-category"></i>
+        Manage Categories
+      </button>
+      <button class="btn-primary add-btn" (click)="openAddModal()">
+        <i class="ti ti-plus"></i>
+        Add Medicine
+      </button>
+    </div>
   </div>
 
   <!-- Filters -->
@@ -141,6 +147,42 @@
       <div class="modal-footer">
         <button class="btn-outline" (click)="showDeleteModal = false">Cancel</button>
         <button class="btn-danger" (click)="deleteConfirmed()">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Category Management Modal -->
+  <div class="modal-overlay" *ngIf="showCategoryModal" (click)="showCategoryModal = false">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Manage Categories</h3>
+        <button class="modal-close" (click)="showCategoryModal = false">
+          <i class="ti ti-x"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- Add new category -->
+        <div class="category-add-row">
+          <input type="text" class="form-input" [(ngModel)]="newCategoryName" placeholder="New category name..." />
+          <button class="btn-primary btn-sm" (click)="addCategory()" [disabled]="!newCategoryName.trim()">
+            <i class="ti ti-plus"></i> Add
+          </button>
+        </div>
+        <p class="form-error" *ngIf="categoryError">{{ categoryError }}</p>
+
+        <!-- Category list -->
+        <div class="category-list">
+          <div *ngFor="let cat of categories" class="category-item">
+            <span class="category-chip">{{ cat.categoryName }}</span>
+            <button class="action-btn delete small" title="Delete" (click)="deleteCategory(cat.categoryId)">
+              <i class="ti ti-trash"></i>
+            </button>
+          </div>
+          <p *ngIf="categories.length === 0" class="empty-text">No categories yet</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-outline" (click)="showCategoryModal = false">Close</button>
       </div>
     </div>
   </div>

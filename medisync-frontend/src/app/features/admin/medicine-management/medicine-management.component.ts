@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 import { MasterMedicineService } from '../../../core/services/master-medicine.service';
 import { MedicineService } from '../../../core/services/medicine.service';
 import { MasterMedicine, MedicineCategory } from '../../../core/models';
 import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-medicine-management',
@@ -31,6 +33,11 @@ export class MedicineManagementComponent implements OnInit {
   showDeleteModal = false;
   deletingMedicine: MasterMedicine | null = null;
 
+  // Category management
+  showCategoryModal = false;
+  newCategoryName = '';
+  categoryError = '';
+
   // Pagination
   currentPage = 1;
   pageSize = 10;
@@ -45,7 +52,8 @@ export class MedicineManagementComponent implements OnInit {
 
   constructor(
     private masterMedicineService: MasterMedicineService,
-    private medicineService: MedicineService
+    private medicineService: MedicineService,
+    private http: HttpClient
   ) {}
 
   ngOnInit(): void {
@@ -135,6 +143,31 @@ export class MedicineManagementComponent implements OnInit {
       this.loadData();
       this.showDeleteModal = false;
       this.deletingMedicine = null;
+    });
+  }
+
+  // ─── Category Management ──────────────────────────────────────────────────────
+
+  addCategory(): void {
+    if (!this.newCategoryName.trim()) return;
+    this.categoryError = '';
+
+    this.http.post<MedicineCategory>(`${environment.apiUrl}/admin/categories`, {
+      categoryName: this.newCategoryName.trim()
+    }).subscribe({
+      next: (cat) => {
+        this.categories.push(cat);
+        this.newCategoryName = '';
+      },
+      error: (err) => {
+        this.categoryError = err.error?.error || 'Failed to add category.';
+      }
+    });
+  }
+
+  deleteCategory(id: number): void {
+    this.http.delete(`${environment.apiUrl}/admin/categories/${id}`).subscribe(() => {
+      this.categories = this.categories.filter(c => c.categoryId !== id);
     });
   }
 }

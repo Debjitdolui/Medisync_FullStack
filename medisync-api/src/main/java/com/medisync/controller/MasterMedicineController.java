@@ -93,4 +93,29 @@ public class MasterMedicineController {
     public ResponseEntity<List<MasterMedicine>> search(@RequestParam String query) {
         return ResponseEntity.ok(masterMedicineRepository.searchByName(query));
     }
+
+    // ─── Category Management (Admin) ────────────────────────────────────────────
+
+    @GetMapping("/api/admin/categories")
+    public ResponseEntity<List<MedicineCategory>> getCategories() {
+        return ResponseEntity.ok(categoryRepository.findAll());
+    }
+
+    @PostMapping("/api/admin/categories")
+    public ResponseEntity<?> createCategory(@RequestBody Map<String, String> body) {
+        String name = body.get("categoryName");
+        if (name == null || name.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Category name is required"));
+        }
+        MedicineCategory category = new MedicineCategory();
+        category.setCategoryName(name.trim());
+        category.setDescription(body.getOrDefault("description", ""));
+        return ResponseEntity.ok(categoryRepository.save(category));
+    }
+
+    @DeleteMapping("/api/admin/categories/{id}")
+    public ResponseEntity<?> deleteCategory(@PathVariable Long id) {
+        categoryRepository.deleteById(id);
+        return ResponseEntity.ok(Map.of("message", "Category deleted"));
+    }
 }
