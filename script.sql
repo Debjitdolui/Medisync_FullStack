@@ -1,4 +1,4 @@
--- ═══════════════════════════════════════════════════════════════════
+- ═══════════════════════════════════════════════════════════════════
 -- MediSync Database Seed Data
 -- Run this script against PostgreSQL database: healthdb, schema: dev
 -- 
@@ -37,6 +37,11 @@ TRUNCATE TABLE dev.nurses CASCADE;
 TRUNCATE TABLE dev.pharmacies CASCADE;
 TRUNCATE TABLE dev.users CASCADE;
 
+select * from dev.pharmacies;
+UPDATE dev.pharmacies;
+SET email = 'debjit@admin.com'
+WHERE user_id = ;
+
 -- ─── STEP 2: RESET SEQUENCES ────────────────────────────────────
 ALTER SEQUENCE dev.users_user_id_seq RESTART WITH 1;
 ALTER SEQUENCE dev.pharmacies_pharmacy_id_seq RESTART WITH 1;
@@ -51,6 +56,8 @@ ALTER SEQUENCE dev.nurse_reviews_review_id_seq RESTART WITH 1;
 ALTER SEQUENCE dev.admin_activity_logs_log_id_seq RESTART WITH 1;
 ALTER SEQUENCE dev.inventory_logs_log_id_seq RESTART WITH 1;
 
+
+select * from dev.medicines;
 -- ─── STEP 3: INSERT MOCK DATA ───────────────────────────────────
 
 -- BCrypt hash of "password123"
@@ -267,120 +274,34 @@ INSERT INTO dev.inventory_logs (medicine_id, action, quantity_change, stock_afte
 -- All passwords: password123
 -- ═══════════════════════════════════════════════════════════════════
 
-
--- ═══════════════════════════════════════════════════════════════════
--- MIGRATION: Master Medicines System
--- This section sets up the centralized medicine management
--- ═══════════════════════════════════════════════════════════════════
-
--- Step 1: Clean old medicine data
-TRUNCATE TABLE dev.inventory_logs CASCADE;
-TRUNCATE TABLE dev.medicines CASCADE;
-ALTER SEQUENCE dev.medicines_medicine_id_seq RESTART WITH 1;
-ALTER SEQUENCE dev.inventory_logs_log_id_seq RESTART WITH 1;
-
--- Step 2: Create master_medicines table
-DROP TABLE IF EXISTS dev.master_medicines CASCADE;
-CREATE TABLE dev.master_medicines (
-    master_medicine_id BIGSERIAL PRIMARY KEY,
-    medicine_name VARCHAR(255) UNIQUE NOT NULL,
-    category_id BIGINT REFERENCES dev.medicine_categories(category_id),
-    created_at TIMESTAMP DEFAULT NOW()
-);
-
--- Step 3: Alter medicines table for new structure
-ALTER TABLE dev.medicines DROP COLUMN IF EXISTS expiry_date;
-DO $$
-BEGIN
-    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='dev' AND table_name='medicines' AND column_name='manufacturer') THEN
-        ALTER TABLE dev.medicines RENAME COLUMN manufacturer TO brand;
-    END IF;
-END $$;
-ALTER TABLE dev.medicines ADD COLUMN IF NOT EXISTS master_medicine_id BIGINT REFERENCES dev.master_medicines(master_medicine_id);
-ALTER TABLE dev.medicines DROP CONSTRAINT IF EXISTS medicines_pharmacy_id_medicine_name_key;
-
--- Step 4: Insert Master Medicines (admin-managed centralized list)
-INSERT INTO dev.master_medicines (medicine_name, category_id) VALUES
--- Antibiotics (category_id: 1)
-('Amoxicillin 500mg', 1),
-('Azithromycin 250mg', 1),
-('Azithromycin 500mg', 1),
-('Ciprofloxacin 500mg', 1),
-('Cefixime 200mg', 1),
-('Doxycycline 100mg', 1),
-('Metronidazole 400mg', 1),
--- Pain Relief (category_id: 2)
-('Paracetamol 500mg', 2),
-('Ibuprofen 400mg', 2),
-('Diclofenac 50mg', 2),
-('Aceclofenac 100mg', 2),
-('Tramadol 50mg', 2),
--- Cardiovascular (category_id: 3)
-('Amlodipine 5mg', 3),
-('Atenolol 50mg', 3),
-('Losartan 50mg', 3),
-('Telmisartan 40mg', 3),
-('Enalapril 5mg', 3),
--- Diabetes (category_id: 4)
-('Metformin 500mg', 4),
-('Glimepiride 2mg', 4),
-('Sitagliptin 100mg', 4),
-('Insulin Glargine', 4),
--- Respiratory (category_id: 5)
-('Cetirizine 10mg', 5),
-('Montelukast 10mg', 5),
-('Salbutamol Inhaler', 5),
-('Levocetrizine 5mg', 5),
-('Budesonide Inhaler', 5),
--- Gastrointestinal (category_id: 6)
-('Pantoprazole 40mg', 6),
-('Omeprazole 20mg', 6),
-('Ranitidine 150mg', 6),
-('Domperidone 10mg', 6),
-('Ondansetron 4mg', 6),
--- Vitamins & Supplements (category_id: 7)
-('Vitamin D3 1000IU', 7),
-('Vitamin B12 1500mcg', 7),
-('Calcium + Vitamin D3', 7),
-('Multivitamin Tablets', 7),
-('Iron + Folic Acid', 7),
-('Omega-3 Fish Oil', 7),
--- Dermatology (category_id: 8)
-('Clotrimazole Cream', 8),
-('Betamethasone Cream', 8),
-('Ketoconazole Shampoo', 8),
-('Mupirocin Ointment', 8);
-
--- Step 5: Insert fresh Pharmacy Medicines (linked to master)
--- Kaniska MedPlus (pharmacy_id: 1)
-INSERT INTO dev.medicines (pharmacy_id, category_id, medicine_name, master_medicine_id, brand, price, stock_quantity, description, created_at, updated_at) VALUES
-(1, 1, 'Amoxicillin 500mg', 1, 'Cipla', 85.00, 150, 'Broad-spectrum antibiotic', NOW() - INTERVAL '60 days', NOW()),
-(1, 1, 'Azithromycin 250mg', 2, 'Sun Pharma', 120.00, 80, 'Macrolide antibiotic for respiratory infections', NOW() - INTERVAL '55 days', NOW()),
-(1, 2, 'Paracetamol 500mg', 8, 'Crocin', 25.00, 500, 'Fever and mild pain relief', NOW() - INTERVAL '60 days', NOW()),
-(1, 2, 'Ibuprofen 400mg', 9, 'Brufen', 45.00, 200, 'Anti-inflammatory and pain relief', NOW() - INTERVAL '50 days', NOW()),
-(1, 3, 'Amlodipine 5mg', 13, 'Amlong', 35.00, 300, 'Calcium channel blocker for hypertension', NOW() - INTERVAL '45 days', NOW()),
-(1, 4, 'Metformin 500mg', 18, 'Glycomet', 30.00, 250, 'Oral hypoglycemic for Type 2 diabetes', NOW() - INTERVAL '40 days', NOW()),
-(1, 5, 'Cetirizine 10mg', 22, 'Alerid', 20.00, 400, 'Antihistamine for allergies', NOW() - INTERVAL '35 days', NOW()),
-(1, 6, 'Pantoprazole 40mg', 27, 'Pan-D', 55.00, 180, 'Proton pump inhibitor for acidity', NOW() - INTERVAL '30 days', NOW()),
-(1, 7, 'Vitamin D3 1000IU', 32, 'HealthVit', 180.00, 100, 'Vitamin D supplement for bone health', NOW() - INTERVAL '25 days', NOW()),
-(1, 5, 'Montelukast 10mg', 23, 'Montair', 95.00, 120, 'Leukotriene inhibitor for asthma', NOW() - INTERVAL '20 days', NOW());
-
--- Subhajit HealthKart (pharmacy_id: 2)
-INSERT INTO dev.medicines (pharmacy_id, category_id, medicine_name, master_medicine_id, brand, price, stock_quantity, description, created_at, updated_at) VALUES
-(2, 1, 'Ciprofloxacin 500mg', 4, 'Ciplox', 65.00, 100, 'Fluoroquinolone antibiotic', NOW() - INTERVAL '50 days', NOW()),
-(2, 2, 'Diclofenac 50mg', 10, 'Voveran', 40.00, 220, 'NSAID for pain and inflammation', NOW() - INTERVAL '45 days', NOW()),
-(2, 2, 'Paracetamol 500mg', 8, 'Dolo', 22.00, 600, 'Fever and pain relief', NOW() - INTERVAL '40 days', NOW()),
-(2, 3, 'Atenolol 50mg', 14, 'Tenormin', 28.00, 180, 'Beta blocker for hypertension', NOW() - INTERVAL '35 days', NOW()),
-(2, 4, 'Glimepiride 2mg', 19, 'Amaryl', 75.00, 90, 'Sulfonylurea for Type 2 diabetes', NOW() - INTERVAL '30 days', NOW()),
-(2, 6, 'Omeprazole 20mg', 28, 'Omez', 42.00, 250, 'Proton pump inhibitor for GERD', NOW() - INTERVAL '25 days', NOW()),
-(2, 7, 'Multivitamin Tablets', 35, 'Revital', 250.00, 150, 'Daily multivitamin and mineral supplement', NOW() - INTERVAL '20 days', NOW()),
-(2, 8, 'Clotrimazole Cream', 37, 'Candid', 85.00, 70, 'Antifungal cream for skin infections', NOW() - INTERVAL '15 days', NOW()),
-(2, 5, 'Salbutamol Inhaler', 24, 'Asthalin', 130.00, 60, 'Bronchodilator for asthma relief', NOW() - INTERVAL '10 days', NOW()),
-(2, 1, 'Amoxicillin 500mg', 1, 'Mox', 90.00, 120, 'Penicillin antibiotic', NOW() - INTERVAL '5 days', NOW());
-
--- Step 6: Fresh inventory logs
-INSERT INTO dev.inventory_logs (medicine_id, action, quantity_change, stock_after, created_at) VALUES
-(1, 'add', 150, 150, NOW() - INTERVAL '60 days'),
-(3, 'add', 500, 500, NOW() - INTERVAL '60 days'),
-(11, 'add', 100, 100, NOW() - INTERVAL '50 days'),
-(13, 'add', 600, 600, NOW() - INTERVAL '40 days');
+-- Create master_medicines table
+  CREATE TABLE dev.master_medicines (
+      master_medicine_id BIGSERIAL PRIMARY KEY,
+      medicine_name VARCHAR(255) UNIQUE NOT NULL,
+      category_id BIGINT REFERENCES dev.medicine_categories(category_id),
+      created_at TIMESTAMP DEFAULT NOW()
+  );
+  
+  -- Populate master_medicines from existing distinct medicine names
+  INSERT INTO dev.master_medicines (medicine_name, category_id)
+  SELECT DISTINCT medicine_name, category_id FROM dev.medicines;
+  
+  -- Add master_medicine_id column to medicines table
+  ALTER TABLE dev.medicines ADD COLUMN master_medicine_id BIGINT REFERENCES
+   dev.master_medicines(master_medicine_id);
+  
+  -- Rename manufacturer to brand
+  ALTER TABLE dev.medicines RENAME COLUMN manufacturer TO brand;
+  
+  -- Drop expiry_date column
+  ALTER TABLE dev.medicines DROP COLUMN IF EXISTS expiry_date;
+  
+  -- Link existing medicines to their master records
+  UPDATE dev.medicines m
+  SET master_medicine_id = mm.master_medicine_id
+  FROM dev.master_medicines mm
+  WHERE m.medicine_name = mm.medicine_name;
+  
+  -- Drop old unique constraint and add new one
+  ALTER TABLE dev.medicines DROP CONSTRAINT IF EXISTS
+  medicines_pharmacy_id_medicine_name_key;
