@@ -65,6 +65,7 @@ export class AdminLayoutComponent implements OnInit {
           { label: 'Pharmacies', icon: 'ti-building-hospital', route: '/admin/pharmacies' },
           { label: 'Nurses', icon: 'ti-nurse', route: '/admin/nurses' },
           { label: 'Users', icon: 'ti-users', route: '/admin/users' },
+          { label: 'Medicines', icon: 'ti-pill', route: '/admin/medicines' },
           { label: 'Reports', icon: 'ti-report-analytics', route: '/admin/reports' },
           { label: 'Activity Logs', icon: 'ti-list-details', route: '/admin/logs' },
         ];

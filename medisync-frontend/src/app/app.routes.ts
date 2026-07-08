@@ -65,6 +65,7 @@ export const routes: Routes = [
       { path: 'nurses', loadComponent: () => import('./features/admin/nurse-approvals/nurse-approvals.component').then(m => m.NurseApprovalsComponent) },
       { path: 'users', loadComponent: () => import('./features/admin/user-management/user-management.component').then(m => m.UserManagementComponent) },
       { path: 'reports', loadComponent: () => import('./features/admin/reports/reports.component').then(m => m.ReportsComponent) },
+      { path: 'medicines', loadComponent: () => import('./features/admin/medicine-management/medicine-management.component').then(m => m.MedicineManagementComponent) },
       { path: 'logs', loadComponent: () => import('./features/admin/activity-logs/activity-logs.component').then(m => m.ActivityLogsComponent) },
     ]
   },

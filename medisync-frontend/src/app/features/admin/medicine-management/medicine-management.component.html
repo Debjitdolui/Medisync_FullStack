@@ -1,0 +1,147 @@
+<div class="medicine-mgmt-page">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <h1>Medicine Management</h1>
+      <p class="header-sub">Add and manage medicines available on the platform</p>
+    </div>
+    <button class="btn-primary add-btn" (click)="openAddModal()">
+      <i class="ti ti-plus"></i>
+      Add Medicine
+    </button>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-bar">
+    <div class="search-wrapper">
+      <i class="ti ti-search"></i>
+      <input type="text" placeholder="Search medicines..." [(ngModel)]="searchTerm" (input)="filterMedicines()" />
+    </div>
+    <select class="filter-select" [(ngModel)]="selectedCategoryFilter" (change)="filterMedicines()">
+      <option value="">All Categories</option>
+      <option *ngFor="let cat of categories" [value]="cat.categoryId">{{ cat.categoryName }}</option>
+    </select>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-chip">
+      <span class="stat-count">{{ filteredMedicines.length }}</span>
+      <span class="stat-label">Showing</span>
+    </div>
+    <div class="stat-chip">
+      <span class="stat-count total">{{ masterMedicines.length }}</span>
+      <span class="stat-label">Total Medicines</span>
+    </div>
+    <div class="stat-chip">
+      <span class="stat-count">{{ categories.length }}</span>
+      <span class="stat-label">Categories</span>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="table-card">
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Medicine Name</th>
+            <th>Category</th>
+            <th>Added On</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let med of paginatedMedicines; let i = index">
+            <td>{{ (currentPage - 1) * pageSize + i + 1 }}</td>
+            <td class="med-name">{{ med.medicineName }}</td>
+            <td>
+              <span class="category-chip">{{ med.category?.categoryName }}</span>
+            </td>
+            <td class="date-cell">{{ med.createdAt | date:'mediumDate' }}</td>
+            <td class="actions-cell">
+              <button class="action-btn edit" title="Edit" (click)="openEditModal(med)">
+                <i class="ti ti-pencil"></i>
+              </button>
+              <button class="action-btn delete" title="Delete" (click)="confirmDelete(med)">
+                <i class="ti ti-trash"></i>
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="filteredMedicines.length === 0">
+            <td colspan="5" class="empty-row">
+              <div class="empty-state">
+                <i class="ti ti-pill-off"></i>
+                <p>No medicines found</p>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <app-pagination
+    [totalItems]="filteredMedicines.length"
+    [pageSize]="pageSize"
+    [currentPage]="currentPage"
+    (pageChange)="onPageChange($event)"
+    (pageSizeChange)="onPageSizeChange($event)">
+  </app-pagination>
+
+  <!-- Add/Edit Modal -->
+  <div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{ editing ? 'Edit Medicine' : 'Add New Medicine' }}</h3>
+        <button class="modal-close" (click)="closeModal()">
+          <i class="ti ti-x"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Medicine Name *</label>
+          <input type="text" class="form-input" [(ngModel)]="form.medicineName" placeholder="e.g., Paracetamol 500mg" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Category *</label>
+          <select class="form-input" [(ngModel)]="form.categoryId">
+            <option [value]="0">Select Category</option>
+            <option *ngFor="let cat of categories" [value]="cat.categoryId">{{ cat.categoryName }}</option>
+          </select>
+        </div>
+        <p class="form-error" *ngIf="formError">{{ formError }}</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-outline" (click)="closeModal()">Cancel</button>
+        <button class="btn-primary" (click)="save()">
+          {{ editing ? 'Update' : 'Add Medicine' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Modal -->
+  <div class="modal-overlay" *ngIf="showDeleteModal" (click)="showDeleteModal = false">
+    <div class="modal-card small" (click)="$event.stopPropagation()">
+      <div class="modal-header danger">
+        <h3>Delete Medicine</h3>
+        <button class="modal-close" (click)="showDeleteModal = false">
+          <i class="ti ti-x"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="delete-warning">
+          <i class="ti ti-alert-triangle"></i>
+          <p>Are you sure you want to delete <strong>{{ deletingMedicine?.medicineName }}</strong>?</p>
+          <span>This will remove it from all pharmacy inventories.</span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-outline" (click)="showDeleteModal = false">Cancel</button>
+        <button class="btn-danger" (click)="deleteConfirmed()">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
