@@ -30,6 +30,8 @@ export class PharmacyDashboardComponent implements OnInit {
   totalReviews = 0;
   lowStockMedicines: Medicine[] = [];
   recentActivity: ActivityItem[] = [];
+  isOnline = true;
+  statusToggling = false;
 
   private pharmacyId = 1;
 
@@ -54,6 +56,7 @@ export class PharmacyDashboardComponent implements OnInit {
     this.pharmacyService.getDashboard().subscribe(dashboard => {
       this.pharmacyName = dashboard.pharmacy.pharmacyName;
       this.pharmacyId = dashboard.pharmacy.pharmacyId;
+      this.isOnline = dashboard.pharmacy.isOnline !== false;
 
       // Load rating from reviews
       this.reviewService.getPharmacyReviews(this.pharmacyId).subscribe(page => {
@@ -108,5 +111,18 @@ export class PharmacyDashboardComponent implements OnInit {
         time: '2 days ago'
       }
     ];
+  }
+
+  toggleStatus(): void {
+    this.statusToggling = true;
+    this.pharmacyService.toggleOnlineStatus().subscribe({
+      next: (res) => {
+        this.isOnline = res.isOnline;
+        this.statusToggling = false;
+      },
+      error: () => {
+        this.statusToggling = false;
+      }
+    });
   }
 }

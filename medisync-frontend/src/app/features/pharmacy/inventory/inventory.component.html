@@ -5,10 +5,20 @@
       <h1>Inventory Management</h1>
       <p class="header-sub">Manage your pharmacy medicines and stock levels</p>
     </div>
-    <button class="btn-primary add-btn" (click)="openAddModal()">
-      <i class="ti ti-plus"></i>
-      Add Medicine
-    </button>
+    <div class="header-actions">
+      <button class="btn-outline add-btn" (click)="downloadTemplate()">
+        <i class="ti ti-download"></i>
+        Download Template
+      </button>
+      <button class="btn-secondary add-btn" (click)="openBulkUploadModal()">
+        <i class="ti ti-upload"></i>
+        Bulk Upload
+      </button>
+      <button class="btn-primary add-btn" (click)="openAddModal()">
+        <i class="ti ti-plus"></i>
+        Add Medicine
+      </button>
+    </div>
   </div>
 
   <!-- Filters & Search -->
@@ -196,6 +206,99 @@
       <div class="modal-footer">
         <button class="btn-outline" (click)="showDeleteModal = false">Cancel</button>
         <button class="btn-danger" (click)="deleteConfirmed()">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bulk Upload Modal -->
+  <div class="modal-overlay" *ngIf="showBulkUploadModal" (click)="closeBulkUploadModal()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3><i class="ti ti-upload"></i> Bulk Upload Medicines</h3>
+        <button class="modal-close" (click)="closeBulkUploadModal()">
+          <i class="ti ti-x"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- Instructions -->
+        <div class="bulk-instructions" *ngIf="!bulkUploadResult">
+          <div class="instruction-step">
+            <span class="step-num">1</span>
+            <span>Download the Excel template using the "Download Template" button</span>
+          </div>
+          <div class="instruction-step">
+            <span class="step-num">2</span>
+            <span>Select medicine names from the dropdown, fill brand, price & stock</span>
+          </div>
+          <div class="instruction-step">
+            <span class="step-num">3</span>
+            <span>Upload the filled Excel file below</span>
+          </div>
+          <div class="instruction-note">
+            <i class="ti ti-info-circle"></i>
+            <span>Only medicines approved by admin can be selected. Duplicates will be skipped.</span>
+          </div>
+        </div>
+
+        <!-- File input -->
+        <div class="file-upload-area" *ngIf="!bulkUploadResult">
+          <input type="file" id="bulkFile" accept=".xlsx,.xls" (change)="onBulkFileSelected($event)" hidden />
+          <label for="bulkFile" class="file-drop-zone">
+            <i class="ti ti-file-spreadsheet"></i>
+            <p *ngIf="!bulkUploadFile">Click to select Excel file (.xlsx)</p>
+            <p *ngIf="bulkUploadFile" class="file-selected">
+              <i class="ti ti-check"></i> {{ bulkUploadFile.name }}
+            </p>
+          </label>
+        </div>
+
+        <p class="form-error" *ngIf="bulkUploadError">{{ bulkUploadError }}</p>
+
+        <!-- Results -->
+        <div class="bulk-results" *ngIf="bulkUploadResult">
+          <div class="result-summary">
+            <div class="result-item success">
+              <span class="result-count">{{ bulkUploadResult.added }}</span>
+              <span class="result-label">Added</span>
+            </div>
+            <div class="result-item warning">
+              <span class="result-count">{{ bulkUploadResult.skipped }}</span>
+              <span class="result-label">Skipped</span>
+            </div>
+            <div class="result-item danger">
+              <span class="result-count">{{ bulkUploadResult.errors }}</span>
+              <span class="result-label">Errors</span>
+            </div>
+          </div>
+
+          <!-- Error details -->
+          <div class="error-details" *ngIf="bulkUploadResult.errorDetails?.length > 0">
+            <h4>Error Details:</h4>
+            <ul>
+              <li *ngFor="let err of bulkUploadResult.errorDetails">{{ err }}</li>
+            </ul>
+          </div>
+
+          <!-- Added medicines -->
+          <div class="added-list" *ngIf="bulkUploadResult.addedMedicines?.length > 0">
+            <h4>Successfully Added:</h4>
+            <div class="added-chips">
+              <span class="added-chip" *ngFor="let name of bulkUploadResult.addedMedicines">{{ name }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-outline" (click)="closeBulkUploadModal()">
+          {{ bulkUploadResult ? 'Close' : 'Cancel' }}
+        </button>
+        <button class="btn-primary" *ngIf="!bulkUploadResult" (click)="uploadBulkFile()" [disabled]="!bulkUploadFile || bulkUploading">
+          <i class="ti ti-upload"></i>
+          {{ bulkUploading ? 'Uploading...' : 'Upload & Process' }}
+        </button>
+        <button class="btn-primary" *ngIf="bulkUploadResult" (click)="closeBulkUploadModal(); openBulkUploadModal()">
+          <i class="ti ti-upload"></i> Upload Another
+        </button>
       </div>
     </div>
   </div>

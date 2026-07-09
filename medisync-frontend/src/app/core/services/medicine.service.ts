@@ -37,4 +37,22 @@ export class MedicineService {
   getCategories(): Observable<MedicineCategory[]> {
     return this.http.get<MedicineCategory[]>(`${this.apiUrl}/categories`);
   }
+
+  // Pharmacy Bulk Upload
+  downloadTemplate(): void {
+    this.http.get(`${this.apiUrl}/template`, { responseType: 'blob' }).subscribe(blob => {
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'pharmacy_medicine_template.xlsx';
+      a.click();
+      window.URL.revokeObjectURL(url);
+    });
+  }
+
+  bulkUpload(file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post(`${this.apiUrl}/bulk-upload`, formData);
+  }
 }

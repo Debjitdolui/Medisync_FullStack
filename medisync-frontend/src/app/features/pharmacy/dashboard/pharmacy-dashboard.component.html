@@ -5,9 +5,21 @@
       <h1>Welcome back, <span class="highlight">{{ pharmacyName }}</span></h1>
       <p class="welcome-sub">Here's your pharmacy overview for today</p>
     </div>
-    <div class="welcome-date">
-      <i class="ti ti-calendar"></i>
-      <span>{{ today }}</span>
+    <div class="welcome-right">
+      <div class="status-toggle" [class.online]="isOnline" [class.offline]="!isOnline">
+        <span class="status-label">
+          <i class="ti" [ngClass]="isOnline ? 'ti-wifi' : 'ti-wifi-off'"></i>
+          {{ isOnline ? 'Online' : 'Offline' }}
+        </span>
+        <label class="toggle-switch">
+          <input type="checkbox" [checked]="isOnline" (change)="toggleStatus()" [disabled]="statusToggling" />
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="welcome-date">
+        <i class="ti ti-calendar"></i>
+        <span>{{ today }}</span>
+      </div>
     </div>
   </div>
 

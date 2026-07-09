@@ -63,6 +63,9 @@ public class Pharmacy {
     @Column(name = "is_blocked")
     private Boolean isBlocked = false;
 
+    @Column(name = "is_online")
+    private Boolean isOnline = true;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

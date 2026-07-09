@@ -38,6 +38,13 @@ export class MedicineManagementComponent implements OnInit {
   newCategoryName = '';
   categoryError = '';
 
+  // Bulk upload
+  showBulkUploadModal = false;
+  bulkUploadFile: File | null = null;
+  bulkUploadResult: any = null;
+  bulkUploading = false;
+  bulkUploadError = '';
+
   // Pagination
   currentPage = 1;
   pageSize = 10;
@@ -168,6 +175,56 @@ export class MedicineManagementComponent implements OnInit {
   deleteCategory(id: number): void {
     this.http.delete(`${environment.apiUrl}/admin/categories/${id}`).subscribe(() => {
       this.categories = this.categories.filter(c => c.categoryId !== id);
+    });
+  }
+
+  // ─── Bulk Upload ──────────────────────────────────────────────────────────────
+
+  downloadTemplate(): void {
+    this.masterMedicineService.downloadTemplate();
+  }
+
+  openBulkUploadModal(): void {
+    this.showBulkUploadModal = true;
+    this.bulkUploadFile = null;
+    this.bulkUploadResult = null;
+    this.bulkUploadError = '';
+    this.bulkUploading = false;
+  }
+
+  closeBulkUploadModal(): void {
+    this.showBulkUploadModal = false;
+    this.bulkUploadFile = null;
+    this.bulkUploadResult = null;
+    this.bulkUploadError = '';
+  }
+
+  onBulkFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.bulkUploadFile = input.files[0];
+      this.bulkUploadError = '';
+      this.bulkUploadResult = null;
+    }
+  }
+
+  uploadBulkFile(): void {
+    if (!this.bulkUploadFile) return;
+    this.bulkUploading = true;
+    this.bulkUploadError = '';
+
+    this.masterMedicineService.bulkUpload(this.bulkUploadFile).subscribe({
+      next: (result) => {
+        this.bulkUploadResult = result;
+        this.bulkUploading = false;
+        if (result.added > 0) {
+          this.loadData();
+        }
+      },
+      error: (err) => {
+        this.bulkUploadError = err.error?.error || 'Failed to upload file.';
+        this.bulkUploading = false;
+      }
     });
   }
 }

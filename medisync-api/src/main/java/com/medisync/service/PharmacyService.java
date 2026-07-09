@@ -106,4 +106,11 @@ public class PharmacyService {
         pharmacy.setPasswordHash(passwordEncoder.encode(newPassword));
         pharmacyRepository.save(pharmacy);
     }
+
+    public Pharmacy toggleOnlineStatus(String email) {
+        Pharmacy pharmacy = pharmacyRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Pharmacy not found"));
+        pharmacy.setIsOnline(!Boolean.TRUE.equals(pharmacy.getIsOnline()));
+        return pharmacyRepository.save(pharmacy);
+    }
 }

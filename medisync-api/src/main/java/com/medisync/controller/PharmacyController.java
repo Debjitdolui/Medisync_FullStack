@@ -59,4 +59,13 @@ public class PharmacyController {
         pharmacyService.changePassword(auth.getName(), body.get("currentPassword"), body.get("newPassword"));
         return ResponseEntity.ok(Map.of("message", "Password changed successfully"));
     }
+
+    @PutMapping("/toggle-status")
+    public ResponseEntity<?> toggleOnlineStatus(Authentication auth) {
+        Pharmacy pharmacy = pharmacyService.toggleOnlineStatus(auth.getName());
+        return ResponseEntity.ok(Map.of(
+                "isOnline", pharmacy.getIsOnline(),
+                "message", pharmacy.getIsOnline() ? "Pharmacy is now Online" : "Pharmacy is now Offline"
+        ));
+    }
 }

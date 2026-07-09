@@ -68,6 +68,13 @@ export class InventoryComponent implements OnInit {
   deletingMedicine: Medicine | null = null;
   deleteError = '';
 
+  // Bulk Upload
+  showBulkUploadModal = false;
+  bulkUploadFile: File | null = null;
+  bulkUploadResult: any = null;
+  bulkUploading = false;
+  bulkUploadError = '';
+
   constructor(
     private medicineService: MedicineService,
     private masterMedicineService: MasterMedicineService,
@@ -276,5 +283,55 @@ export class InventoryComponent implements OnInit {
       }
     });
     return Array.from(map.entries()).map(([categoryId, categoryName]) => ({ categoryId, categoryName }));
+  }
+
+  // ─── Bulk Upload ──────────────────────────────────────────────────────────────
+
+  downloadTemplate(): void {
+    this.medicineService.downloadTemplate();
+  }
+
+  openBulkUploadModal(): void {
+    this.showBulkUploadModal = true;
+    this.bulkUploadFile = null;
+    this.bulkUploadResult = null;
+    this.bulkUploadError = '';
+    this.bulkUploading = false;
+  }
+
+  closeBulkUploadModal(): void {
+    this.showBulkUploadModal = false;
+    this.bulkUploadFile = null;
+    this.bulkUploadResult = null;
+    this.bulkUploadError = '';
+  }
+
+  onBulkFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.bulkUploadFile = input.files[0];
+      this.bulkUploadError = '';
+      this.bulkUploadResult = null;
+    }
+  }
+
+  uploadBulkFile(): void {
+    if (!this.bulkUploadFile) return;
+    this.bulkUploading = true;
+    this.bulkUploadError = '';
+
+    this.medicineService.bulkUpload(this.bulkUploadFile).subscribe({
+      next: (result) => {
+        this.bulkUploadResult = result;
+        this.bulkUploading = false;
+        if (result.added > 0) {
+          this.loadData();
+        }
+      },
+      error: (err) => {
+        this.bulkUploadError = err.error?.error || 'Failed to upload file.';
+        this.bulkUploading = false;
+      }
+    });
   }
 }

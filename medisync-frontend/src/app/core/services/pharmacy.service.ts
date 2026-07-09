@@ -45,4 +45,8 @@ export class PharmacyService {
   changePassword(currentPassword: string, newPassword: string): Observable<any> {
     return this.http.put(`${this.apiUrl}/change-password`, { currentPassword, newPassword });
   }
+
+  toggleOnlineStatus(): Observable<{ isOnline: boolean; message: string }> {
+    return this.http.put<{ isOnline: boolean; message: string }>(`${this.apiUrl}/toggle-status`, {});
+  }
 }

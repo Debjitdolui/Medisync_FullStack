@@ -406,3 +406,92 @@
     grid-template-columns: 1fr;
   }
 }
+
+
+// Welcome Right
+.welcome-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+// Status Toggle
+.status-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  transition: all 0.3s;
+
+  &.online {
+    background: #f0fdf4;
+    border-color: #bbf7d0;
+    .status-label { color: #16a34a; }
+  }
+
+  &.offline {
+    background: #fef2f2;
+    border-color: #fecaca;
+    .status-label { color: #dc2626; }
+  }
+
+  .status-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 22px;
+
+  input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #cbd5e1;
+    transition: 0.3s;
+    border-radius: 22px;
+
+    &::before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: 0.3s;
+      border-radius: 50%;
+    }
+  }
+
+  input:checked + .toggle-slider {
+    background-color: #16a34a;
+  }
+
+  input:checked + .toggle-slider::before {
+    transform: translateX(18px);
+  }
+
+  input:disabled + .toggle-slider {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}

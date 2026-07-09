@@ -39,4 +39,22 @@ export class MasterMedicineService {
   delete(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/admin/master-medicines/${id}`);
   }
+
+  // Bulk upload
+  downloadTemplate(): void {
+    this.http.get(`${this.apiUrl}/admin/master-medicines/template`, { responseType: 'blob' }).subscribe(blob => {
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'medicine_upload_template.xlsx';
+      a.click();
+      window.URL.revokeObjectURL(url);
+    });
+  }
+
+  bulkUpload(file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post(`${this.apiUrl}/admin/master-medicines/bulk-upload`, formData);
+  }
 }
