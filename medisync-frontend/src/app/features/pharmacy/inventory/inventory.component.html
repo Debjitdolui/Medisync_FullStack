@@ -74,7 +74,7 @@
               <span class="med-desc" *ngIf="med.description">{{ med.description }}</span>
             </td>
             <td>
-              <span class="category-chip">{{ med.category?.categoryName }}</span>
+              <span class="category-chip">{{ med.category.categoryName }}</span>
             </td>
             <td>{{ med.brand || '—' }}</td>
             <td class="price-cell">₹{{ med.price }}</td>
@@ -139,12 +139,12 @@
               <div class="autocomplete-dropdown" *ngIf="showMasterSuggestions && filteredMasterMedicines.length > 0">
                 <div class="autocomplete-item" *ngFor="let m of filteredMasterMedicines" (mousedown)="selectMasterMedicine(m)">
                   <span class="item-name">{{ m.medicineName }}</span>
-                  <span class="item-category">{{ m.category?.categoryName }}</span>
+                  <span class="item-category">{{ m.category.categoryName }}</span>
                 </div>
               </div>
             </div>
             <span class="form-hint" *ngIf="selectedMasterMedicine">
-              Category: {{ selectedMasterMedicine.category?.categoryName }}
+              Category: {{ selectedMasterMedicine.category.categoryName }}
             </span>
             <span class="field-error" *ngIf="formErrors.masterMedicine">{{ formErrors.masterMedicine }}</span>
           </div>

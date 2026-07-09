@@ -21,12 +21,12 @@
       </div>
       <div class="stepper-line"></div>
       <div class="stepper-item">
-        <div class="stepper-dot"><i class="ti ti-clipboard-check"></i></div>
+        <div class="stepper-dot" [class.active]="showBookingModal"><i class="ti ti-clipboard-check"></i></div>
         <span>Confirm Booking</span>
       </div>
       <div class="stepper-line"></div>
       <div class="stepper-item">
-        <div class="stepper-dot"><i class="ti ti-home-heart"></i></div>
+        <div class="stepper-dot" [class.active]="bookingSuccess"><i class="ti ti-home-heart"></i></div>
         <span>Nurse Arrives</span>
       </div>
     </div>
@@ -115,13 +115,29 @@
 <div class="modal-overlay" *ngIf="showBookingModal" (click)="closeBooking()">
   <div class="modal-card" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h3>Confirm Booking</h3>
+      <h3>
+        <ng-container [ngSwitch]="bookingStep">
+          <span *ngSwitchCase="'details'">Booking Details</span>
+          <span *ngSwitchCase="'date'">Select Date</span>
+          <span *ngSwitchCase="'slots'">Choose Time Slot</span>
+          <span *ngSwitchCase="'confirm'">Booking Confirmed</span>
+        </ng-container>
+      </h3>
       <button class="close-btn" (click)="closeBooking()"><i class="ti ti-x"></i></button>
     </div>
 
-    <div *ngIf="!bookingSuccess" class="modal-body">
-      <!-- Nurse Summary -->
-      <div class="booking-summary">
+    <!-- Step Progress Indicator (4 steps: details, date, slots, confirm) -->
+    <div class="step-progress" *ngIf="!bookingSuccess">
+      <div class="step-dot" [class.active]="bookingStep === 'details'" [class.completed]="bookingStep !== 'details'"></div>
+      <div class="step-line" [class.completed]="bookingStep !== 'details'"></div>
+      <div class="step-dot" [class.active]="bookingStep === 'date'" [class.completed]="bookingStep === 'slots'"></div>
+      <div class="step-line" [class.completed]="bookingStep === 'slots'"></div>
+      <div class="step-dot" [class.active]="bookingStep === 'slots'"></div>
+    </div>
+
+    <div class="modal-body">
+      <!-- Nurse Summary (always visible) -->
+      <div class="booking-summary" *ngIf="!bookingSuccess">
         <div class="summary-nurse">
           <div class="summary-avatar">{{ selectedNurse?.fullName?.charAt(0) }}</div>
           <div>
@@ -135,40 +151,146 @@
         </div>
       </div>
 
-      <!-- Booking Form -->
-      <div class="form-group">
-        <label class="form-label">Your Address *</label>
-        <input class="form-input" placeholder="Enter complete address for nurse visit" [(ngModel)]="bookingAddress">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Health Issue / Notes</label>
-        <textarea class="form-input textarea" placeholder="Describe your health concern or any special instructions" [(ngModel)]="bookingHealthIssue" rows="3"></textarea>
-      </div>
-      <div class="form-row">
+      <!-- Step 1: Details (Address & Health Issue) -->
+      <div *ngIf="bookingStep === 'details'" class="step-content">
         <div class="form-group">
-          <label class="form-label">Preferred Date *</label>
-          <input type="date" class="form-input" [(ngModel)]="bookingDate" [min]="minBookingDate">
+          <label class="form-label">Your Address *</label>
+          <input class="form-input" placeholder="Enter complete address for nurse visit" [(ngModel)]="bookingAddress">
         </div>
         <div class="form-group">
-          <label class="form-label">Preferred Time</label>
-          <input class="form-input" placeholder="e.g., 10:00 AM - 12:00 PM" [(ngModel)]="bookingTime">
+          <label class="form-label">Health Issue / Notes</label>
+          <textarea class="form-input textarea" placeholder="Describe your health concern or any special instructions" [(ngModel)]="bookingHealthIssue" rows="3"></textarea>
+        </div>
+
+        <button class="btn-confirm" (click)="proceedToDateSelection()" [disabled]="!bookingAddress">
+          <span>Continue to Date Selection</span>
+          <i class="ti ti-arrow-right"></i>
+        </button>
+      </div>
+
+      <!-- Step 2: Date Selection (Next 7 Days) -->
+      <div *ngIf="bookingStep === 'date'" class="step-content">
+        <button class="back-link" (click)="goBackToDetails()">
+          <i class="ti ti-arrow-left"></i> Back to details
+        </button>
+
+        <p class="step-instruction">Choose a date for your nurse visit (next 7 days):</p>
+
+        <div class="date-grid">
+          <div *ngFor="let d of availableDates"
+               class="date-chip"
+               [class.selected]="selectedDate === d.date"
+               (click)="selectDate(d.date)">
+            <span class="date-day">{{ d.dayName }}</span>
+            <span class="date-label">{{ d.label }}</span>
+          </div>
         </div>
       </div>
 
-      <button class="btn-confirm" (click)="confirmBooking()" [disabled]="isBooking || !bookingAddress || !bookingDate">
-        <i class="ti ti-check"></i>
-        {{ isBooking ? 'Booking...' : 'Confirm Booking' }}
-      </button>
-    </div>
+      <!-- Step 3: Time Slots -->
+      <div *ngIf="bookingStep === 'slots'" class="step-content">
+        <button class="back-link" (click)="goBackToDate()">
+          <i class="ti ti-arrow-left"></i> Back to dates
+        </button>
 
-    <!-- Success State -->
-    <div *ngIf="bookingSuccess" class="modal-body success-body">
-      <div class="success-icon-wrapper">
-        <i class="ti ti-circle-check"></i>
+        <div class="selected-info-chip">
+          <i class="ti ti-calendar"></i>
+          {{ getFormattedDate(selectedDate) }}
+        </div>
+
+        <p class="step-instruction">Select an available time slot:</p>
+
+        <!-- Loading state -->
+        <div *ngIf="loadingSlots" class="slots-loading">
+          <div class="spinner"></div>
+          <span>Loading available slots...</span>
+        </div>
+
+        <!-- Error state -->
+        <div *ngIf="slotsError && !loadingSlots" class="slots-error">
+          <i class="ti ti-alert-circle"></i>
+          <span>{{ slotsError }}</span>
+          <button class="retry-btn" (click)="selectDate(selectedDate)">Retry</button>
+        </div>
+
+        <!-- Slots grid -->
+        <div *ngIf="!loadingSlots && !slotsError && availableSlots.length > 0" class="slots-grid">
+          <div *ngFor="let slot of availableSlots"
+               class="slot-chip"
+               [class.selected]="selectedSlot === slot"
+               (click)="selectSlot(slot)">
+            <i class="ti ti-clock"></i>
+            <span>{{ slot }}</span>
+          </div>
+        </div>
+
+        <!-- Confirm booking button -->
+        <button class="btn-confirm" *ngIf="selectedSlot" (click)="proceedToConfirm()" [disabled]="isBooking">
+          <i class="ti ti-check"></i>
+          {{ isBooking ? 'Processing...' : 'Confirm Booking ₹' + (selectedService?.basePrice || 200) }}
+        </button>
       </div>
-      <h3>Booking Confirmed!</h3>
-      <p>Your request has been sent to <strong>{{ selectedNurse?.fullName }}</strong>. You'll receive a confirmation shortly.</p>
-      <button class="btn-confirm" (click)="closeBooking()">Done</button>
+
+      <!-- Step 4: Success Confirmation -->
+      <div *ngIf="bookingSuccess" class="step-content success-body">
+        <div class="success-icon-wrapper">
+          <i class="ti ti-circle-check"></i>
+        </div>
+        <h3>Booking Confirmed!</h3>
+        <p>Your nurse visit has been successfully booked.</p>
+
+        <div class="confirmation-details">
+          <div class="confirm-row">
+            <i class="ti ti-user"></i>
+            <div>
+              <span class="confirm-label">Nurse</span>
+              <span class="confirm-value">{{ selectedNurse?.fullName }}</span>
+            </div>
+          </div>
+          <div class="confirm-row">
+            <i class="ti ti-calendar"></i>
+            <div>
+              <span class="confirm-label">Date</span>
+              <span class="confirm-value">{{ getFormattedDate(selectedDate) }}</span>
+            </div>
+          </div>
+          <div class="confirm-row">
+            <i class="ti ti-clock"></i>
+            <div>
+              <span class="confirm-label">Time Slot</span>
+              <span class="confirm-value">{{ selectedSlot }}</span>
+            </div>
+          </div>
+          <div class="confirm-row">
+            <i class="ti ti-map-pin"></i>
+            <div>
+              <span class="confirm-label">Address</span>
+              <span class="confirm-value">{{ bookingAddress }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="buffer-notice">
+          <i class="ti ti-info-circle"></i>
+          <div>
+            <strong>Payment Info</strong>
+            <p>Payment can be made from My Bookings after nurse confirms.</p>
+          </div>
+        </div>
+
+        <div class="buffer-notice">
+          <i class="ti ti-info-circle"></i>
+          <div>
+            <strong>30-min Buffer Window</strong>
+            <p>The nurse will confirm acceptance within 30 minutes. If unconfirmed, the booking expires automatically. You'll receive a notification once confirmed.</p>
+          </div>
+        </div>
+
+        <button class="btn-confirm" (click)="closeBooking()">
+          <i class="ti ti-check"></i>
+          Done
+        </button>
+      </div>
     </div>
   </div>
 </div>

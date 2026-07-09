@@ -13,6 +13,7 @@ export interface Pharmacy {
   longitude?: number;
   approvalStatus: 'pending' | 'approved' | 'rejected';
   isBlocked?: boolean;
+  isOnline?: boolean;
   createdAt: string;
   updatedAt: string;
 }

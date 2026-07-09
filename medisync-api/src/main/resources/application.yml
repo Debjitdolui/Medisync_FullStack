@@ -25,3 +25,8 @@ spring:
 jwt:
   secret: MediSync2026SecretKeyForJWTTokenGenerationAndValidation!@#$%^&*
   expiration: 86400000
+
+# Razorpay Test Mode
+razorpay:
+  key-id: rzp_test_1234567890abcde
+  key-secret: test_secret_1234567890abcde

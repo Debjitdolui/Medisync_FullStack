@@ -707,7 +707,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-  &:hover { background: var(--bg); border-color: var(--primary); color: var(--primary); }
+  &:hover { background: var(--primary); color: #fff; border-color: var(--primary); transform: translateY(-1px); }
 }
 
 .btn-secondary {
@@ -723,7 +723,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-  &:hover { background: var(--primary); color: #fff; }
+  &:hover { background: var(--primary); color: #fff; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); }
 }
 
 // Bulk Upload Modal

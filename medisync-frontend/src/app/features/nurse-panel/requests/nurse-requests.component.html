@@ -46,9 +46,22 @@
             </span>
           </div>
         </div>
-        <span class="request-status-badge" [ngClass]="req.requestStatus">
-          {{ formatStatus(req.requestStatus) }}
-        </span>
+        <div class="request-status-wrapper">
+          <span class="request-status-badge" [ngClass]="req.requestStatus">
+            {{ formatStatus(req.requestStatus) }}
+          </span>
+          <!-- Payment status badge -->
+          <span
+            class="payment-badge paid"
+            *ngIf="(req.requestStatus === 'accepted' || req.requestStatus === 'completed') && paymentStatus.get(req.requestId) === true">
+            <i class="ti ti-circle-check"></i> User Paid ✓
+          </span>
+          <span
+            class="payment-badge pending"
+            *ngIf="(req.requestStatus === 'accepted' || req.requestStatus === 'completed') && paymentStatus.get(req.requestId) === false">
+            <i class="ti ti-clock"></i> Payment Pending
+          </span>
+        </div>
       </div>
 
       <div class="request-details">

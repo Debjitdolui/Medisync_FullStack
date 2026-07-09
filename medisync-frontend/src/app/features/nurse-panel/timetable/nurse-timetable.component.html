@@ -1,0 +1,137 @@
+<div class="timetable-container">
+  <!-- Header -->
+  <div class="page-header">
+    <h1>Timetable Management</h1>
+    <p class="subtitle">Manage your weekly schedule and blocked dates</p>
+  </div>
+
+  <!-- Alerts -->
+  <div class="alert alert-error" *ngIf="error">
+    <span>{{ error }}</span>
+    <button class="alert-dismiss" (click)="dismissError()">&times;</button>
+  </div>
+
+  <div class="alert alert-success" *ngIf="successMessage">
+    <span>{{ successMessage }}</span>
+    <button class="alert-dismiss" (click)="dismissSuccess()">&times;</button>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-spinner" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Loading schedule...</p>
+  </div>
+
+  <!-- Weekly Schedule Section -->
+  <section class="card schedule-section" *ngIf="!loading">
+    <div class="card-header">
+      <h2>Weekly Schedule</h2>
+    </div>
+
+    <!-- Add Slot Form -->
+    <div class="add-slot-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="daySelect">Day</label>
+          <select id="daySelect" [(ngModel)]="newSlot.dayOfWeek">
+            <option *ngFor="let day of days" [value]="day">{{ dayLabels[day] }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="startTime">Start Time</label>
+          <input id="startTime" type="time" [(ngModel)]="newSlot.startTime" />
+        </div>
+        <div class="form-group">
+          <label for="endTime">End Time</label>
+          <input id="endTime" type="time" [(ngModel)]="newSlot.endTime" />
+        </div>
+        <div class="form-group form-action">
+          <button class="btn btn-secondary" (click)="addSlot()" [disabled]="saving">
+            {{ saving ? 'Adding...' : '+ Add Slot' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Weekly Grid -->
+    <div class="weekly-grid">
+      <div class="day-column" *ngFor="let day of days">
+        <div class="day-header">{{ dayLabels[day] }}</div>
+
+        <div class="slots-list">
+          <!-- Saved slots -->
+          <div
+            class="slot-card"
+            *ngFor="let slot of getSlotsForDay(day)"
+            [class.inactive]="!slot.isActive"
+          >
+            <div class="slot-time">
+              {{ slot.startTime }} - {{ slot.endTime }}
+            </div>
+            <div class="slot-actions">
+              <button
+                class="btn-icon"
+                [class.active]="slot.isActive"
+                (click)="toggleSlot(slot)"
+                [title]="slot.isActive ? 'Deactivate' : 'Activate'"
+              >
+                {{ slot.isActive ? '✓' : '✗' }}
+              </button>
+              <button class="btn-icon btn-delete" (click)="deleteSlot(slot)" title="Delete">
+                🗑
+              </button>
+            </div>
+          </div>
+
+          <!-- Empty state -->
+          <div class="empty-day" *ngIf="getSlotsForDay(day).length === 0">
+            <span class="text-muted">No slots</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Blocked Dates Section -->
+  <section class="card blocked-section" *ngIf="!loading">
+    <div class="card-header">
+      <h2>Blocked Dates</h2>
+    </div>
+
+    <!-- Add Blocked Date Form -->
+    <div class="add-blocked-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="blockDate">Date</label>
+          <input id="blockDate" type="date" [(ngModel)]="newBlockedDate" />
+        </div>
+        <div class="form-group flex-grow">
+          <label for="blockReason">Reason (optional)</label>
+          <input id="blockReason" type="text" [(ngModel)]="newBlockedReason" placeholder="e.g., Personal leave" />
+        </div>
+        <div class="form-group form-action">
+          <button class="btn btn-secondary" (click)="addBlockedDate()" [disabled]="!newBlockedDate">
+            + Block Date
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Blocked Dates List -->
+    <div class="blocked-list" *ngIf="blockedDates.length > 0">
+      <div class="blocked-item" *ngFor="let blocked of blockedDates">
+        <div class="blocked-info">
+          <span class="blocked-date">{{ formatDate(blocked.blockedDate) }}</span>
+          <span class="blocked-reason" *ngIf="blocked.reason">{{ blocked.reason }}</span>
+        </div>
+        <button class="btn-icon btn-delete" (click)="removeBlockedDate(blocked.blockedId)" title="Remove">
+          🗑
+        </button>
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="blockedDates.length === 0">
+      <p class="text-muted">No blocked dates. Use the form above to block specific dates.</p>
+    </div>
+  </section>
+</div>

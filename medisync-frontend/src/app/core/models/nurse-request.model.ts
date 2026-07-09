@@ -10,7 +10,12 @@ export interface NurseRequest {
   healthIssue?: string;
   requestDate: string;
   preferredTime?: string;
-  requestStatus: 'pending' | 'accepted' | 'in_progress' | 'completed' | 'cancelled';
+  timeSlot?: string;
+  expiresAt?: string;
+  acceptedAt?: string;
+  completedAt?: string;
+  bookingGroupId?: string;
+  requestStatus: 'pending' | 'accepted' | 'rejected' | 'expired' | 'in_progress' | 'completed' | 'cancelled';
   createdAt: string;
   updatedAt: string;
 }
@@ -22,4 +27,43 @@ export interface CreateNurseRequestDto {
   healthIssue?: string;
   requestDate: string;
   preferredTime?: string;
+  timeSlot?: string;
+  paymentMethod?: string;
+  bookingGroupId?: string;
+  dates?: string[];
+  timeSlots?: string[];
+}
+
+export interface NurseSchedule {
+  scheduleId: number;
+  nurse?: Nurse;
+  dayOfWeek: string;
+  startTime: string;
+  endTime: string;
+  isActive: boolean;
+}
+
+export interface NurseBlockedDate {
+  blockedId: number;
+  nurse?: Nurse;
+  blockedDate: string;
+  reason?: string;
+}
+
+export interface Payment {
+  paymentId: number;
+  request?: NurseRequest;
+  user?: User;
+  amount: number;
+  paymentMethod: string;
+  transactionId: string;
+  status: 'held' | 'confirmed' | 'refunded' | 'released';
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AvailableSlotsResponse {
+  nurseId: number;
+  date: string;
+  availableSlots: string[];
 }

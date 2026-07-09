@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 import { NurseRequestService } from '../../../core/services/nurse-request.service';
 import { NurseRequest } from '../../../core/models';
 import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-nurse-requests',
@@ -24,6 +26,9 @@ export class NurseRequestsComponent implements OnInit {
   currentPage = 1;
   pageSize = 10;
 
+  // Payment status tracking
+  paymentStatus: Map<number, boolean> = new Map();
+
   get paginatedRequests() {
     const start = (this.currentPage - 1) * this.pageSize;
     return this.filteredRequests.slice(start, start + this.pageSize);
@@ -38,7 +43,10 @@ export class NurseRequestsComponent implements OnInit {
     this.currentPage = 1;
   }
 
-  constructor(private nurseRequestService: NurseRequestService) {}
+  constructor(
+    private nurseRequestService: NurseRequestService,
+    private http: HttpClient
+  ) {}
 
   ngOnInit(): void {
     this.loadRequests();
@@ -49,6 +57,22 @@ export class NurseRequestsComponent implements OnInit {
       this.allRequests = requests;
       this.computeCounts();
       this.applyFilter();
+      this.checkPaymentStatuses();
+    });
+  }
+
+  private checkPaymentStatuses(): void {
+    this.allRequests.forEach(req => {
+      if (req.requestStatus === 'accepted' || req.requestStatus === 'completed') {
+        this.http.get<any>(`${environment.apiUrl}/nurse-requests/${req.requestId}/payment`).subscribe({
+          next: (payment) => {
+            this.paymentStatus.set(req.requestId, payment?.paid === true);
+          },
+          error: () => {
+            this.paymentStatus.set(req.requestId, false);
+          }
+        });
+      }
     });
   }
 

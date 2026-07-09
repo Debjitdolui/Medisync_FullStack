@@ -39,6 +39,8 @@ public class SecurityConfig {
                     "/api/nurses/register",
                     "/api/nurses/login",
                     "/api/nurses/services",
+                    "/api/nurses/schedule/*",
+                    "/api/nurse-requests/slots",
                     "/api/master-medicines/**",
                     "/api/search/**",
                     "/uploads/**"

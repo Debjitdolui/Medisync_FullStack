@@ -199,7 +199,8 @@
 .btn-outline {
   padding: 9px 18px; background: none; color: var(--text-secondary);
   border: 1px solid var(--border); border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer;
-  &:hover { background: var(--bg); }
+  transition: all 0.2s;
+  &:hover { background: var(--primary); color: #fff; border-color: var(--primary); transform: translateY(-1px); }
 }
 
 .btn-danger {
@@ -235,7 +236,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-  &:hover { background: var(--primary); color: #fff; }
+  &:hover { background: var(--primary); color: #fff; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(var(--primary-rgb, 79, 70, 229), 0.3); }
 }
 
 // Category modal

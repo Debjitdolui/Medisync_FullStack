@@ -94,7 +94,10 @@ public class PharmacyService {
     }
 
     public List<Pharmacy> listApproved() {
-        return pharmacyRepository.findByApprovalStatus("approved");
+        return pharmacyRepository.findByApprovalStatus("approved").stream()
+                .filter(p -> !Boolean.TRUE.equals(p.getIsBlocked()))
+                .filter(p -> !Boolean.FALSE.equals(p.getIsOnline()))
+                .collect(java.util.stream.Collectors.toList());
     }
 
     public void changePassword(String email, String currentPassword, String newPassword) {

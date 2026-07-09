@@ -8,17 +8,23 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class NurseModuleService {
 
+    private static final int BUFFER_MINUTES = 30;
+
     private final NurseRepository nurseRepository;
     private final NurseServiceRepository nurseServiceRepository;
     private final NurseRequestRepository nurseRequestRepository;
+    private final NurseScheduleRepository nurseScheduleRepository;
+    private final NurseBlockedDateRepository nurseBlockedDateRepository;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final NotificationService notificationService;
@@ -74,6 +80,56 @@ public class NurseModuleService {
         return nurseServiceRepository.findAll();
     }
 
+    // ─── Slot Availability Logic ─────────────────────────────────────────────────
+
+    /**
+     * Get available time slots for a nurse on a specific date.
+     * Considers: weekly schedule, blocked dates, existing bookings (pending/accepted/in_progress).
+     */
+    public List<String> getAvailableSlots(Long nurseId, LocalDate date) {
+        // 1. Check if date is blocked
+        if (nurseBlockedDateRepository.existsByNurseNurseIdAndBlockedDate(nurseId, date)) {
+            return Collections.emptyList();
+        }
+
+        // 2. Get nurse's schedule for that day of week
+        String dayOfWeek = date.getDayOfWeek().name(); // MONDAY, TUESDAY, etc.
+        List<NurseSchedule> schedules = nurseScheduleRepository.findByNurseNurseIdAndDayOfWeek(nurseId, dayOfWeek);
+        schedules = schedules.stream().filter(s -> Boolean.TRUE.equals(s.getIsActive())).toList();
+
+        if (schedules.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // 3. Use the exact slots nurse has defined (not split into 1-hour chunks)
+        List<String> allSlots = new ArrayList<>();
+        for (NurseSchedule schedule : schedules) {
+            allSlots.add(schedule.getStartTime().toString() + "-" + schedule.getEndTime().toString());
+        }
+
+        // 4. Remove slots that are already booked (pending/accepted/in_progress)
+        List<NurseRequest> activeBookings = nurseRequestRepository.findActiveBookingsForNurseOnDate(nurseId, date);
+        Set<String> bookedSlots = activeBookings.stream()
+                .map(NurseRequest::getTimeSlot)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        allSlots.removeIf(bookedSlots::contains);
+
+        // 5. If today, remove past slots (must be at least 2 hours from now)
+        if (date.equals(LocalDate.now())) {
+            LocalTime minTime = LocalTime.now().plusHours(2);
+            allSlots.removeIf(slot -> {
+                LocalTime slotStart = LocalTime.parse(slot.split("-")[0]);
+                return slotStart.isBefore(minTime);
+            });
+        }
+
+        return allSlots;
+    }
+
+    // ─── Create Booking Request with Buffer ──────────────────────────────────────
+
     public NurseRequest createRequest(String patientEmail, NurseRequestDto dto) {
         User patient = userRepository.findByEmail(patientEmail)
                 .orElseThrow(() -> new RuntimeException("Patient not found"));
@@ -81,6 +137,15 @@ public class NurseModuleService {
                 .orElseThrow(() -> new RuntimeException("Nurse not found"));
         NurseService service = nurseServiceRepository.findById(dto.getServiceId())
                 .orElseThrow(() -> new RuntimeException("Service not found"));
+
+        // Validate slot availability
+        if (dto.getTimeSlot() != null) {
+            List<String> available = getAvailableSlots(nurse.getNurseId(), dto.getRequestDate());
+            if (!available.contains(dto.getTimeSlot())) {
+                throw new RuntimeException("Selected time slot is not available");
+            }
+        }
+
         NurseRequest request = new NurseRequest();
         request.setPatient(patient);
         request.setNurse(nurse);
@@ -89,14 +154,46 @@ public class NurseModuleService {
         request.setHealthIssue(dto.getHealthIssue());
         request.setRequestDate(dto.getRequestDate());
         request.setPreferredTime(dto.getPreferredTime());
+        request.setTimeSlot(dto.getTimeSlot());
+        request.setBookingGroupId(dto.getBookingGroupId());
+
+        // Set buffer expiry time (30 minutes from now)
+        request.setExpiresAt(LocalDateTime.now().plusMinutes(BUFFER_MINUTES));
+
         NurseRequest saved = nurseRequestRepository.save(request);
 
         // Notify the nurse about new booking request
         notificationService.notifyNurse(nurse.getEmail(), "NEW_REQUEST",
                 "New Booking Request",
-                "You have a new " + service.getServiceName() + " request from " + patient.getUsername() + " for " + dto.getRequestDate());
+                "You have a new " + service.getServiceName() + " request from " + patient.getUsername()
+                        + " for " + dto.getRequestDate()
+                        + (dto.getTimeSlot() != null ? " (" + dto.getTimeSlot() + ")" : "")
+                        + ". Please respond within 30 minutes.");
 
         return saved;
+    }
+
+    // ─── Multi-day booking ───────────────────────────────────────────────────────
+
+    public List<NurseRequest> createMultiDayBooking(String patientEmail, NurseRequestDto dto, List<LocalDate> dates, List<String> timeSlots) {
+        String groupId = UUID.randomUUID().toString();
+        List<NurseRequest> requests = new ArrayList<>();
+
+        for (int i = 0; i < dates.size(); i++) {
+            NurseRequestDto dayDto = new NurseRequestDto();
+            dayDto.setNurseId(dto.getNurseId());
+            dayDto.setServiceId(dto.getServiceId());
+            dayDto.setAddress(dto.getAddress());
+            dayDto.setHealthIssue(dto.getHealthIssue());
+            dayDto.setRequestDate(dates.get(i));
+            dayDto.setPreferredTime(dto.getPreferredTime());
+            dayDto.setTimeSlot(timeSlots.size() > i ? timeSlots.get(i) : dto.getTimeSlot());
+            dayDto.setBookingGroupId(groupId);
+
+            requests.add(createRequest(patientEmail, dayDto));
+        }
+
+        return requests;
     }
 
     public List<NurseRequest> getPatientRequests(String email) {
@@ -114,7 +211,20 @@ public class NurseModuleService {
     public NurseRequest updateRequestStatus(Long requestId, String status) {
         NurseRequest request = nurseRequestRepository.findById(requestId)
                 .orElseThrow(() -> new RuntimeException("Request not found"));
+
+        // Validate status transition
+        String currentStatus = request.getRequestStatus();
+        validateStatusTransition(currentStatus, status);
+
         request.setRequestStatus(status);
+
+        // Set timestamps based on status
+        if ("accepted".equals(status)) {
+            request.setAcceptedAt(LocalDateTime.now());
+        } else if ("completed".equals(status)) {
+            request.setCompletedAt(LocalDateTime.now());
+        }
+
         NurseRequest saved = nurseRequestRepository.save(request);
 
         // Notify the patient about status change
@@ -122,15 +232,30 @@ public class NurseModuleService {
         String nurseName = request.getNurse().getFullName();
         String title = "Nurse Request " + status.substring(0, 1).toUpperCase() + status.substring(1);
         String message = switch (status) {
-            case "accepted" -> "Your request has been accepted by " + nurseName + ". They will arrive on " + request.getRequestDate();
+            case "accepted" -> "Your request has been accepted by " + nurseName + ". They will arrive on " + request.getRequestDate()
+                    + (request.getTimeSlot() != null ? " at " + request.getTimeSlot().split("-")[0] : "");
+            case "rejected" -> "Your request with " + nurseName + " has been declined. Your payment will be refunded.";
             case "in_progress" -> nurseName + " is on the way for your " + request.getService().getServiceName();
             case "completed" -> "Your " + request.getService().getServiceName() + " with " + nurseName + " is completed. Please leave a review!";
-            case "cancelled" -> "Your request with " + nurseName + " has been cancelled.";
+            case "cancelled" -> "Your request with " + nurseName + " has been cancelled. Your payment will be refunded.";
             default -> "Your nurse request status has been updated to: " + status;
         };
         notificationService.notifyUser(patientEmail, "REQUEST_UPDATE", title, message);
 
         return saved;
+    }
+
+    private void validateStatusTransition(String current, String next) {
+        Map<String, Set<String>> allowed = Map.of(
+                "pending", Set.of("accepted", "rejected", "expired", "cancelled"),
+                "accepted", Set.of("in_progress", "cancelled"),
+                "in_progress", Set.of("completed")
+        );
+
+        Set<String> allowedNext = allowed.getOrDefault(current, Collections.emptySet());
+        if (!allowedNext.contains(next)) {
+            throw new RuntimeException("Cannot change status from '" + current + "' to '" + next + "'");
+        }
     }
 
     public Nurse getProfile(String email) {

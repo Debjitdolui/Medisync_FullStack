@@ -105,9 +105,37 @@
               <p>Nurse: {{ booking.nurse.fullName }}</p>
               <p class="booking-date">{{ booking.requestDate }} | {{ booking.preferredTime }}</p>
             </div>
-            <span class="status-badge" [ngClass]="getStatusClass(booking.requestStatus)">
-              {{ booking.requestStatus }}
-            </span>
+            <div class="booking-status-payment">
+              <span class="status-badge" [ngClass]="getStatusClass(booking.requestStatus)">
+                {{ booking.requestStatus }}
+              </span>
+
+              <!-- Payment: Pay Now button for accepted bookings that are not paid -->
+              <button
+                class="btn-pay-now"
+                *ngIf="booking.requestStatus === 'accepted' && !paymentStatus.get(booking.requestId)?.paid"
+                (click)="payNow(booking)">
+                <i class="ti ti-currency-rupee"></i>
+                Pay Now ₹{{ booking.service.basePrice }}
+              </button>
+
+              <!-- Payment: Paid badge -->
+              <span
+                class="paid-badge"
+                *ngIf="paymentStatus.get(booking.requestId)?.paid">
+                <i class="ti ti-circle-check"></i> Paid ✓
+                <small *ngIf="paymentStatus.get(booking.requestId)?.transactionId">
+                  ({{ paymentStatus.get(booking.requestId)?.transactionId }})
+                </small>
+              </span>
+
+              <!-- Completed without online payment -->
+              <span
+                class="paid-badge paid-direct"
+                *ngIf="booking.requestStatus === 'completed' && !paymentStatus.get(booking.requestId)?.paid">
+                Paid directly to nurse
+              </span>
+            </div>
           </div>
           <p *ngIf="bookings.length === 0" class="empty">No bookings yet</p>
         </div>

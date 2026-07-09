@@ -44,8 +44,23 @@ public class NurseRequest {
     @Column(name = "preferred_time")
     private String preferredTime;
 
+    @Column(name = "time_slot")
+    private String timeSlot; // e.g., "10:00-11:00"
+
+    @Column(name = "expires_at")
+    private LocalDateTime expiresAt; // buffer deadline (created_at + 30 min)
+
+    @Column(name = "accepted_at")
+    private LocalDateTime acceptedAt;
+
+    @Column(name = "completed_at")
+    private LocalDateTime completedAt;
+
+    @Column(name = "booking_group_id")
+    private String bookingGroupId; // UUID for multi-day bookings
+
     @Column(name = "request_status", columnDefinition = "varchar(255) default 'pending'")
-    private String requestStatus = "pending";
+    private String requestStatus = "pending"; // pending, accepted, rejected, expired, in_progress, completed, cancelled
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

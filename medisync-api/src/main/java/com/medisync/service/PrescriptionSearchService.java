@@ -39,6 +39,7 @@ public class PrescriptionSearchService {
         }
 
         Map<Long, List<Medicine>> grouped = medicines.stream()
+                .filter(m -> !Boolean.FALSE.equals(m.getPharmacy().getIsOnline()))
                 .collect(Collectors.groupingBy(m -> m.getPharmacy().getPharmacyId()));
 
         List<PharmacySearchResult> results = new ArrayList<>();

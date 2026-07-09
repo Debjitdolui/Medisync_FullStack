@@ -44,6 +44,7 @@ export class AdminSidebarComponent {
         return [
           { label: 'Dashboard', icon: 'ti-dashboard', route: '/nurse/dashboard' },
           { label: 'My Requests', icon: 'ti-clipboard-list', route: '/nurse/requests' },
+          { label: 'Timetable', icon: 'ti-calendar-time', route: '/nurse/timetable' },
           { label: 'Availability', icon: 'ti-clock', route: '/nurse/availability' },
         ];
       default:
