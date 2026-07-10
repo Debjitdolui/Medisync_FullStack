@@ -5,17 +5,6 @@
     <p class="subtitle">Manage your weekly schedule and blocked dates</p>
   </div>
 
-  <!-- Alerts -->
-  <div class="alert alert-error" *ngIf="error">
-    <span>{{ error }}</span>
-    <button class="alert-dismiss" (click)="dismissError()">&times;</button>
-  </div>
-
-  <div class="alert alert-success" *ngIf="successMessage">
-    <span>{{ successMessage }}</span>
-    <button class="alert-dismiss" (click)="dismissSuccess()">&times;</button>
-  </div>
-
   <!-- Loading State -->
   <div class="loading-spinner" *ngIf="loading">
     <div class="spinner"></div>

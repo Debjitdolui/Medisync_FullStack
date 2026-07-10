@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { ReactiveFormsModule, FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
 import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
@@ -21,7 +22,8 @@ export class LoginComponent {
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private toastr: ToastrService
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -50,6 +52,7 @@ export class LoginComponent {
     this.authService.login({ email, password }).subscribe({
       next: (res) => {
         this.isLoading = false;
+        this.toastr.success('Welcome back!', 'Login Successful');
         switch (res.role) {
           case 'customer':
             this.router.navigate(['/user/dashboard']);
@@ -70,6 +73,7 @@ export class LoginComponent {
       error: (err) => {
         this.isLoading = false;
         this.errorMessage = err?.error?.error || 'Invalid credentials. Please try again.';
+        this.toastr.error(this.errorMessage, 'Login Failed');
       }
     });
   }

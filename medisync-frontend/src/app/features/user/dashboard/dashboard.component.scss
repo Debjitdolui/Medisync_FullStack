@@ -73,82 +73,71 @@
   max-width: 460px;
 }
 
-.search-bar {
-  display: flex;
+// Typewriter Animation
+.typewriter-section {
+  margin-top: 8px;
+  padding: 16px 0;
+}
+
+.search-cta {
+  display: inline-flex;
   align-items: center;
-  background: #ffffff;
-  border: 1.5px solid var(--border);
-  border-radius: 12px;
-  padding: 5px 5px 5px 18px;
-  max-width: 520px;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  gap: 8px;
+  padding: 12px 24px;
+  background: var(--primary);
+  color: #fff;
+  border-radius: 10px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+  margin-bottom: 18px;
 
-  &:focus-within {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 4px rgba(26, 115, 232, 0.08);
-  }
+  i { font-size: 18px; }
 
-  > i {
-    font-size: 20px;
-    color: var(--text-muted);
-    flex-shrink: 0;
-  }
-
-  input {
-    flex: 1;
-    border: none;
-    background: transparent;
-    padding: 12px 12px;
-    font-size: 14px;
-    font-family: inherit;
-    color: var(--text-primary);
-    outline: none;
-
-    &::placeholder {
-      color: var(--text-muted);
-    }
-  }
-
-  .search-btn {
-    padding: 11px 28px;
-    background: var(--primary);
-    color: #fff;
-    border: none;
-    border-radius: 9px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s, transform 0.15s;
-    white-space: nowrap;
-
-    &:hover {
-      background: var(--primary-hover);
-      transform: scale(1.02);
-    }
+  &:hover {
+    background: #2563eb;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
   }
 }
 
-.hero-tags {
+.typewriter-block {
   display: flex;
-  gap: 8px;
-  margin-top: 14px;
+  flex-direction: column;
+  gap: 4px;
+}
 
-  .tag {
-    padding: 5px 12px;
-    background: #ffffff;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    font-size: 12px;
-    color: var(--text-secondary);
-    cursor: pointer;
-    transition: all 0.2s;
+.typewriter-prefix {
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
 
-    &:hover {
-      background: var(--primary-light);
-      border-color: var(--primary);
-      color: var(--primary);
-    }
-  }
+.typewriter-text {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  min-height: 36px;
+  line-height: 1.4;
+}
+
+:host ::ng-deep .tw-cursor {
+  color: var(--primary);
+  font-weight: 300;
+  animation: blink 0.8s infinite;
+  margin-left: 2px;
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
 }
 
 // Hero Visual (right side)

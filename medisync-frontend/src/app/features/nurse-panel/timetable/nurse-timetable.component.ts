@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
 import { NurseApiService } from '../../../core/services/nurse.service';
 import { NurseSchedule, NurseBlockedDate } from '../../../core/models/nurse-request.model';
 
@@ -42,10 +43,11 @@ export class NurseTimetableComponent implements OnInit {
   // UI state
   loading = false;
   saving = false;
-  error: string | null = null;
-  successMessage: string | null = null;
 
-  constructor(private nurseApi: NurseApiService) {}
+  constructor(
+    private nurseApi: NurseApiService,
+    private toastr: ToastrService
+  ) {}
 
   ngOnInit(): void {
     this.loadSchedule();
@@ -62,7 +64,7 @@ export class NurseTimetableComponent implements OnInit {
         this.loading = false;
       },
       error: (err) => {
-        this.error = 'Failed to load schedule';
+        this.toastr.error('Failed to load schedule', 'Error');
         this.loading = false;
       }
     });
@@ -74,28 +76,26 @@ export class NurseTimetableComponent implements OnInit {
 
   addSlot(): void {
     if (!this.newSlot.startTime || !this.newSlot.endTime) {
-      this.error = 'Please select start and end times';
+      this.toastr.warning('Please select start and end times', 'Validation');
       return;
     }
 
     if (this.newSlot.startTime >= this.newSlot.endTime) {
-      this.error = 'End time must be after start time';
+      this.toastr.warning('End time must be after start time', 'Validation');
       return;
     }
 
     this.saving = true;
-    this.error = null;
 
     this.nurseApi.addSlot(this.newSlot.dayOfWeek, this.newSlot.startTime, this.newSlot.endTime).subscribe({
       next: (saved) => {
         this.schedule.push(saved);
         this.saving = false;
-        this.successMessage = 'Slot added successfully!';
+        this.toastr.success('Slot added successfully!', 'Added');
         this.newSlot = { dayOfWeek: this.newSlot.dayOfWeek, startTime: '09:00', endTime: '17:00' };
-        setTimeout(() => this.successMessage = null, 3000);
       },
       error: (err) => {
-        this.error = err.error?.error || 'Failed to add slot. It may overlap with an existing slot.';
+        this.toastr.error(err.error?.error || 'Failed to add slot. It may overlap with an existing slot.', 'Error');
         this.saving = false;
       }
     });
@@ -108,9 +108,10 @@ export class NurseTimetableComponent implements OnInit {
         if (index > -1) {
           this.schedule[index] = updated;
         }
+        this.toastr.success(`Slot ${updated.isActive ? 'activated' : 'deactivated'}`, 'Updated');
       },
       error: () => {
-        this.error = 'Failed to toggle slot';
+        this.toastr.error('Failed to toggle slot', 'Error');
       }
     });
   }
@@ -123,11 +124,10 @@ export class NurseTimetableComponent implements OnInit {
     this.nurseApi.deleteScheduleSlot(slot.scheduleId).subscribe({
       next: () => {
         this.schedule = this.schedule.filter(s => s.scheduleId !== slot.scheduleId);
-        this.successMessage = 'Slot deleted';
-        setTimeout(() => this.successMessage = null, 3000);
+        this.toastr.success('Slot deleted', 'Deleted');
       },
       error: () => {
-        this.error = 'Failed to delete slot';
+        this.toastr.error('Failed to delete slot', 'Error');
       }
     });
   }
@@ -140,14 +140,14 @@ export class NurseTimetableComponent implements OnInit {
         this.blockedDates = data;
       },
       error: () => {
-        this.error = 'Failed to load blocked dates';
+        this.toastr.error('Failed to load blocked dates', 'Error');
       }
     });
   }
 
   addBlockedDate(): void {
     if (!this.newBlockedDate) {
-      this.error = 'Please select a date to block';
+      this.toastr.warning('Please select a date to block', 'Validation');
       return;
     }
 
@@ -156,12 +156,10 @@ export class NurseTimetableComponent implements OnInit {
         this.loadBlockedDates();
         this.newBlockedDate = '';
         this.newBlockedReason = '';
-        this.successMessage = 'Date blocked successfully';
-        this.error = null;
-        setTimeout(() => this.successMessage = null, 3000);
+        this.toastr.success('Date blocked successfully', 'Blocked');
       },
       error: () => {
-        this.error = 'Failed to block date';
+        this.toastr.error('Failed to block date', 'Error');
       }
     });
   }
@@ -172,11 +170,10 @@ export class NurseTimetableComponent implements OnInit {
     this.nurseApi.removeBlockedDate(blockedId).subscribe({
       next: () => {
         this.blockedDates = this.blockedDates.filter(d => d.blockedId !== blockedId);
-        this.successMessage = 'Blocked date removed';
-        setTimeout(() => this.successMessage = null, 3000);
+        this.toastr.success('Blocked date removed', 'Removed');
       },
       error: () => {
-        this.error = 'Failed to remove blocked date';
+        this.toastr.error('Failed to remove blocked date', 'Error');
       }
     });
   }
@@ -184,13 +181,5 @@ export class NurseTimetableComponent implements OnInit {
   formatDate(dateStr: string): string {
     const date = new Date(dateStr);
     return date.toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
-  }
-
-  dismissError(): void {
-    this.error = null;
-  }
-
-  dismissSuccess(): void {
-    this.successMessage = null;
   }
 }

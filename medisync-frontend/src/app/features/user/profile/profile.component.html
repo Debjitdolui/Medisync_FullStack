@@ -21,6 +21,9 @@
         <button [class.active]="activeTab === 'bookings'" (click)="activeTab = 'bookings'">
           <i class="ti ti-calendar"></i> My Bookings
         </button>
+        <button [class.active]="activeTab === 'payments'" (click)="activeTab = 'payments'; loadPayments()">
+          <i class="ti ti-receipt"></i> Payment History
+        </button>
         <button [class.active]="activeTab === 'security'" (click)="activeTab = 'security'">
           <i class="ti ti-shield"></i> Security
         </button>
@@ -98,12 +101,13 @@
       <!-- Bookings Tab -->
       <div *ngIf="activeTab === 'bookings'">
         <h2 class="tab-title">My Bookings</h2>
+        <p class="tab-subtitle" *ngIf="bookings.length > 0">{{ bookings.length }} booking{{ bookings.length > 1 ? 's' : '' }} total</p>
         <div class="bookings-list">
-          <div *ngFor="let booking of bookings" class="booking-card">
+          <div *ngFor="let booking of paginatedBookings" class="booking-card">
             <div class="booking-info">
               <h4>{{ booking.service.serviceName }}</h4>
               <p>Nurse: {{ booking.nurse.fullName }}</p>
-              <p class="booking-date">{{ booking.requestDate }} | {{ booking.preferredTime }}</p>
+              <p class="booking-date">{{ booking.requestDate }} | {{ booking.timeSlot || booking.preferredTime }}</p>
             </div>
             <div class="booking-status-payment">
               <span class="status-badge" [ngClass]="getStatusClass(booking.requestStatus)">
@@ -123,10 +127,7 @@
               <span
                 class="paid-badge"
                 *ngIf="paymentStatus.get(booking.requestId)?.paid">
-                <i class="ti ti-circle-check"></i> Paid ✓
-                <small *ngIf="paymentStatus.get(booking.requestId)?.transactionId">
-                  ({{ paymentStatus.get(booking.requestId)?.transactionId }})
-                </small>
+                <i class="ti ti-circle-check"></i> Paid
               </span>
 
               <!-- Completed without online payment -->
@@ -138,6 +139,48 @@
             </div>
           </div>
           <p *ngIf="bookings.length === 0" class="empty">No bookings yet</p>
+        </div>
+
+        <!-- Pagination -->
+        <div class="booking-pagination" *ngIf="totalBookingPages > 1">
+          <button class="page-btn" (click)="prevBookingPage()" [disabled]="bookingPage === 1">
+            <i class="ti ti-chevron-left"></i> Previous
+          </button>
+          <span class="page-info">Page {{ bookingPage }} of {{ totalBookingPages }}</span>
+          <button class="page-btn" (click)="nextBookingPage()" [disabled]="bookingPage === totalBookingPages">
+            Next <i class="ti ti-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Payment History Tab -->
+      <div *ngIf="activeTab === 'payments'">
+        <h2 class="tab-title">Payment History</h2>
+        <p class="tab-subtitle">All your payments on MediSync</p>
+
+        <div class="loading-text" *ngIf="loadingPayments">Loading payments...</div>
+
+        <div class="payments-list" *ngIf="!loadingPayments && payments.length > 0">
+          <div *ngFor="let payment of payments" class="payment-card">
+            <div class="payment-icon">
+              <i class="ti ti-receipt"></i>
+            </div>
+            <div class="payment-info">
+              <h4>{{ payment.serviceName }}</h4>
+              <p>Nurse: {{ payment.nurseName }}</p>
+              <p class="payment-date">{{ payment.requestDate }} | {{ payment.createdAt | date:'dd MMM yyyy, hh:mm a' }}</p>
+            </div>
+            <div class="payment-amount">
+              <span class="amount">₹{{ payment.amount }}</span>
+              <span class="payment-method">{{ payment.paymentMethod }}</span>
+              <span class="txn-id">{{ payment.transactionId }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="empty" *ngIf="!loadingPayments && payments.length === 0">
+          <i class="ti ti-receipt-off"></i>
+          <p>No payment history yet. Payments will appear here after you pay for nurse services.</p>
         </div>
       </div>
 

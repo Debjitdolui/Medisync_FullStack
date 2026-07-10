@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { ToastrService } from 'ngx-toastr';
 import { NurseRequestService } from '../../../core/services/nurse-request.service';
 import { NurseRequest } from '../../../core/models';
 import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
@@ -45,7 +46,8 @@ export class NurseRequestsComponent implements OnInit {
 
   constructor(
     private nurseRequestService: NurseRequestService,
-    private http: HttpClient
+    private http: HttpClient,
+    private toastr: ToastrService
   ) {}
 
   ngOnInit(): void {
@@ -98,8 +100,14 @@ export class NurseRequestsComponent implements OnInit {
   }
 
   updateStatus(request: NurseRequest, status: string): void {
-    this.nurseRequestService.updateRequestStatus(request.requestId, status).subscribe(() => {
-      this.loadRequests();
+    this.nurseRequestService.updateRequestStatus(request.requestId, status).subscribe({
+      next: () => {
+        this.toastr.success(`Request ${this.formatStatus(status).toLowerCase()} successfully`, 'Status Updated');
+        this.loadRequests();
+      },
+      error: () => {
+        this.toastr.error(`Failed to update request status to ${this.formatStatus(status).toLowerCase()}`, 'Error');
+      }
     });
   }
 

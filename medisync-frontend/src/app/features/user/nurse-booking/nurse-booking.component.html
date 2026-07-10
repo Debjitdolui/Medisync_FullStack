@@ -114,8 +114,9 @@
 <!-- Booking Modal -->
 <div class="modal-overlay" *ngIf="showBookingModal" (click)="closeBooking()">
   <div class="modal-card" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h3>
+    <!-- Gradient Header Strip -->
+    <div class="modal-gradient-header">
+      <h3 class="modal-header-title">
         <ng-container [ngSwitch]="bookingStep">
           <span *ngSwitchCase="'details'">Booking Details</span>
           <span *ngSwitchCase="'date'">Select Date</span>
@@ -126,33 +127,53 @@
       <button class="close-btn" (click)="closeBooking()"><i class="ti ti-x"></i></button>
     </div>
 
-    <!-- Step Progress Indicator (4 steps: details, date, slots, confirm) -->
-    <div class="step-progress" *ngIf="!bookingSuccess">
-      <div class="step-dot" [class.active]="bookingStep === 'details'" [class.completed]="bookingStep !== 'details'"></div>
-      <div class="step-line" [class.completed]="bookingStep !== 'details'"></div>
-      <div class="step-dot" [class.active]="bookingStep === 'date'" [class.completed]="bookingStep === 'slots'"></div>
-      <div class="step-line" [class.completed]="bookingStep === 'slots'"></div>
-      <div class="step-dot" [class.active]="bookingStep === 'slots'"></div>
+    <!-- Step Progress Indicator (3 steps: details, date, slots) -->
+    <div class="step-progress-bar" *ngIf="!bookingSuccess">
+      <div class="step-pill" [class.active]="bookingStep === 'details'" [class.completed]="bookingStep !== 'details'">
+        <span class="step-pill-icon">
+          <i class="ti ti-check" *ngIf="bookingStep !== 'details'"></i>
+          <span *ngIf="bookingStep === 'details'">1</span>
+        </span>
+        <span class="step-pill-label">Details</span>
+      </div>
+      <div class="step-connector" [class.completed]="bookingStep !== 'details'"></div>
+      <div class="step-pill" [class.active]="bookingStep === 'date'" [class.completed]="bookingStep === 'slots'">
+        <span class="step-pill-icon">
+          <i class="ti ti-check" *ngIf="bookingStep === 'slots'"></i>
+          <span *ngIf="bookingStep !== 'slots'">2</span>
+        </span>
+        <span class="step-pill-label">Date</span>
+      </div>
+      <div class="step-connector" [class.completed]="bookingStep === 'slots'"></div>
+      <div class="step-pill" [class.active]="bookingStep === 'slots'">
+        <span class="step-pill-icon">
+          <span>3</span>
+        </span>
+        <span class="step-pill-label">Slot</span>
+      </div>
     </div>
 
     <div class="modal-body">
-      <!-- Nurse Summary (always visible) -->
-      <div class="booking-summary" *ngIf="!bookingSuccess">
-        <div class="summary-nurse">
-          <div class="summary-avatar">{{ selectedNurse?.fullName?.charAt(0) }}</div>
-          <div>
+      <!-- Nurse Summary Card -->
+      <div class="booking-summary-card" *ngIf="!bookingSuccess">
+        <div class="summary-card-inner">
+          <div class="summary-avatar-wrapper">
+            <div class="summary-avatar">{{ selectedNurse?.fullName?.charAt(0) }}</div>
+            <span class="avatar-pulse"></span>
+          </div>
+          <div class="summary-details">
             <span class="summary-name">{{ selectedNurse?.fullName }}</span>
             <span class="summary-spec">{{ selectedNurse?.specialization }}</span>
           </div>
-        </div>
-        <div class="summary-service">
-          <span class="summary-service-name">{{ selectedService?.serviceName || 'Home Injection' }}</span>
-          <span class="summary-price">₹{{ selectedService?.basePrice || 200 }}</span>
+          <div class="summary-service-badge">
+            <span class="badge-label">{{ selectedService?.serviceName || 'Home Injection' }}</span>
+            <span class="badge-price">₹{{ selectedService?.basePrice || 200 }}</span>
+          </div>
         </div>
       </div>
 
       <!-- Step 1: Details (Address & Health Issue) -->
-      <div *ngIf="bookingStep === 'details'" class="step-content">
+      <div *ngIf="bookingStep === 'details'" class="step-content step-slide-in">
         <div class="form-group">
           <label class="form-label">Your Address *</label>
           <input class="form-input" placeholder="Enter complete address for nurse visit" [(ngModel)]="bookingAddress">
@@ -162,14 +183,14 @@
           <textarea class="form-input textarea" placeholder="Describe your health concern or any special instructions" [(ngModel)]="bookingHealthIssue" rows="3"></textarea>
         </div>
 
-        <button class="btn-confirm" (click)="proceedToDateSelection()" [disabled]="!bookingAddress">
+        <button class="btn-confirm btn-gradient" (click)="proceedToDateSelection()" [disabled]="!bookingAddress">
           <span>Continue to Date Selection</span>
           <i class="ti ti-arrow-right"></i>
         </button>
       </div>
 
       <!-- Step 2: Date Selection (Next 7 Days) -->
-      <div *ngIf="bookingStep === 'date'" class="step-content">
+      <div *ngIf="bookingStep === 'date'" class="step-content step-slide-in">
         <button class="back-link" (click)="goBackToDetails()">
           <i class="ti ti-arrow-left"></i> Back to details
         </button>
@@ -181,6 +202,7 @@
                class="date-chip"
                [class.selected]="selectedDate === d.date"
                (click)="selectDate(d.date)">
+            <i class="ti ti-calendar-event date-chip-icon"></i>
             <span class="date-day">{{ d.dayName }}</span>
             <span class="date-label">{{ d.label }}</span>
           </div>
@@ -188,7 +210,7 @@
       </div>
 
       <!-- Step 3: Time Slots -->
-      <div *ngIf="bookingStep === 'slots'" class="step-content">
+      <div *ngIf="bookingStep === 'slots'" class="step-content step-slide-in">
         <button class="back-link" (click)="goBackToDate()">
           <i class="ti ti-arrow-left"></i> Back to dates
         </button>
@@ -221,20 +243,31 @@
                (click)="selectSlot(slot)">
             <i class="ti ti-clock"></i>
             <span>{{ slot }}</span>
+            <i class="ti ti-circle-check slot-check-icon" *ngIf="selectedSlot === slot"></i>
           </div>
         </div>
 
         <!-- Confirm booking button -->
-        <button class="btn-confirm" *ngIf="selectedSlot" (click)="proceedToConfirm()" [disabled]="isBooking">
+        <button class="btn-confirm btn-gradient" *ngIf="selectedSlot" (click)="proceedToConfirm()" [disabled]="isBooking">
           <i class="ti ti-check"></i>
           {{ isBooking ? 'Processing...' : 'Confirm Booking ₹' + (selectedService?.basePrice || 200) }}
+          <i class="ti ti-arrow-right" *ngIf="!isBooking"></i>
         </button>
       </div>
 
       <!-- Step 4: Success Confirmation -->
       <div *ngIf="bookingSuccess" class="step-content success-body">
+        <!-- Confetti dots -->
+        <div class="confetti-container">
+          <span class="confetti-dot" *ngFor="let dot of [1,2,3,4,5,6,7,8,9,10,11,12]"></span>
+        </div>
+
         <div class="success-icon-wrapper">
-          <i class="ti ti-circle-check"></i>
+          <svg class="progress-ring" viewBox="0 0 80 80">
+            <circle class="progress-ring-bg" cx="40" cy="40" r="36" />
+            <circle class="progress-ring-fill" cx="40" cy="40" r="36" />
+          </svg>
+          <i class="ti ti-circle-check success-check-icon"></i>
         </div>
         <h3>Booking Confirmed!</h3>
         <p>Your nurse visit has been successfully booked.</p>
@@ -286,7 +319,7 @@
           </div>
         </div>
 
-        <button class="btn-confirm" (click)="closeBooking()">
+        <button class="btn-confirm btn-gradient" (click)="closeBooking()">
           <i class="ti ti-check"></i>
           Done
         </button>

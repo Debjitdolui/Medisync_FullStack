@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ToastrService } from 'ngx-toastr';
 import { NurseApiService } from '../../../core/services/nurse.service';
 import { NurseRequestService } from '../../../core/services/nurse-request.service';
 
@@ -36,7 +37,8 @@ export class AvailabilityComponent implements OnInit {
 
   constructor(
     private nurseService: NurseApiService,
-    private nurseRequestService: NurseRequestService
+    private nurseRequestService: NurseRequestService,
+    private toastr: ToastrService
   ) {}
 
   ngOnInit(): void {
@@ -65,8 +67,14 @@ export class AvailabilityComponent implements OnInit {
 
   toggleAvailability(): void {
     const newStatus = this.currentStatus === 'online' ? 'offline' : 'online';
-    this.nurseService.updateAvailability(newStatus).subscribe(nurse => {
-      this.currentStatus = nurse.availabilityStatus;
+    this.nurseService.updateAvailability(newStatus).subscribe({
+      next: (nurse) => {
+        this.currentStatus = nurse.availabilityStatus;
+        this.toastr.success(`You are now ${nurse.availabilityStatus}`, 'Availability Updated');
+      },
+      error: () => {
+        this.toastr.error('Failed to update availability', 'Error');
+      }
     });
   }
 }

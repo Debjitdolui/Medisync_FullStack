@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule, Router } from '@angular/router';
+import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { ToastrService } from 'ngx-toastr';
 import { UserService } from '../../../core/services/user.service';
 import { AddressService } from '../../../core/services/address.service';
 import { NurseRequestService } from '../../../core/services/nurse-request.service';
@@ -20,12 +21,20 @@ declare var Razorpay: any;
   styleUrl: './profile.component.scss'
 })
 export class ProfileComponent implements OnInit {
-  activeTab: 'profile' | 'addresses' | 'bookings' | 'security' = 'profile';
+  activeTab: 'profile' | 'addresses' | 'bookings' | 'payments' | 'security' = 'profile';
   user: User | null = null;
   addresses: UserAddress[] = [];
   bookings: NurseRequest[] = [];
   isEditing = false;
   isLoading = true;
+
+  // Booking pagination
+  bookingPage = 1;
+  bookingPageSize = 5;
+
+  // Payment history
+  payments: any[] = [];
+  loadingPayments = false;
 
   // Edit form
   editName = '';
@@ -49,13 +58,39 @@ export class ProfileComponent implements OnInit {
     private nurseRequestService: NurseRequestService,
     private authService: AuthService,
     private router: Router,
-    private http: HttpClient
+    private route: ActivatedRoute,
+    private http: HttpClient,
+    private toastr: ToastrService
   ) {}
 
   ngOnInit(): void {
+    // Handle fragment navigation (e.g., /user/profile#bookings)
+    this.route.fragment.subscribe(fragment => {
+      if (fragment === 'bookings' || fragment === 'payments' || fragment === 'addresses' || fragment === 'security') {
+        this.activeTab = fragment;
+      }
+    });
+
     this.loadProfile();
     this.loadAddresses();
     this.loadBookings();
+  }
+
+  get paginatedBookings(): NurseRequest[] {
+    const start = (this.bookingPage - 1) * this.bookingPageSize;
+    return this.bookings.slice(start, start + this.bookingPageSize);
+  }
+
+  get totalBookingPages(): number {
+    return Math.ceil(this.bookings.length / this.bookingPageSize);
+  }
+
+  nextBookingPage(): void {
+    if (this.bookingPage < this.totalBookingPages) this.bookingPage++;
+  }
+
+  prevBookingPage(): void {
+    if (this.bookingPage > 1) this.bookingPage--;
   }
 
   loadProfile(): void {
@@ -91,6 +126,29 @@ export class ProfileComponent implements OnInit {
         });
       }
     });
+  }
+
+  loadPayments(): void {
+    this.loadingPayments = true;
+    this.payments = [];
+    // Collect payment info from all bookings that have been paid
+    this.bookings.forEach(booking => {
+      this.http.get<any>(`${environment.apiUrl}/nurse-requests/${booking.requestId}/payment`).subscribe({
+        next: (result) => {
+          if (result.paid) {
+            this.payments.push({
+              ...result.payment,
+              nurseName: booking.nurse.fullName,
+              serviceName: booking.service.serviceName,
+              requestDate: booking.requestDate
+            });
+          }
+          this.loadingPayments = false;
+        },
+        error: () => { this.loadingPayments = false; }
+      });
+    });
+    if (this.bookings.length === 0) this.loadingPayments = false;
   }
 
   payNow(booking: NurseRequest): void {
@@ -133,8 +191,7 @@ export class ProfileComponent implements OnInit {
         rzp.open();
       },
       error: (err) => {
-        alert('Failed to initiate payment. Please try again.');
-        console.error('Failed to create payment order', err);
+        this.toastr.error(err?.error?.error || 'Failed to initiate payment. Please try again.', 'Payment Error');
       }
     });
   }
@@ -147,9 +204,10 @@ export class ProfileComponent implements OnInit {
     }).subscribe({
       next: (result) => {
         this.paymentStatus.set(requestId, { paid: true, transactionId: paymentResponse.razorpay_payment_id });
+        this.toastr.success('Payment completed successfully!', 'Payment');
       },
       error: (err) => {
-        console.error('Payment verification failed', err);
+        this.toastr.error(err?.error?.error || 'Payment verification failed. Please contact support.', 'Payment Error');
       }
     });
   }
@@ -158,12 +216,14 @@ export class ProfileComponent implements OnInit {
     this.userService.updateProfile({ username: this.editName, phone: this.editPhone }).subscribe(user => {
       this.user = user;
       this.isEditing = false;
+      this.toastr.success('Profile updated successfully!', 'Profile');
     });
   }
 
   deleteAddress(id: number): void {
     this.addressService.deleteAddress(id).subscribe(() => {
       this.addresses = this.addresses.filter(a => a.addressId !== id);
+      this.toastr.success('Address deleted successfully!', 'Address');
     });
   }
 
@@ -194,12 +254,14 @@ export class ProfileComponent implements OnInit {
       this.addresses.push(addr);
       this.showAddressForm = false;
       this.newAddress = { addressLine: '', city: '', state: '', pincode: '', isDefault: false };
+      this.toastr.success('Address added successfully!', 'Address');
     });
   }
 
   deactivateAccount(): void {
     if (confirm('Are you sure you want to deactivate your account?')) {
       this.userService.deactivateAccount().subscribe(() => {
+        this.toastr.info('Your account has been deactivated.', 'Account');
         this.authService.logout();
         this.router.navigate(['/login']);
       });

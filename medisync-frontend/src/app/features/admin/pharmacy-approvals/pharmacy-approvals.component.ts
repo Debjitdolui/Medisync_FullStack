@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ToastrService } from 'ngx-toastr';
 import { AdminService } from '../../../core/services/admin.service';
 import { Pharmacy } from '../../../core/models';
 import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
@@ -24,7 +25,10 @@ export class PharmacyApprovalsComponent implements OnInit {
   modalTarget: Pharmacy | null = null;
   isProcessing = false;
 
-  constructor(private adminService: AdminService) {}
+  constructor(
+    private adminService: AdminService,
+    private toastr: ToastrService
+  ) {}
 
   ngOnInit(): void { this.loadPharmacies(); }
 
@@ -50,11 +54,27 @@ export class PharmacyApprovalsComponent implements OnInit {
   }
 
   approve(id: number): void {
-    this.adminService.approvePharmacy(id, 'approved').subscribe(() => this.loadPharmacies());
+    this.adminService.approvePharmacy(id, 'approved').subscribe({
+      next: () => {
+        this.toastr.success('Pharmacy approved successfully', 'Approved');
+        this.loadPharmacies();
+      },
+      error: () => {
+        this.toastr.error('Failed to approve pharmacy', 'Error');
+      }
+    });
   }
 
   reject(id: number): void {
-    this.adminService.approvePharmacy(id, 'rejected').subscribe(() => this.loadPharmacies());
+    this.adminService.approvePharmacy(id, 'rejected').subscribe({
+      next: () => {
+        this.toastr.warning('Pharmacy rejected', 'Rejected');
+        this.loadPharmacies();
+      },
+      error: () => {
+        this.toastr.error('Failed to reject pharmacy', 'Error');
+      }
+    });
   }
 
   // Modal actions
@@ -92,8 +112,13 @@ export class PharmacyApprovalsComponent implements OnInit {
           this.isProcessing = false;
           this.showModal = false;
           this.modalTarget = null;
+          this.toastr.success('Pharmacy blocked successfully', 'Blocked');
         },
-        error: () => { this.isProcessing = false; this.showModal = false; }
+        error: () => {
+          this.isProcessing = false;
+          this.showModal = false;
+          this.toastr.error('Failed to block pharmacy', 'Error');
+        }
       });
     } else {
       this.adminService.unblockPharmacy(id).subscribe({
@@ -105,8 +130,13 @@ export class PharmacyApprovalsComponent implements OnInit {
           this.isProcessing = false;
           this.showModal = false;
           this.modalTarget = null;
+          this.toastr.success('Pharmacy unblocked successfully', 'Unblocked');
         },
-        error: () => { this.isProcessing = false; this.showModal = false; }
+        error: () => {
+          this.isProcessing = false;
+          this.showModal = false;
+          this.toastr.error('Failed to unblock pharmacy', 'Error');
+        }
       });
     }
   }

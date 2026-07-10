@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
 import { MedicineService } from '../../../core/services/medicine.service';
 import { MasterMedicineService } from '../../../core/services/master-medicine.service';
 import { PharmacyService } from '../../../core/services/pharmacy.service';
@@ -78,7 +79,8 @@ export class InventoryComponent implements OnInit {
   constructor(
     private medicineService: MedicineService,
     private masterMedicineService: MasterMedicineService,
-    private pharmacyService: PharmacyService
+    private pharmacyService: PharmacyService,
+    private toastr: ToastrService
   ) {}
 
   ngOnInit(): void {
@@ -238,14 +240,26 @@ export class InventoryComponent implements OnInit {
     };
 
     if (this.editingMedicine) {
-      this.medicineService.updateMedicine(this.editingMedicine.medicineId, request).subscribe(() => {
-        this.loadData();
-        this.closeMedicineModal();
+      this.medicineService.updateMedicine(this.editingMedicine.medicineId, request).subscribe({
+        next: () => {
+          this.toastr.success('Medicine updated successfully', 'Updated');
+          this.loadData();
+          this.closeMedicineModal();
+        },
+        error: () => {
+          this.toastr.error('Failed to update medicine', 'Error');
+        }
       });
     } else {
-      this.medicineService.addMedicine(request).subscribe(() => {
-        this.loadData();
-        this.closeMedicineModal();
+      this.medicineService.addMedicine(request).subscribe({
+        next: () => {
+          this.toastr.success('Medicine added successfully', 'Added');
+          this.loadData();
+          this.closeMedicineModal();
+        },
+        error: () => {
+          this.toastr.error('Failed to add medicine', 'Error');
+        }
       });
     }
   }
@@ -261,15 +275,15 @@ export class InventoryComponent implements OnInit {
 
     this.medicineService.deleteMedicine(this.deletingMedicine.medicineId).subscribe({
       next: () => {
+        this.toastr.success('Medicine deleted successfully', 'Deleted');
         this.loadData();
         this.showDeleteModal = false;
         this.deletingMedicine = null;
       },
       error: () => {
+        this.toastr.error('Failed to delete medicine. Please try again.', 'Error');
         this.showDeleteModal = false;
         this.deletingMedicine = null;
-        this.deleteError = 'Failed to delete medicine. Please try again.';
-        setTimeout(() => this.deleteError = '', 4000);
       }
     });
   }
@@ -289,6 +303,7 @@ export class InventoryComponent implements OnInit {
 
   downloadTemplate(): void {
     this.medicineService.downloadTemplate();
+    this.toastr.info('Template download started', 'Download');
   }
 
   openBulkUploadModal(): void {
@@ -325,12 +340,16 @@ export class InventoryComponent implements OnInit {
         this.bulkUploadResult = result;
         this.bulkUploading = false;
         if (result.added > 0) {
+          this.toastr.success(`${result.added} medicine(s) uploaded successfully`, 'Bulk Upload');
           this.loadData();
+        } else {
+          this.toastr.info('No new medicines were added', 'Bulk Upload');
         }
       },
       error: (err) => {
         this.bulkUploadError = err.error?.error || 'Failed to upload file.';
         this.bulkUploading = false;
+        this.toastr.error(this.bulkUploadError, 'Upload Failed');
       }
     });
   }

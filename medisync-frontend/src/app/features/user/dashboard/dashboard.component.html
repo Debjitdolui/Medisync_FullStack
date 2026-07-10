@@ -9,19 +9,16 @@
       <h1>Your Health, <span class="highlight">Our Priority</span></h1>
       <p class="hero-subtitle">Search medicines, book home nurses, and manage your healthcare — all in one place.</p>
 
-      <form class="search-bar" (ngSubmit)="onSearch()">
-        <i class="ti ti-search"></i>
-        <input type="text"
-               placeholder="Search medicine (e.g., Paracetamol 650mg)"
-               [(ngModel)]="searchQuery"
-               name="searchQuery">
-        <button type="submit" class="search-btn">Search</button>
-      </form>
-
-      <div class="hero-tags">
-        <span class="tag" (click)="searchFor('Paracetamol')">Paracetamol</span>
-        <span class="tag" (click)="searchFor('Amoxicillin')">Amoxicillin</span>
-        <span class="tag" (click)="searchFor('Cetirizine')">Cetirizine</span>
+      <!-- Animated Typewriter -->
+      <div class="typewriter-section">
+        <a routerLink="/user/medicine-search" class="search-cta">
+          <i class="ti ti-search"></i>
+          Search Medicine
+        </a>
+        <div class="typewriter-block">
+          <span class="typewriter-prefix">We help you</span>
+          <span class="typewriter-text"><span [innerHTML]="currentPhraseHtml"></span></span>
+        </div>
       </div>
     </div>
 

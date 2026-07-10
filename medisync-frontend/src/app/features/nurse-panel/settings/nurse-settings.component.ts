@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
 import { NurseApiService } from '../../../core/services/nurse.service';
 import { ReviewService } from '../../../core/services/review.service';
 import { Nurse } from '../../../core/models';
@@ -36,7 +37,8 @@ export class NurseSettingsComponent implements OnInit {
 
   constructor(
     private nurseService: NurseApiService,
-    private reviewService: ReviewService
+    private reviewService: ReviewService,
+    private toastr: ToastrService
   ) {}
 
   ngOnInit(): void {
@@ -75,9 +77,11 @@ export class NurseSettingsComponent implements OnInit {
         this.nurse = nurse;
         this.nurseInitial = nurse.fullName.charAt(0).toUpperCase();
         this.isSaving = false;
+        this.toastr.success('Profile saved successfully', 'Saved');
       },
       error: () => {
         this.isSaving = false;
+        this.toastr.error('Failed to save profile', 'Error');
       }
     });
   }
@@ -86,10 +90,11 @@ export class NurseSettingsComponent implements OnInit {
     if (this.passwordForm.newPass !== this.passwordForm.confirm) return;
     this.nurseService.changePassword(this.passwordForm.current, this.passwordForm.newPass).subscribe({
       next: () => {
+        this.toastr.success('Password changed successfully', 'Success');
         this.passwordForm = { current: '', newPass: '', confirm: '' };
       },
       error: () => {
-        // Handle error
+        this.toastr.error('Failed to change password', 'Error');
       }
     });
   }

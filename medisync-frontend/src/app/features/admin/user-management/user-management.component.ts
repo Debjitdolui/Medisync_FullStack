@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
 import { AdminService } from '../../../core/services/admin.service';
 import { User } from '../../../core/models';
 import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
@@ -27,7 +28,10 @@ export class UserManagementComponent implements OnInit {
   modalTarget: User | null = null;
   isProcessing = false;
 
-  constructor(private adminService: AdminService) {}
+  constructor(
+    private adminService: AdminService,
+    private toastr: ToastrService
+  ) {}
 
   ngOnInit(): void { this.loadUsers(); }
 
@@ -84,11 +88,15 @@ export class UserManagementComponent implements OnInit {
 
     action$.subscribe({
       next: () => {
+        const actionLabel = this.modalAction === 'block' ? 'blocked' : 'unblocked';
+        this.toastr.success(`User ${actionLabel} successfully`, this.modalAction === 'block' ? 'Blocked' : 'Unblocked');
         this.isProcessing = false;
         this.closeModal();
         this.loadUsers();
       },
       error: () => {
+        const actionLabel = this.modalAction === 'block' ? 'block' : 'unblock';
+        this.toastr.error(`Failed to ${actionLabel} user`, 'Error');
         this.isProcessing = false;
         this.closeModal();
       }

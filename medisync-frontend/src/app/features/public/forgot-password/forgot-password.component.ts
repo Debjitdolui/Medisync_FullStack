@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
 import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
@@ -21,7 +22,10 @@ export class ForgotPasswordComponent {
   errorMessage = '';
   otpMessage = '';
 
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private toastr: ToastrService
+  ) {}
 
   sendOtp(): void {
     if (!this.email) {
@@ -36,10 +40,12 @@ export class ForgotPasswordComponent {
         this.isLoading = false;
         this.otpMessage = res.message;
         this.step = 2;
+        this.toastr.success('OTP sent to your email!', 'OTP Sent');
       },
       error: (err) => {
         this.isLoading = false;
         this.errorMessage = err?.error?.error || 'Failed to send OTP. Check your email.';
+        this.toastr.error(this.errorMessage, 'Error');
       }
     });
   }
@@ -68,10 +74,12 @@ export class ForgotPasswordComponent {
       next: () => {
         this.isLoading = false;
         this.step = 3;
+        this.toastr.success('Password reset successfully! You can now log in.', 'Success');
       },
       error: (err) => {
         this.isLoading = false;
         this.errorMessage = err?.error?.error || 'Invalid OTP or reset failed.';
+        this.toastr.error(this.errorMessage, 'Reset Failed');
       }
     });
   }

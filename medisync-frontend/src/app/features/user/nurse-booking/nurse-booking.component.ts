@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
 import { NurseApiService } from '../../../core/services/nurse.service';
 import { NurseRequestService } from '../../../core/services/nurse-request.service';
 import { ReviewService } from '../../../core/services/review.service';
@@ -43,7 +44,8 @@ export class NurseBookingComponent implements OnInit {
   constructor(
     private nurseService: NurseApiService,
     private nurseRequestService: NurseRequestService,
-    private reviewService: ReviewService
+    private reviewService: ReviewService,
+    private toastr: ToastrService
   ) {}
 
   ngOnInit(): void {
@@ -165,11 +167,13 @@ export class NurseBookingComponent implements OnInit {
         this.loadingSlots = false;
         if (this.availableSlots.length === 0) {
           this.slotsError = 'No available slots for this date. Please try another date.';
+          this.toastr.warning('No available slots for this date. Please try another date.', 'Slots');
         }
       },
       error: () => {
         this.loadingSlots = false;
         this.slotsError = 'Failed to load available slots. Please try again.';
+        this.toastr.error('Failed to load available slots. Please try again.', 'Error');
       }
     });
   }
@@ -214,9 +218,11 @@ export class NurseBookingComponent implements OnInit {
         this.bookingSuccess = true;
         this.confirmedBooking = booking;
         this.bookingStep = 'confirm';
+        this.toastr.success('Booking confirmed successfully!', 'Booking');
       },
-      error: () => {
+      error: (err) => {
         this.isBooking = false;
+        this.toastr.error(err?.error?.error || 'Booking failed. Please try again.', 'Booking Error');
       }
     });
   }

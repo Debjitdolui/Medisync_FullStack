@@ -21,42 +21,50 @@
       <div class="card-body">
         <div class="form-row">
           <div class="form-group">
-            <label class="form-label">Pharmacy Name</label>
-            <input type="text" class="form-input" [(ngModel)]="pharmacyForm.pharmacyName" />
+            <label class="form-label">Pharmacy Name <span class="required">*</span></label>
+            <input type="text" class="form-input" [class.input-error]="formErrors.pharmacyName" [(ngModel)]="pharmacyForm.pharmacyName" />
+            <span class="field-error" *ngIf="formErrors.pharmacyName">{{ formErrors.pharmacyName }}</span>
           </div>
           <div class="form-group">
-            <label class="form-label">Owner Name</label>
-            <input type="text" class="form-input" [(ngModel)]="pharmacyForm.ownerName" />
+            <label class="form-label">Owner Name <span class="required">*</span></label>
+            <input type="text" class="form-input" [class.input-error]="formErrors.ownerName" [(ngModel)]="pharmacyForm.ownerName" />
+            <span class="field-error" *ngIf="formErrors.ownerName">{{ formErrors.ownerName }}</span>
           </div>
         </div>
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">License Number</label>
-            <input type="text" class="form-input" [(ngModel)]="pharmacyForm.licenseNumber" readonly />
+            <input type="text" class="form-input disabled" [(ngModel)]="pharmacyForm.licenseNumber" readonly />
+            <span class="field-hint">License number cannot be changed</span>
           </div>
           <div class="form-group">
-            <label class="form-label">Phone</label>
-            <input type="text" class="form-input" [(ngModel)]="pharmacyForm.phone" />
+            <label class="form-label">Phone <span class="required">*</span></label>
+            <input type="text" class="form-input" [class.input-error]="formErrors.phone" [(ngModel)]="pharmacyForm.phone" />
+            <span class="field-error" *ngIf="formErrors.phone">{{ formErrors.phone }}</span>
           </div>
         </div>
         <div class="form-row">
           <div class="form-group full">
-            <label class="form-label">Address</label>
-            <input type="text" class="form-input" [(ngModel)]="pharmacyForm.address" />
+            <label class="form-label">Address <span class="required">*</span></label>
+            <input type="text" class="form-input" [class.input-error]="formErrors.address" [(ngModel)]="pharmacyForm.address" />
+            <span class="field-error" *ngIf="formErrors.address">{{ formErrors.address }}</span>
           </div>
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label class="form-label">City</label>
-            <input type="text" class="form-input" [(ngModel)]="pharmacyForm.city" />
+            <label class="form-label">City <span class="required">*</span></label>
+            <input type="text" class="form-input" [class.input-error]="formErrors.city" [(ngModel)]="pharmacyForm.city" />
+            <span class="field-error" *ngIf="formErrors.city">{{ formErrors.city }}</span>
           </div>
           <div class="form-group">
-            <label class="form-label">State</label>
-            <input type="text" class="form-input" [(ngModel)]="pharmacyForm.state" />
+            <label class="form-label">State <span class="required">*</span></label>
+            <input type="text" class="form-input" [class.input-error]="formErrors.state" [(ngModel)]="pharmacyForm.state" />
+            <span class="field-error" *ngIf="formErrors.state">{{ formErrors.state }}</span>
           </div>
           <div class="form-group">
-            <label class="form-label">Pincode</label>
-            <input type="text" class="form-input" [(ngModel)]="pharmacyForm.pincode" />
+            <label class="form-label">Pincode <span class="required">*</span></label>
+            <input type="text" class="form-input" [class.input-error]="formErrors.pincode" [(ngModel)]="pharmacyForm.pincode" />
+            <span class="field-error" *ngIf="formErrors.pincode">{{ formErrors.pincode }}</span>
           </div>
         </div>
         <div class="card-actions">
@@ -126,63 +134,6 @@
       </div>
     </div>
 
-    <!-- Notification Preferences -->
-    <div class="settings-card">
-      <div class="card-header">
-        <div class="card-header-icon amber">
-          <i class="ti ti-bell"></i>
-        </div>
-        <div>
-          <h3>Notification Preferences</h3>
-          <p>Manage how you receive notifications</p>
-        </div>
-      </div>
-      <div class="card-body">
-        <div class="toggle-list">
-          <div class="toggle-item">
-            <div class="toggle-info">
-              <span class="toggle-label">Low Stock Alerts</span>
-              <span class="toggle-desc">Get notified when medicine stock falls below threshold</span>
-            </div>
-            <label class="toggle-switch">
-              <input type="checkbox" [(ngModel)]="notifications.lowStock" />
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-          <div class="toggle-item">
-            <div class="toggle-info">
-              <span class="toggle-label">Expiry Reminders</span>
-              <span class="toggle-desc">Get notified 30 days before medicine expiry</span>
-            </div>
-            <label class="toggle-switch">
-              <input type="checkbox" [(ngModel)]="notifications.expiry" />
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-          <div class="toggle-item">
-            <div class="toggle-info">
-              <span class="toggle-label">Order Updates</span>
-              <span class="toggle-desc">Notifications for new orders and reviews</span>
-            </div>
-            <label class="toggle-switch">
-              <input type="checkbox" [(ngModel)]="notifications.orders" />
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-          <div class="toggle-item">
-            <div class="toggle-info">
-              <span class="toggle-label">Email Notifications</span>
-              <span class="toggle-desc">Receive notifications via email</span>
-            </div>
-            <label class="toggle-switch">
-              <input type="checkbox" [(ngModel)]="notifications.email" />
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- Pharmacy Images Section -->
     <div class="settings-card">
       <div class="card-header">
@@ -199,7 +150,7 @@
         <div class="images-grid" *ngIf="pharmacyImages.length > 0">
           <div class="image-card" *ngFor="let img of pharmacyImages">
             <img [src]="getImageUrl(img)" [alt]="'Pharmacy image ' + img.displayOrder" />
-            <button class="image-delete-btn" (click)="deleteImage(img)">
+            <button class="image-delete-btn" (click)="confirmDeleteImage(img)">
               <i class="ti ti-trash"></i>
             </button>
           </div>
@@ -223,6 +174,23 @@
         <div class="upload-error" *ngIf="uploadError">
           <i class="ti ti-alert-circle"></i> {{ uploadError }}
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Image Confirmation Modal -->
+  <div class="modal-overlay" *ngIf="showDeleteModal" (click)="cancelDelete()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-icon danger">
+        <i class="ti ti-trash"></i>
+      </div>
+      <h3>Delete Photo?</h3>
+      <p>Are you sure you want to delete this pharmacy photo? This action cannot be undone.</p>
+      <div class="modal-actions">
+        <button class="btn-cancel" (click)="cancelDelete()">Cancel</button>
+        <button class="btn-delete" (click)="deleteImageConfirmed()">
+          <i class="ti ti-trash"></i> Delete Photo
+        </button>
       </div>
     </div>
   </div>

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { ToastrService } from 'ngx-toastr';
 import { MasterMedicineService } from '../../../core/services/master-medicine.service';
 import { MedicineService } from '../../../core/services/medicine.service';
 import { MasterMedicine, MedicineCategory } from '../../../core/models';
@@ -60,7 +61,8 @@ export class MedicineManagementComponent implements OnInit {
   constructor(
     private masterMedicineService: MasterMedicineService,
     private medicineService: MedicineService,
-    private http: HttpClient
+    private http: HttpClient,
+    private toastr: ToastrService
   ) {}
 
   ngOnInit(): void {
@@ -126,13 +128,27 @@ export class MedicineManagementComponent implements OnInit {
 
     if (this.editing) {
       this.masterMedicineService.update(this.editing.masterMedicineId, this.form.medicineName.trim(), this.form.categoryId).subscribe({
-        next: () => { this.loadData(); this.closeModal(); },
-        error: (err) => { this.formError = err.error?.error || 'Failed to update.'; }
+        next: () => {
+          this.toastr.success('Medicine updated successfully', 'Updated');
+          this.loadData();
+          this.closeModal();
+        },
+        error: (err) => {
+          this.formError = err.error?.error || 'Failed to update.';
+          this.toastr.error(this.formError, 'Update Failed');
+        }
       });
     } else {
       this.masterMedicineService.create(this.form.medicineName.trim(), this.form.categoryId).subscribe({
-        next: () => { this.loadData(); this.closeModal(); },
-        error: (err) => { this.formError = err.error?.error || 'Failed to add.'; }
+        next: () => {
+          this.toastr.success('Medicine added successfully', 'Added');
+          this.loadData();
+          this.closeModal();
+        },
+        error: (err) => {
+          this.formError = err.error?.error || 'Failed to add.';
+          this.toastr.error(this.formError, 'Add Failed');
+        }
       });
     }
   }
@@ -146,10 +162,18 @@ export class MedicineManagementComponent implements OnInit {
 
   deleteConfirmed(): void {
     if (!this.deletingMedicine) return;
-    this.masterMedicineService.delete(this.deletingMedicine.masterMedicineId).subscribe(() => {
-      this.loadData();
-      this.showDeleteModal = false;
-      this.deletingMedicine = null;
+    this.masterMedicineService.delete(this.deletingMedicine.masterMedicineId).subscribe({
+      next: () => {
+        this.toastr.success('Medicine deleted successfully', 'Deleted');
+        this.loadData();
+        this.showDeleteModal = false;
+        this.deletingMedicine = null;
+      },
+      error: (err) => {
+        this.toastr.error('Failed to delete medicine', 'Delete Failed');
+        this.showDeleteModal = false;
+        this.deletingMedicine = null;
+      }
     });
   }
 
@@ -165,16 +189,24 @@ export class MedicineManagementComponent implements OnInit {
       next: (cat) => {
         this.categories.push(cat);
         this.newCategoryName = '';
+        this.toastr.success('Category added successfully', 'Category Added');
       },
       error: (err) => {
         this.categoryError = err.error?.error || 'Failed to add category.';
+        this.toastr.error(this.categoryError, 'Category Error');
       }
     });
   }
 
   deleteCategory(id: number): void {
-    this.http.delete(`${environment.apiUrl}/admin/categories/${id}`).subscribe(() => {
-      this.categories = this.categories.filter(c => c.categoryId !== id);
+    this.http.delete(`${environment.apiUrl}/admin/categories/${id}`).subscribe({
+      next: () => {
+        this.categories = this.categories.filter(c => c.categoryId !== id);
+        this.toastr.success('Category deleted successfully', 'Category Deleted');
+      },
+      error: (err) => {
+        this.toastr.error('Failed to delete category', 'Delete Failed');
+      }
     });
   }
 
@@ -218,12 +250,16 @@ export class MedicineManagementComponent implements OnInit {
         this.bulkUploadResult = result;
         this.bulkUploading = false;
         if (result.added > 0) {
+          this.toastr.success(`${result.added} medicines uploaded successfully`, 'Bulk Upload');
           this.loadData();
+        } else {
+          this.toastr.info('No new medicines were added', 'Bulk Upload');
         }
       },
       error: (err) => {
         this.bulkUploadError = err.error?.error || 'Failed to upload file.';
         this.bulkUploading = false;
+        this.toastr.error(this.bulkUploadError, 'Upload Failed');
       }
     });
   }

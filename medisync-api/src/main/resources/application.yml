@@ -28,5 +28,5 @@ jwt:
 
 # Razorpay Test Mode
 razorpay:
-  key-id: rzp_test_1234567890abcde
-  key-secret: test_secret_1234567890abcde
+  key-id: rzp_test_TBpvX3JOmglohp
+  key-secret: I1UtmcRGNH0oWEyOmNGj19dN

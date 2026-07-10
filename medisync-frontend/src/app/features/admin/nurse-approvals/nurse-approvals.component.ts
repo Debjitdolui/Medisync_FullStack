@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { ToastrService } from 'ngx-toastr';
 import { AdminService } from '../../../core/services/admin.service';
 import { Nurse, NurseService } from '../../../core/models';
 import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
@@ -32,7 +33,11 @@ export class NurseApprovalsComponent implements OnInit {
   nurseServices: NurseService[] = [];
   newService = { serviceName: '', description: '', basePrice: 0 };
 
-  constructor(private adminService: AdminService, private http: HttpClient) {}
+  constructor(
+    private adminService: AdminService,
+    private http: HttpClient,
+    private toastr: ToastrService
+  ) {}
 
   ngOnInit(): void {
     this.loadNurses();
@@ -47,15 +52,27 @@ export class NurseApprovalsComponent implements OnInit {
 
   addService(): void {
     if (!this.newService.serviceName.trim()) return;
-    this.http.post<NurseService>(`${environment.apiUrl}/admin/nurse-services`, this.newService).subscribe(s => {
-      this.nurseServices.push(s);
-      this.newService = { serviceName: '', description: '', basePrice: 0 };
+    this.http.post<NurseService>(`${environment.apiUrl}/admin/nurse-services`, this.newService).subscribe({
+      next: (s) => {
+        this.nurseServices.push(s);
+        this.newService = { serviceName: '', description: '', basePrice: 0 };
+        this.toastr.success('Service added successfully', 'Service Added');
+      },
+      error: () => {
+        this.toastr.error('Failed to add service', 'Error');
+      }
     });
   }
 
   deleteService(id: number): void {
-    this.http.delete(`${environment.apiUrl}/admin/nurse-services/${id}`).subscribe(() => {
-      this.nurseServices = this.nurseServices.filter(s => s.serviceId !== id);
+    this.http.delete(`${environment.apiUrl}/admin/nurse-services/${id}`).subscribe({
+      next: () => {
+        this.nurseServices = this.nurseServices.filter(s => s.serviceId !== id);
+        this.toastr.success('Service deleted successfully', 'Service Deleted');
+      },
+      error: () => {
+        this.toastr.error('Failed to delete service', 'Error');
+      }
     });
   }
 
@@ -81,11 +98,27 @@ export class NurseApprovalsComponent implements OnInit {
   }
 
   approve(id: number): void {
-    this.adminService.approveNurse(id, 'approved').subscribe(() => this.loadNurses());
+    this.adminService.approveNurse(id, 'approved').subscribe({
+      next: () => {
+        this.toastr.success('Nurse approved successfully', 'Approved');
+        this.loadNurses();
+      },
+      error: () => {
+        this.toastr.error('Failed to approve nurse', 'Error');
+      }
+    });
   }
 
   reject(id: number): void {
-    this.adminService.approveNurse(id, 'rejected').subscribe(() => this.loadNurses());
+    this.adminService.approveNurse(id, 'rejected').subscribe({
+      next: () => {
+        this.toastr.warning('Nurse rejected', 'Rejected');
+        this.loadNurses();
+      },
+      error: () => {
+        this.toastr.error('Failed to reject nurse', 'Error');
+      }
+    });
   }
 
   // Modal actions
@@ -116,7 +149,6 @@ export class NurseApprovalsComponent implements OnInit {
     if (this.modalAction === 'block') {
       this.adminService.blockNurse(id).subscribe({
         next: (updated) => {
-          // Directly mutate the item in array
           const nurse = this.nurses.find(n => n.nurseId === id);
           if (nurse) {
             nurse.isBlocked = true;
@@ -124,8 +156,13 @@ export class NurseApprovalsComponent implements OnInit {
           this.isProcessing = false;
           this.showModal = false;
           this.modalTarget = null;
+          this.toastr.success('Nurse blocked successfully', 'Blocked');
         },
-        error: () => { this.isProcessing = false; this.showModal = false; }
+        error: () => {
+          this.isProcessing = false;
+          this.showModal = false;
+          this.toastr.error('Failed to block nurse', 'Error');
+        }
       });
     } else {
       this.adminService.unblockNurse(id).subscribe({
@@ -137,8 +174,13 @@ export class NurseApprovalsComponent implements OnInit {
           this.isProcessing = false;
           this.showModal = false;
           this.modalTarget = null;
+          this.toastr.success('Nurse unblocked successfully', 'Unblocked');
         },
-        error: () => { this.isProcessing = false; this.showModal = false; }
+        error: () => {
+          this.isProcessing = false;
+          this.showModal = false;
+          this.toastr.error('Failed to unblock nurse', 'Error');
+        }
       });
     }
   }

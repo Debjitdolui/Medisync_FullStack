@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
 import { PharmacyService } from '../../../core/services/pharmacy.service';
 import { Pharmacy, PharmacyImage } from '../../../core/models';
 import { environment } from '../../../../environments/environment';
@@ -26,17 +27,12 @@ export class SettingsComponent implements OnInit {
     pincode: ''
   };
 
+  formErrors: any = {};
+
   passwordForm = {
     currentPassword: '',
     newPassword: '',
     confirmPassword: ''
-  };
-
-  notifications = {
-    lowStock: true,
-    expiry: true,
-    orders: true,
-    email: false
   };
 
   // Image upload
@@ -45,7 +41,14 @@ export class SettingsComponent implements OnInit {
   uploadError = '';
   maxImages = 3;
 
-  constructor(private pharmacyService: PharmacyService) {}
+  // Delete modal
+  showDeleteModal = false;
+  imageToDelete: PharmacyImage | null = null;
+
+  constructor(
+    private pharmacyService: PharmacyService,
+    private toastr: ToastrService
+  ) {}
 
   ngOnInit(): void {
     this.loadPharmacyData();
@@ -111,21 +114,15 @@ export class SettingsComponent implements OnInit {
       next: (image) => {
         this.pharmacyImages.push(image);
         this.isUploading = false;
+        this.toastr.success('Photo uploaded and saved to your pharmacy profile!', 'Photo Saved');
         input.value = ''; // Reset file input
       },
       error: (err) => {
         this.uploadError = err.error?.error || 'Failed to upload image';
         this.isUploading = false;
+        this.toastr.error(this.uploadError, 'Upload Failed');
         input.value = '';
       }
-    });
-  }
-
-  deleteImage(image: PharmacyImage): void {
-    if (!confirm('Are you sure you want to delete this image?')) return;
-
-    this.pharmacyService.deleteImage(image.imageId).subscribe(() => {
-      this.pharmacyImages = this.pharmacyImages.filter(i => i.imageId !== image.imageId);
     });
   }
 
@@ -134,21 +131,118 @@ export class SettingsComponent implements OnInit {
   saveProfile(): void {
     if (!this.pharmacy) return;
 
-    this.pharmacyService.updatePharmacy(this.pharmacy.pharmacyId, this.pharmacyForm).subscribe(() => {
-      this.loadPharmacyData();
+    // Field validation
+    this.formErrors = {};
+    let hasError = false;
+
+    if (!this.pharmacyForm.pharmacyName.trim()) {
+      this.formErrors['pharmacyName'] = 'Pharmacy name is required';
+      hasError = true;
+    }
+    if (!this.pharmacyForm.ownerName.trim()) {
+      this.formErrors['ownerName'] = 'Owner name is required';
+      hasError = true;
+    }
+    if (!this.pharmacyForm.phone.trim()) {
+      this.formErrors['phone'] = 'Phone number is required';
+      hasError = true;
+    } else if (!/^\d{10}$/.test(this.pharmacyForm.phone.trim())) {
+      this.formErrors['phone'] = 'Enter a valid 10-digit phone number';
+      hasError = true;
+    }
+    if (!this.pharmacyForm.address.trim()) {
+      this.formErrors['address'] = 'Address is required';
+      hasError = true;
+    }
+    if (!this.pharmacyForm.city.trim()) {
+      this.formErrors['city'] = 'City is required';
+      hasError = true;
+    }
+    if (!this.pharmacyForm.state.trim()) {
+      this.formErrors['state'] = 'State is required';
+      hasError = true;
+    }
+    if (!this.pharmacyForm.pincode.trim()) {
+      this.formErrors['pincode'] = 'Pincode is required';
+      hasError = true;
+    } else if (!/^\d{6}$/.test(this.pharmacyForm.pincode.trim())) {
+      this.formErrors['pincode'] = 'Enter a valid 6-digit pincode';
+      hasError = true;
+    }
+
+    if (hasError) {
+      this.toastr.error('Please fix the highlighted errors before saving', 'Validation Error');
+      return;
+    }
+
+    this.pharmacyService.updatePharmacy(this.pharmacy.pharmacyId, this.pharmacyForm).subscribe({
+      next: () => {
+        this.toastr.success('Your pharmacy profile has been saved successfully!', 'Profile Updated');
+        this.loadPharmacyData();
+      },
+      error: (err) => {
+        const msg = err.error?.error || err.error?.message || 'Something went wrong. Please try again.';
+        this.toastr.error(msg, 'Save Failed');
+      }
     });
   }
 
   changePassword(): void {
-    if (!this.passwordForm.currentPassword || !this.passwordForm.newPassword) return;
-    if (this.passwordForm.newPassword !== this.passwordForm.confirmPassword) return;
+    if (!this.passwordForm.currentPassword) {
+      this.toastr.error('Please enter your current password', 'Missing Field');
+      return;
+    }
+    if (!this.passwordForm.newPassword) {
+      this.toastr.error('Please enter a new password', 'Missing Field');
+      return;
+    }
+    if (this.passwordForm.newPassword.length < 6) {
+      this.toastr.error('New password must be at least 6 characters', 'Too Short');
+      return;
+    }
+    if (this.passwordForm.newPassword !== this.passwordForm.confirmPassword) {
+      this.toastr.error('New password and confirm password do not match', 'Mismatch');
+      return;
+    }
 
     this.pharmacyService.changePassword(this.passwordForm.currentPassword, this.passwordForm.newPassword).subscribe({
       next: () => {
+        this.toastr.success('Your password has been changed successfully!', 'Password Updated');
         this.passwordForm = { currentPassword: '', newPassword: '', confirmPassword: '' };
       },
+      error: (err) => {
+        const msg = err.error?.error || err.error?.message || 'Current password is incorrect';
+        this.toastr.error(msg, 'Password Change Failed');
+      }
+    });
+  }
+
+  // ─── Delete Image Modal ────────────────────────────────────────────────────────
+
+  confirmDeleteImage(image: PharmacyImage): void {
+    this.imageToDelete = image;
+    this.showDeleteModal = true;
+  }
+
+  cancelDelete(): void {
+    this.showDeleteModal = false;
+    this.imageToDelete = null;
+  }
+
+  deleteImageConfirmed(): void {
+    if (!this.imageToDelete) return;
+
+    this.pharmacyService.deleteImage(this.imageToDelete.imageId).subscribe({
+      next: () => {
+        this.pharmacyImages = this.pharmacyImages.filter(i => i.imageId !== this.imageToDelete!.imageId);
+        this.toastr.success('Photo has been removed from your pharmacy profile', 'Photo Deleted');
+        this.showDeleteModal = false;
+        this.imageToDelete = null;
+      },
       error: () => {
-        // Handle error
+        this.toastr.error('Could not delete the photo. Please try again.', 'Delete Failed');
+        this.showDeleteModal = false;
+        this.imageToDelete = null;
       }
     });
   }

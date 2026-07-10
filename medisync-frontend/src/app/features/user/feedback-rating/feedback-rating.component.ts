@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
 import { StarRatingComponent } from '../../../shared/components/star-rating/star-rating.component';
 import { ReviewService } from '../../../core/services/review.service';
 import { PharmacyService } from '../../../core/services/pharmacy.service';
@@ -37,7 +38,8 @@ export class FeedbackRatingComponent implements OnInit {
   constructor(
     private reviewService: ReviewService,
     private pharmacyService: PharmacyService,
-    private nurseRequestService: NurseRequestService
+    private nurseRequestService: NurseRequestService,
+    private toastr: ToastrService
   ) {}
 
   ngOnInit(): void {
@@ -122,9 +124,16 @@ export class FeedbackRatingComponent implements OnInit {
         pharmacyId: this.selectedPharmacyId,
         rating: this.rating,
         reviewText: this.feedbackText
-      }).subscribe(() => {
-        this.isSubmitting = false;
-        this.submitted = true;
+      }).subscribe({
+        next: () => {
+          this.isSubmitting = false;
+          this.submitted = true;
+          this.toastr.success('Review submitted successfully!', 'Thank you');
+        },
+        error: (err) => {
+          this.isSubmitting = false;
+          this.toastr.error(err?.error?.error || 'Failed to submit review. Please try again.', 'Error');
+        }
       });
     } else if (this.selectedType === 'nurse' && this.selectedBooking) {
       this.reviewService.addNurseReview({
@@ -132,15 +141,23 @@ export class FeedbackRatingComponent implements OnInit {
         requestId: this.selectedBooking.requestId,
         rating: this.rating,
         reviewText: this.feedbackText
-      }).subscribe(() => {
-        this.isSubmitting = false;
-        this.submitted = true;
+      }).subscribe({
+        next: () => {
+          this.isSubmitting = false;
+          this.submitted = true;
+          this.toastr.success('Review submitted successfully!', 'Thank you');
+        },
+        error: (err) => {
+          this.isSubmitting = false;
+          this.toastr.error(err?.error?.error || 'Failed to submit review. Please try again.', 'Error');
+        }
       });
     } else {
       // Platform review (mock)
       setTimeout(() => {
         this.isSubmitting = false;
         this.submitted = true;
+        this.toastr.success('Review submitted successfully!', 'Thank you');
       }, 500);
     }
   }

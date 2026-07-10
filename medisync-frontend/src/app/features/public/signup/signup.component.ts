@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { ReactiveFormsModule, FormGroup, FormBuilder, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
 import { AuthService } from '../../../core/services/auth.service';
 import { NurseApiService } from '../../../core/services/nurse.service';
 import { NurseService } from '../../../core/models';
@@ -30,7 +31,8 @@ export class SignupComponent implements OnInit {
     private fb: FormBuilder,
     private authService: AuthService,
     private nurseApiService: NurseApiService,
-    private router: Router
+    private router: Router,
+    private toastr: ToastrService
   ) {}
 
   ngOnInit(): void {
@@ -164,11 +166,13 @@ export class SignupComponent implements OnInit {
         }).subscribe({
           next: () => {
             this.isLoading = false;
+            this.toastr.success('Registration successful! Welcome to MediSync.', 'Success');
             this.router.navigate(['/user/dashboard']);
           },
           error: (err) => {
             this.isLoading = false;
             this.errorMessage = err?.error?.error || 'Registration failed';
+            this.toastr.error(this.errorMessage, 'Registration Failed');
           }
         });
         break;
@@ -189,10 +193,12 @@ export class SignupComponent implements OnInit {
           next: () => {
             this.isLoading = false;
             this.successMessage = 'Pharmacy registration submitted! Awaiting admin approval.';
+            this.toastr.success(this.successMessage, 'Registration Submitted');
           },
           error: (err) => {
             this.isLoading = false;
             this.errorMessage = err?.error?.error || 'Registration failed';
+            this.toastr.error(this.errorMessage, 'Registration Failed');
           }
         });
         break;
@@ -211,10 +217,12 @@ export class SignupComponent implements OnInit {
           next: () => {
             this.isLoading = false;
             this.successMessage = 'Nurse registration submitted! Awaiting admin approval.';
+            this.toastr.success(this.successMessage, 'Registration Submitted');
           },
           error: (err) => {
             this.isLoading = false;
             this.errorMessage = err?.error?.error || 'Registration failed';
+            this.toastr.error(this.errorMessage, 'Registration Failed');
           }
         });
         break;
