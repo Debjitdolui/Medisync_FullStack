@@ -94,6 +94,12 @@ export const routes: Routes = [
 
   // ─── PUBLIC ROUTES (each with explicit path) ────────────────────────────────
 
+  { path: 'about', component: PublicLayoutComponent, children: [
+    { path: '', loadComponent: () => import('./features/public/about/about.component').then(m => m.AboutComponent) }
+  ]},
+  { path: 'services', component: PublicLayoutComponent, children: [
+    { path: '', loadComponent: () => import('./features/public/services/services.component').then(m => m.ServicesComponent) }
+  ]},
   { path: 'home', component: PublicLayoutComponent, children: [
     { path: '', loadComponent: () => import('./features/public/home/home.component').then(m => m.HomeComponent) }
   ]},
