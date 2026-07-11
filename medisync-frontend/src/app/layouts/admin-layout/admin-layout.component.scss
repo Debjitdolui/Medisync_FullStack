@@ -307,6 +307,40 @@
   background: #f5f6fa;
 }
 
+// ─── Admin Footer ─────────────────────────────────────────
+.admin-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 32px;
+  background: #ffffff;
+  border-top: 1px solid #e8eaf0;
+  flex-shrink: 0;
+
+  .footer-left {
+    font-size: 13px;
+    color: #94a3b8;
+
+    strong {
+      color: #475569;
+      font-weight: 600;
+    }
+  }
+
+  .footer-right {
+    font-size: 13px;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    .ti-heart-filled {
+      color: #ef4444;
+      font-size: 14px;
+    }
+  }
+}
+
 // ─── Hamburger & Sidebar Close (hidden on desktop) ────────
 .hamburger-btn {
   display: none;
@@ -424,5 +458,12 @@
   .notif-panel-wrapper {
     width: 300px;
     right: -50px;
+  }
+
+  .admin-footer {
+    flex-direction: column;
+    gap: 6px;
+    padding: 14px 16px;
+    text-align: center;
   }
 }

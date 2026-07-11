@@ -64,9 +64,14 @@ public class NurseRequestController {
     // ─── Get available slots for a nurse on a date ───────────────────────────────
 
     @GetMapping("/slots")
-    public ResponseEntity<?> getAvailableSlots(@RequestParam Long nurseId, @RequestParam String date) {
+    public ResponseEntity<?> getAvailableSlots(@RequestParam Long nurseId, @RequestParam String date, @RequestParam(required = false) Long serviceId) {
         LocalDate requestDate = LocalDate.parse(date);
-        List<String> slots = nurseModuleService.getAvailableSlots(nurseId, requestDate);
+        List<String> slots;
+        if (serviceId != null) {
+            slots = nurseModuleService.getAvailableSlots(nurseId, requestDate, serviceId);
+        } else {
+            slots = nurseModuleService.getAvailableSlots(nurseId, requestDate);
+        }
         return ResponseEntity.ok(Map.of("nurseId", nurseId, "date", date, "availableSlots", slots));
     }
 
@@ -198,5 +203,73 @@ public class NurseRequestController {
     public ResponseEntity<?> getBookingGroup(@PathVariable String groupId) {
         List<NurseRequest> requests = nurseRequestRepository.findByBookingGroupId(groupId);
         return ResponseEntity.ok(requests);
+    }
+
+    // ─── Nurse Calendar: Get bookings for a month ────────────────────────────────
+
+    @GetMapping("/calendar")
+    public ResponseEntity<?> getNurseCalendar(Authentication auth, @RequestParam int month, @RequestParam int year) {
+        List<NurseRequest> allRequests = nurseModuleService.getNurseRequests(auth.getName());
+
+        // Filter by month/year
+        List<Map<String, Object>> calendarData = allRequests.stream()
+                .filter(r -> {
+                    LocalDate date = r.getRequestDate();
+                    return date != null && date.getMonthValue() == month && date.getYear() == year;
+                })
+                .map(r -> {
+                    Map<String, Object> item = new java.util.LinkedHashMap<>();
+                    item.put("requestId", r.getRequestId());
+                    item.put("date", r.getRequestDate().toString());
+                    item.put("timeSlot", r.getTimeSlot());
+                    item.put("serviceName", r.getService() != null ? r.getService().getServiceName() : "Unknown");
+                    item.put("durationMinutes", r.getService() != null && r.getService().getDurationMinutes() != null ? r.getService().getDurationMinutes() : 60);
+                    item.put("patientName", r.getPatient() != null ? r.getPatient().getUsername() : "Unknown");
+                    item.put("status", r.getRequestStatus());
+                    return item;
+                })
+                .collect(java.util.stream.Collectors.toList());
+
+        return ResponseEntity.ok(calendarData);
+    }
+
+    // ─── Nurse Day Summary: Get detail for a specific date ───────────────────────
+
+    @GetMapping("/day-summary")
+    public ResponseEntity<?> getDaySummary(Authentication auth, @RequestParam String date) {
+        List<NurseRequest> allRequests = nurseModuleService.getNurseRequests(auth.getName());
+        LocalDate targetDate = LocalDate.parse(date);
+
+        List<NurseRequest> dayRequests = allRequests.stream()
+                .filter(r -> targetDate.equals(r.getRequestDate()))
+                .collect(java.util.stream.Collectors.toList());
+
+        // Calculate total work minutes from actual time slots or service duration
+        int totalMinutes = dayRequests.stream()
+                .filter(r -> List.of("pending", "accepted", "in_progress", "completed").contains(r.getRequestStatus()))
+                .mapToInt(r -> {
+                    // Try to calculate from timeSlot first (e.g., "09:30-10:00")
+                    if (r.getTimeSlot() != null && r.getTimeSlot().contains("-")) {
+                        try {
+                            String[] parts = r.getTimeSlot().split("-");
+                            java.time.LocalTime start = java.time.LocalTime.parse(parts[0].trim());
+                            java.time.LocalTime end = java.time.LocalTime.parse(parts[1].trim());
+                            return (int) java.time.Duration.between(start, end).toMinutes();
+                        } catch (Exception ignored) {}
+                    }
+                    // Fallback to service duration
+                    return r.getService() != null && r.getService().getDurationMinutes() != null 
+                            ? r.getService().getDurationMinutes() : 60;
+                })
+                .sum();
+
+        return ResponseEntity.ok(Map.of(
+                "date", date,
+                "bookings", dayRequests,
+                "totalWorkMinutes", totalMinutes,
+                "maxDailyMinutes", 480,
+                "remainingMinutes", Math.max(0, 480 - totalMinutes),
+                "capacityPercent", Math.min(100, (totalMinutes * 100) / 480)
+        ));
     }
 }

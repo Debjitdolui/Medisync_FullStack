@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
@@ -113,6 +113,16 @@ export class MedicineSearchComponent implements OnInit {
 
   toggleLocationDropdown(): void {
     this.showLocationDropdown = !this.showLocationDropdown;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    // Close location dropdown if click is outside .location-selector
+    const locationEl = document.querySelector('.location-selector');
+    if (locationEl && !locationEl.contains(target)) {
+      this.showLocationDropdown = false;
+    }
   }
 
   selectAddress(address: UserAddress): void {

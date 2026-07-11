@@ -24,4 +24,7 @@ public class NurseService {
 
     @Column(name = "base_price")
     private BigDecimal basePrice;
+
+    @Column(name = "duration_minutes")
+    private Integer durationMinutes; // 30 for Injection, 240 for IV Drip, 480 for Home Nursing
 }

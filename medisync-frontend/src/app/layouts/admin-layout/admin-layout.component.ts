@@ -81,6 +81,7 @@ export class AdminLayoutComponent implements OnInit {
           { label: 'Dashboard', icon: 'ti-dashboard', route: '/nurse/dashboard' },
           { label: 'My Requests', icon: 'ti-clipboard-list', route: '/nurse/requests' },
           { label: 'Timetable', icon: 'ti-calendar-time', route: '/nurse/timetable' },
+          { label: 'Calendar', icon: 'ti-calendar-event', route: '/nurse/calendar' },
           { label: 'Reviews', icon: 'ti-star', route: '/nurse/reviews' },
           { label: 'Availability', icon: 'ti-clock', route: '/nurse/availability' },
           { label: 'My Profile', icon: 'ti-user', route: '/nurse/settings' },

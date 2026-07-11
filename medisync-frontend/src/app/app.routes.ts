@@ -51,6 +51,7 @@ export const routes: Routes = [
       { path: 'availability', loadComponent: () => import('./features/nurse-panel/availability/availability.component').then(m => m.AvailabilityComponent) },
       { path: 'settings', loadComponent: () => import('./features/nurse-panel/settings/nurse-settings.component').then(m => m.NurseSettingsComponent) },
       { path: 'timetable', loadComponent: () => import('./features/nurse-panel/timetable/nurse-timetable.component').then(m => m.NurseTimetableComponent) },
+      { path: 'calendar', loadComponent: () => import('./features/nurse-panel/calendar/nurse-calendar.component').then(m => m.NurseCalendarComponent) },
     ]
   },
 

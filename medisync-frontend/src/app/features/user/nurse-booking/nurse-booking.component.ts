@@ -33,6 +33,10 @@ export class NurseBookingComponent implements OnInit {
 
   // Slot-based booking flow
   bookingStep: 'details' | 'date' | 'slots' | 'confirm' = 'details';
+
+  // Nurse pagination
+  nursePage = 1;
+  nursePageSize = 6;
   availableDates: { date: string; label: string; dayName: string }[] = [];
   selectedDate = '';
   availableSlots: string[] = [];
@@ -91,12 +95,56 @@ export class NurseBookingComponent implements OnInit {
   clearServiceFilter(): void {
     this.selectedService = null;
     this.filteredNurses = [...this.allNurses];
+    this.nursePage = 1;
   }
 
   private filterNursesByService(service: NurseService): void {
     this.nurseService.getAvailableNurses(service.serviceId).subscribe(nurses => {
       this.filteredNurses = nurses;
+      this.nursePage = 1;
     });
+  }
+
+  // Nurse pagination
+  get paginatedNurses(): Nurse[] {
+    const start = (this.nursePage - 1) * this.nursePageSize;
+    return this.filteredNurses.slice(start, start + this.nursePageSize);
+  }
+
+  get totalNursePages(): number {
+    return Math.ceil(this.filteredNurses.length / this.nursePageSize);
+  }
+
+  nextNursePage(): void {
+    if (this.nursePage < this.totalNursePages) this.nursePage++;
+  }
+
+  prevNursePage(): void {
+    if (this.nursePage > 1) this.nursePage--;
+  }
+
+  goToNursePage(page: number): void {
+    if (page >= 1 && page <= this.totalNursePages) this.nursePage = page;
+  }
+
+  getPageNumbers(): number[] {
+    const total = this.totalNursePages;
+    const current = this.nursePage;
+    const pages: number[] = [];
+
+    if (total <= 5) {
+      for (let i = 1; i <= total; i++) pages.push(i);
+    } else {
+      // Show first, last, and pages around current
+      let start = Math.max(1, current - 1);
+      let end = Math.min(total, current + 1);
+
+      if (current <= 2) { start = 1; end = 3; }
+      if (current >= total - 1) { start = total - 2; end = total; }
+
+      for (let i = start; i <= end; i++) pages.push(i);
+    }
+    return pages;
   }
 
   // Ratings cache
@@ -114,10 +162,6 @@ export class NurseBookingComponent implements OnInit {
       });
     }
     return this.nurseRatingsCache.get(nurseId) || { average: 0, total: 0 };
-  }
-
-  getDistance(nurseId: number): string {
-    return 'Home Visit';
   }
 
   openBooking(nurse: Nurse): void {
@@ -161,7 +205,7 @@ export class NurseBookingComponent implements OnInit {
     this.availableSlots = [];
     this.bookingStep = 'slots';
 
-    this.nurseRequestService.getAvailableSlots(this.selectedNurse!.nurseId, date).subscribe({
+    this.nurseRequestService.getAvailableSlots(this.selectedNurse!.nurseId, date, this.selectedService?.serviceId).subscribe({
       next: (response) => {
         this.availableSlots = response.availableSlots;
         this.loadingSlots = false;

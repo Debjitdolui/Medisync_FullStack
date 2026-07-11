@@ -22,10 +22,10 @@ export class NurseRequestService {
 
   // ─── Available Slots ───────────────────────────────────────────────────────────
 
-  getAvailableSlots(nurseId: number, date: string): Observable<AvailableSlotsResponse> {
-    return this.http.get<AvailableSlotsResponse>(`${this.apiUrl}/slots`, {
-      params: { nurseId: nurseId.toString(), date }
-    });
+  getAvailableSlots(nurseId: number, date: string, serviceId?: number): Observable<AvailableSlotsResponse> {
+    let params: any = { nurseId: nurseId.toString(), date };
+    if (serviceId) params.serviceId = serviceId.toString();
+    return this.http.get<AvailableSlotsResponse>(`${this.apiUrl}/slots`, { params });
   }
 
   // ─── My Requests ───────────────────────────────────────────────────────────────

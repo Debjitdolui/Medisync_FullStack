@@ -1,0 +1,136 @@
+<div class="calendar-container">
+  <!-- Header -->
+  <div class="calendar-header">
+    <div class="header-left">
+      <h2>My Calendar</h2>
+      <button class="btn-today" (click)="goToToday()">Today</button>
+    </div>
+    <div class="header-center">
+      <button class="btn-nav" (click)="previousMonth()">
+        <i class="ti ti-chevron-left"></i>
+      </button>
+      <span class="month-label">{{ monthYearLabel }}</span>
+      <button class="btn-nav" (click)="nextMonth()">
+        <i class="ti ti-chevron-right"></i>
+      </button>
+    </div>
+    <div class="header-right">
+      <!-- Legend -->
+      <div class="legend">
+        <span class="legend-item">
+          <span class="dot dot-green"></span> Accepted
+        </span>
+        <span class="legend-item">
+          <span class="dot dot-orange"></span> Pending
+        </span>
+        <span class="legend-item">
+          <span class="dot dot-gray"></span> Completed
+        </span>
+        <span class="legend-item">
+          <span class="dot dot-red"></span> Blocked
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="calendar-body" [class.with-panel]="selectedDay">
+    <!-- Calendar Grid -->
+    <div class="calendar-grid-wrapper">
+      <div class="calendar-grid">
+        <!-- Week day headers -->
+        <div class="weekday-header" *ngFor="let day of weekDays">{{ day }}</div>
+
+        <!-- Day cells -->
+        <div
+          *ngFor="let day of calendarDays"
+          class="day-cell"
+          [class.other-month]="!day.isCurrentMonth"
+          [class.today]="day.isToday"
+          [class.selected]="selectedDay === day"
+          [class.has-bookings]="day.bookings.length > 0"
+          (click)="selectDay(day)"
+        >
+          <span class="day-number">{{ day.dayNumber }}</span>
+
+          <div class="day-indicators" *ngIf="day.bookings.length > 0">
+            <span
+              *ngFor="let color of getStatusDots(day.bookings)"
+              class="dot dot-{{ color }}"
+            ></span>
+            <span class="booking-badge" *ngIf="day.bookings.length > 2">
+              {{ day.bookings.length }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading overlay -->
+      <div class="loading-overlay" *ngIf="loading">
+        <div class="spinner"></div>
+      </div>
+    </div>
+
+    <!-- Day Detail Panel -->
+    <div class="day-panel" *ngIf="selectedDay">
+      <div class="panel-header">
+        <h3>{{ formatDateHeading(selectedDay.date) }}</h3>
+        <button class="btn-close" (click)="closeDayPanel()">
+          <i class="ti ti-x"></i>
+        </button>
+      </div>
+
+      <div class="panel-content" *ngIf="!loadingSummary && daySummary">
+        <!-- Capacity Bar -->
+        <div class="capacity-section">
+          <div class="capacity-label">
+            <span>Capacity</span>
+            <span class="capacity-percent">{{ daySummary.capacityPercent }}%</span>
+          </div>
+          <div class="capacity-bar">
+            <div
+              class="capacity-fill"
+              [style.width.%]="daySummary.capacityPercent"
+              [class.high]="daySummary.capacityPercent > 80"
+              [class.medium]="daySummary.capacityPercent > 50 && daySummary.capacityPercent <= 80"
+            ></div>
+          </div>
+          <div class="capacity-info">
+            <span>{{ getCapacityHours(daySummary.totalWorkMinutes) }}h / {{ getCapacityHours(daySummary.maxDailyMinutes) }}h used</span>
+            <span class="remaining">{{ getCapacityHours(daySummary.remainingMinutes) }}h remaining</span>
+          </div>
+        </div>
+
+        <!-- Bookings Timeline -->
+        <div class="bookings-section">
+          <h4>Bookings ({{ daySummary.bookings.length }})</h4>
+
+          <div class="booking-list" *ngIf="daySummary.bookings.length > 0">
+            <div class="booking-item" *ngFor="let booking of daySummary.bookings">
+              <div class="booking-time">
+                <span class="time-slot">{{ booking.timeSlot }}</span>
+                <span class="duration">{{ booking.durationMinutes }}min</span>
+              </div>
+              <div class="booking-details">
+                <span class="service-name">{{ booking.serviceName }}</span>
+                <span class="patient-name">{{ booking.patientName }}</span>
+              </div>
+              <span class="status-badge status-{{ getStatusColor(booking.status) }}">
+                {{ booking.status }}
+              </span>
+            </div>
+          </div>
+
+          <div class="no-bookings" *ngIf="daySummary.bookings.length === 0">
+            <i class="ti ti-calendar-off"></i>
+            <p>No bookings for this day</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel loading -->
+      <div class="panel-loading" *ngIf="loadingSummary">
+        <div class="spinner"></div>
+      </div>
+    </div>
+  </div>
+</div>

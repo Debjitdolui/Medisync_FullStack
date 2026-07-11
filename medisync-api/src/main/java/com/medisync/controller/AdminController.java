@@ -119,6 +119,8 @@ public class AdminController {
         String description = (String) body.getOrDefault("description", "");
         Object priceObj = body.get("basePrice");
         java.math.BigDecimal basePrice = priceObj != null ? new java.math.BigDecimal(priceObj.toString()) : java.math.BigDecimal.ZERO;
+        Object durationObj = body.get("durationMinutes");
+        Integer durationMinutes = durationObj != null ? Integer.valueOf(durationObj.toString()) : 60;
 
         if (name == null || name.isBlank()) {
             return ResponseEntity.badRequest().body(Map.of("error", "Service name is required"));
@@ -128,6 +130,7 @@ public class AdminController {
         service.setServiceName(name.trim());
         service.setDescription(description);
         service.setBasePrice(basePrice);
+        service.setDurationMinutes(durationMinutes);
         return ResponseEntity.ok(nurseServiceRepository.save(service));
     }
 
@@ -139,6 +142,7 @@ public class AdminController {
         if (body.containsKey("serviceName")) service.setServiceName(((String) body.get("serviceName")).trim());
         if (body.containsKey("description")) service.setDescription((String) body.get("description"));
         if (body.containsKey("basePrice")) service.setBasePrice(new java.math.BigDecimal(body.get("basePrice").toString()));
+        if (body.containsKey("durationMinutes")) service.setDurationMinutes(Integer.valueOf(body.get("durationMinutes").toString()));
 
         return ResponseEntity.ok(nurseServiceRepository.save(service));
     }

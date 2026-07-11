@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { NurseApiService } from '../../../core/services/nurse.service';
 import { NurseRequestService } from '../../../core/services/nurse-request.service';
-import { ReviewService } from '../../../core/services/review.service';
 import { NurseRequest } from '../../../core/models';
 
 @Component({
@@ -27,9 +26,8 @@ export class NurseDashboardComponent implements OnInit {
   totalRequests = 0;
   pendingRequests = 0;
   completedRequests = 0;
-  totalEarnings = 0;
-  averageRating = '0.0';
-  totalReviews = 0;
+  monthlyEarnings = 0;
+  currentMonth = '';
 
   recentRequests: NurseRequest[] = [];
 
@@ -37,8 +35,7 @@ export class NurseDashboardComponent implements OnInit {
 
   constructor(
     private nurseService: NurseApiService,
-    private nurseRequestService: NurseRequestService,
-    private reviewService: ReviewService
+    private nurseRequestService: NurseRequestService
   ) {}
 
   ngOnInit(): void {
@@ -61,7 +58,6 @@ export class NurseDashboardComponent implements OnInit {
         month: 'short',
         year: 'numeric'
       });
-      this.loadRating();
     });
   }
 
@@ -70,23 +66,22 @@ export class NurseDashboardComponent implements OnInit {
       this.totalRequests = requests.length;
       this.pendingRequests = requests.filter(r => r.requestStatus === 'pending').length;
       this.completedRequests = requests.filter(r => r.requestStatus === 'completed').length;
-      this.totalEarnings = requests
-        .filter(r => r.requestStatus === 'completed')
-        .reduce((sum, r) => sum + (r.service?.basePrice || 0), 0);
-      this.recentRequests = requests.slice(0, 4);
-    });
-  }
 
-  private loadRating(): void {
-    this.reviewService.getNurseReviews(this.nurseId).subscribe(page => {
-      const reviews = page.content;
-      this.totalReviews = page.totalElements;
-      if (reviews.length > 0) {
-        const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
-        this.averageRating = (sum / reviews.length).toFixed(1);
-      } else {
-        this.averageRating = '0.0';
-      }
+      // Calculate monthly earnings (current month only)
+      const now = new Date();
+      this.currentMonth = now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+      const currentMonthNum = now.getMonth();
+      const currentYear = now.getFullYear();
+
+      this.monthlyEarnings = requests
+        .filter(r => {
+          if (r.requestStatus !== 'completed') return false;
+          const rDate = new Date(r.requestDate);
+          return rDate.getMonth() === currentMonthNum && rDate.getFullYear() === currentYear;
+        })
+        .reduce((sum, r) => sum + (r.service?.basePrice || 0), 0);
+
+      this.recentRequests = requests.slice(0, 4);
     });
   }
 

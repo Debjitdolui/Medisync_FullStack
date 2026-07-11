@@ -16,6 +16,7 @@ export class NurseReviewsComponent implements OnInit {
   reviews: NurseReview[] = [];
   averageRating = 0;
   totalReviews = 0;
+  ratingBreakdown: number[] = [0, 0, 0, 0, 0]; // index 0 = 1 star, index 4 = 5 star
   currentPage = 1;
   pageSize = 10;
   private nurseId = 0;
@@ -39,8 +40,21 @@ export class NurseReviewsComponent implements OnInit {
       if (this.reviews.length > 0) {
         const sum = this.reviews.reduce((acc, r) => acc + r.rating, 0);
         this.averageRating = Math.round((sum / this.reviews.length) * 10) / 10;
+
+        // Calculate breakdown
+        this.ratingBreakdown = [0, 0, 0, 0, 0];
+        this.reviews.forEach(r => {
+          if (r.rating >= 1 && r.rating <= 5) {
+            this.ratingBreakdown[r.rating - 1]++;
+          }
+        });
       }
     });
+  }
+
+  getBreakdownPercent(starIndex: number): number {
+    if (this.totalReviews === 0) return 0;
+    return Math.round((this.ratingBreakdown[starIndex] / this.totalReviews) * 100);
   }
 
   get paginatedReviews() {

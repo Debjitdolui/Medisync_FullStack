@@ -102,10 +102,19 @@ INSERT INTO dev.medicine_categories (category_name, description) VALUES
 -- ═══════════════════════════════════════════════════════════════════
 -- NURSE SERVICES
 -- ═══════════════════════════════════════════════════════════════════
-INSERT INTO dev.nurse_services (service_name, description, base_price) VALUES
-('IV Drip', 'Intravenous drip setup, monitoring, and removal at home', 800.00),
-('Home Nursing', 'Complete home nursing care including health monitoring, medication management, and daily assistance', 1500.00),
-('Injection', 'Intramuscular or subcutaneous injection administration at home', 200.00);
+INSERT INTO dev.nurse_services (service_name, description, base_price, duration_minutes) VALUES
+('IV Drip', 'Intravenous drip setup, monitoring, and removal at home', 800.00, 240),
+('Home Nursing', 'Complete home nursing care including health monitoring, medication management, and daily assistance', 1500.00, 480),
+('Injection', 'Intramuscular or subcutaneous injection administration at home', 200.00, 30);
+
+-- ═══════════════════════════════════════════════════════════════════
+-- NURSE OFFERED SERVICES (link nurses to their services)
+-- ═══════════════════════════════════════════════════════════════════
+INSERT INTO dev.nurse_offered_services (nurse_id, service_id) VALUES
+(1, 1), (1, 3),       -- Muskan: IV Drip, Injection
+(2, 1), (2, 2),       -- Anubhab: IV Drip, Home Nursing
+(3, 1), (3, 2), (3, 3), -- Abhijit: IV Drip, Home Nursing, Injection
+(4, 3);               -- Subhajit: Injection
 
 -- ═══════════════════════════════════════════════════════════════════
 -- USER ADDRESSES

@@ -38,7 +38,7 @@
       <span class="step-badge">1</span>
       <h2>Select a Service</h2>
     </div>
-    <div class="services-row">
+    <div class="services-slider">
       <div *ngFor="let service of services; let i = index"
            class="service-card"
            [class.active]="selectedService?.serviceId === service.serviceId"
@@ -49,6 +49,9 @@
         <div class="service-text">
           <h4>{{ service.serviceName }}</h4>
           <p>{{ service.description }}</p>
+          <span class="service-duration" *ngIf="service.durationMinutes">
+            <i class="ti ti-clock"></i> {{ service.durationMinutes >= 60 ? (service.durationMinutes / 60) + 'h' : service.durationMinutes + ' min' }}
+          </span>
         </div>
         <span class="service-price">₹{{ service.basePrice }}</span>
         <div class="check-mark" *ngIf="selectedService?.serviceId === service.serviceId">
@@ -73,7 +76,7 @@
     </div>
 
     <div class="nurses-grid">
-      <div *ngFor="let nurse of filteredNurses" class="nurse-card">
+      <div *ngFor="let nurse of paginatedNurses" class="nurse-card">
         <div class="nurse-top">
           <div class="nurse-avatar" [ngClass]="'avatar-' + (nurse.nurseId % 3)">
             {{ nurse.fullName.charAt(0) }}
@@ -91,14 +94,31 @@
         <div class="nurse-bottom">
           <div class="nurse-tags">
             <span class="tag specialization"><i class="ti ti-stethoscope"></i> {{ nurse.specialization }}</span>
-            <span class="tag distance"><i class="ti ti-map-pin"></i> {{ getDistance(nurse.nurseId) }} km</span>
-            <span class="tag available"><i class="ti ti-circle-check"></i> Available</span>
+            <span class="tag available"><i class="ti ti-circle-check"></i> Available Now</span>
           </div>
           <button class="book-btn" (click)="openBooking(nurse)">
             <i class="ti ti-calendar-plus"></i>
             Book Now
           </button>
         </div>
+      </div>
+    </div>
+
+    <!-- Nurse Pagination -->
+    <div class="nurse-pagination" *ngIf="filteredNurses.length > nursePageSize">
+      <span class="pagination-summary">
+        Showing {{ (nursePage - 1) * nursePageSize + 1 }}–{{ nursePage === totalNursePages ? filteredNurses.length : nursePage * nursePageSize }} of {{ filteredNurses.length }} nurses
+      </span>
+      <div class="pagination-controls">
+        <button class="page-btn" (click)="prevNursePage()" [disabled]="nursePage === 1">
+          <i class="ti ti-chevron-left"></i>
+        </button>
+        <ng-container *ngFor="let p of getPageNumbers()">
+          <button class="page-num-btn" [class.active]="p === nursePage" (click)="goToNursePage(p)">{{ p }}</button>
+        </ng-container>
+        <button class="page-btn" (click)="nextNursePage()" [disabled]="nursePage === totalNursePages">
+          <i class="ti ti-chevron-right"></i>
+        </button>
       </div>
     </div>
 

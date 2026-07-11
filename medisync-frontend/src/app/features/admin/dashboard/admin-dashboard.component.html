@@ -26,13 +26,67 @@
       </div>
     </div>
     <div class="metric-card">
-      <div class="metric-icon purple"><i class="ti ti-pill"></i></div>
+      <div class="metric-icon orange"><i class="ti ti-hourglass"></i></div>
       <div class="metric-info">
-        <span class="metric-value">{{ dashboard?.totalMedicines || 0 }}</span>
-        <span class="metric-label">Total Medicines</span>
+        <span class="metric-value">{{ totalPending }}</span>
+        <span class="metric-label">Pending Approvals</span>
       </div>
     </div>
   </div>
+
+  <!-- Charts Section -->
+  <div class="charts-grid">
+    <!-- Platform Distribution Donut -->
+    <div class="panel-card chart-panel">
+      <div class="panel-header">
+        <h3><i class="ti ti-chart-pie"></i> Platform Distribution</h3>
+      </div>
+      <div class="chart-content">
+        <div class="donut-chart">
+          <svg viewBox="0 0 160 160" class="donut-svg">
+            <circle *ngFor="let seg of platformSegments"
+              cx="80" cy="80" r="60"
+              fill="none"
+              [attr.stroke]="seg.color"
+              stroke-width="22"
+              [attr.stroke-dasharray]="seg.dashArray"
+              [attr.stroke-dashoffset]="seg.dashOffset"
+              transform="rotate(-90 80 80)"
+              class="donut-segment"
+            />
+            <text x="80" y="76" text-anchor="middle" class="donut-center-value">{{ totalEntities }}</text>
+            <text x="80" y="94" text-anchor="middle" class="donut-center-label">total</text>
+          </svg>
+        </div>
+        <div class="chart-legend">
+          <div class="legend-item" *ngFor="let seg of platformSegments">
+            <span class="legend-dot" [style.background]="seg.color"></span>
+            <span class="legend-label">{{ seg.name }}</span>
+            <span class="legend-value">{{ seg.count }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pharmacy Status Bar Chart -->
+    <div class="panel-card chart-panel">
+      <div class="panel-header">
+        <h3><i class="ti ti-chart-bar"></i> Approval Status Overview</h3>
+      </div>
+      <div class="bar-chart-content">
+        <div class="bar-chart">
+          <div class="bar-item" *ngFor="let bar of statusBars">
+            <span class="bar-label">{{ bar.name }}</span>
+            <div class="bar-track">
+              <div class="bar-fill" [style.width.%]="bar.percent" [style.background]="bar.color"></div>
+            </div>
+            <span class="bar-value">{{ bar.count }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="panels-grid">
     <div class="panel-card">
       <div class="panel-header"><h3><i class="ti ti-clock"></i> Pending Approvals</h3></div>

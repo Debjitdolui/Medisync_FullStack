@@ -1,426 +1,583 @@
+// ─── Variables ────────────────────────────────────────────────────────────────
+$primary: var(--primary, #1a73e8);
+$primary-dark: var(--primary-dark, #1557b0);
+$primary-light: var(--primary-light, #e8f0fe);
+$text-primary: var(--text-primary, #1f2937);
+$text-secondary: var(--text-secondary, #4b5563);
+$text-muted: var(--text-muted, #9ca3af);
+$border: var(--border, #e5e7eb);
+$bg: var(--bg, #ffffff);
+$radius-lg: var(--radius-lg, 12px);
+$shadow: var(--shadow, 0 2px 8px rgba(0, 0, 0, 0.08));
+
+// ─── Container ────────────────────────────────────────────────────────────────
 .timetable-container {
-  padding: 1.5rem;
-  max-width: 1200px;
+  padding: 24px;
+  max-width: 1400px;
   margin: 0 auto;
 }
 
-.page-header {
-  margin-bottom: 1.5rem;
-
-  h1 {
-    font-size: 1.75rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin: 0 0 0.25rem;
-  }
-
-  .subtitle {
-    color: var(--text-secondary);
-    margin: 0;
-    font-size: 0.95rem;
-  }
-}
-
-// ─── Alerts ─────────────────────────────────────────────────────────────────────
-
-.alert {
+// ─── Stats Bar ────────────────────────────────────────────────────────────────
+.stats-bar {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.75rem 1rem;
-  border-radius: var(--radius-lg);
-  margin-bottom: 1rem;
-  font-size: 0.9rem;
-
-  &-error {
-    background: #fee2e2;
-    color: #dc2626;
-    border: 1px solid #fecaca;
-  }
-
-  &-success {
-    background: #dcfce7;
-    color: #16a34a;
-    border: 1px solid #bbf7d0;
-  }
-}
-
-.alert-dismiss {
-  background: none;
-  border: none;
-  font-size: 1.25rem;
-  cursor: pointer;
-  line-height: 1;
-  opacity: 0.7;
-
-  &:hover {
-    opacity: 1;
-  }
-}
-
-// ─── Cards ──────────────────────────────────────────────────────────────────────
-
-.card {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow);
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
-}
-
-.card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1.25rem;
-
-  h2 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin: 0;
-  }
-}
-
-// ─── Buttons ────────────────────────────────────────────────────────────────────
-
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: var(--radius-lg);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.2s, opacity 0.2s;
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
-  &-primary {
-    background: var(--primary);
-    color: #fff;
-
-    &:hover:not(:disabled) {
-      background: var(--primary-dark);
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    }
-  }
-
-  &-secondary {
-    background: var(--primary);
-    color: #fff;
-
-    &:hover:not(:disabled) {
-      background: var(--primary-dark);
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    }
-  }
-}
-
-.btn-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--bg);
-  cursor: pointer;
-  font-size: 0.8rem;
-  transition: all 0.2s;
-
-  &:hover {
-    background: #e8f0fe;
-    border-color: var(--primary);
-    color: var(--primary);
-    transform: translateY(-1px);
-  }
-
-  &.active {
-    background: #dcfce7;
-    border-color: #16a34a;
-    color: #16a34a;
-  }
-
-  &.btn-delete:hover {
-    background: #fee2e2;
-    border-color: #dc2626;
-  }
-}
-
-// ─── Forms ──────────────────────────────────────────────────────────────────────
-
-.add-slot-form,
-.add-blocked-form {
-  background: #f9fafb;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 1rem 1.25rem;
-  margin-bottom: 1.25rem;
-}
-
-.form-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  align-items: flex-end;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-
-  &.flex-grow {
-    flex: 1;
-    min-width: 180px;
-  }
-
-  &.form-action {
-    display: flex;
-    justify-content: flex-end;
-  }
-
-  label {
-    font-size: 0.8rem;
-    font-weight: 500;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.02em;
-  }
-
-  input,
-  select {
-    padding: 0.5rem 0.75rem;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    font-size: 0.9rem;
-    color: var(--text-primary);
-    background: #fff;
-    transition: border-color 0.2s;
-
-    &:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
-    }
-  }
-}
-
-// ─── Weekly Grid ────────────────────────────────────────────────────────────────
-
-.weekly-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 0.5rem;
-  overflow-x: auto;
-}
-
-.day-column {
-  min-width: 120px;
-}
-
-.day-header {
-  text-align: center;
-  font-weight: 600;
-  font-size: 0.85rem;
-  color: var(--text-primary);
-  padding: 0.5rem;
-  background: var(--primary);
-  color: #fff;
-  border-radius: 8px 8px 0 0;
-}
-
-.slots-list {
-  border: 1px solid var(--border);
-  border-top: none;
-  border-radius: 0 0 8px 8px;
-  padding: 0.5rem;
-  min-height: 100px;
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.slot-card {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  padding: 0.5rem;
-  background: #fff;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  transition: all 0.2s;
-
-  &.inactive {
-    opacity: 0.5;
-    background: #f9fafb;
-
-    .slot-time {
-      text-decoration: line-through;
-    }
-  }
-
-  &.unsaved {
-    border-color: var(--primary);
-    border-style: dashed;
-    background: #eff6ff;
-  }
-}
-
-.slot-time {
-  font-size: 0.8rem;
-  font-weight: 500;
-  color: var(--text-primary);
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
+  gap: 16px;
+  margin-bottom: 24px;
   flex-wrap: wrap;
 }
 
-.unsaved-badge {
-  display: inline-block;
-  font-size: 0.65rem;
-  padding: 0.1rem 0.35rem;
-  background: var(--primary);
-  color: #fff;
-  border-radius: 4px;
-  font-weight: 600;
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: $bg;
+  border: 1px solid $border;
+  border-radius: $radius-lg;
+  padding: 16px 20px;
+  flex: 1;
+  min-width: 160px;
+  box-shadow: $shadow;
+}
+
+.stat-icon {
+  font-size: 24px;
+}
+
+.stat-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: $text-primary;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: $text-muted;
   text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.slot-actions {
-  display: flex;
-  gap: 0.25rem;
-}
-
-.empty-day {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 60px;
-}
-
-.text-muted {
-  color: var(--text-muted);
-  font-size: 0.8rem;
-}
-
-// ─── Blocked Dates ──────────────────────────────────────────────────────────────
-
-.blocked-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.blocked-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.75rem 1rem;
-  background: #fff;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  transition: background 0.2s;
-
-  &:hover {
-    background: #f9fafb;
-  }
-}
-
-.blocked-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-}
-
-.blocked-date {
-  font-weight: 500;
-  font-size: 0.9rem;
-  color: var(--text-primary);
-}
-
-.blocked-reason {
-  font-size: 0.8rem;
-  color: var(--text-secondary);
-}
-
-.empty-state {
-  text-align: center;
-  padding: 2rem 1rem;
-
-  p {
-    margin: 0;
-  }
-}
-
-// ─── Loading ────────────────────────────────────────────────────────────────────
-
-.loading-spinner {
+// ─── Loading ──────────────────────────────────────────────────────────────────
+.loading-overlay {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 3rem;
-  gap: 1rem;
+  padding: 60px 0;
+  color: $text-muted;
 
   p {
-    color: var(--text-secondary);
-    margin: 0;
+    margin-top: 12px;
+    font-size: 14px;
   }
 }
 
 .spinner {
   width: 36px;
   height: 36px;
-  border: 3px solid var(--border);
-  border-top-color: var(--primary);
+  border: 3px solid $border;
+  border-top-color: #1a73e8;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
 
 @keyframes spin {
-  to {
-    transform: rotate(360deg);
+  to { transform: rotate(360deg); }
+}
+
+// ─── Main Layout ──────────────────────────────────────────────────────────────
+.main-layout {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 24px;
+  align-items: start;
+}
+
+// ─── Section Titles ───────────────────────────────────────────────────────────
+.section-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: $text-primary;
+  margin: 0 0 16px 0;
+}
+
+.form-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: $text-primary;
+  margin: 0 0 16px 0;
+}
+
+// ─── Weekly Grid ──────────────────────────────────────────────────────────────
+.weekly-grid-section {
+  background: $bg;
+  border: 1px solid $border;
+  border-radius: $radius-lg;
+  padding: 20px;
+  box-shadow: $shadow;
+}
+
+.weekly-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+
+.day-column {
+  min-width: 0;
+}
+
+.day-header {
+  border-top: 3px solid #1a73e8;
+  padding: 10px 8px 8px;
+  text-align: center;
+  background: #f9fafb;
+  border-radius: 8px 8px 0 0;
+  margin-bottom: 8px;
+}
+
+.day-name {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: $text-primary;
+}
+
+.slot-count {
+  display: block;
+  font-size: 11px;
+  color: $text-muted;
+  margin-top: 2px;
+}
+
+.day-slots {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 80px;
+}
+
+// ─── Slot Cards ───────────────────────────────────────────────────────────────
+.slot-card {
+  background: $bg;
+  border: 1px solid $border;
+  border-radius: 8px;
+  padding: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  position: relative;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  &.inactive {
+    opacity: 0.5;
+  }
+
+  // Color coding by duration
+  &.slot-short {
+    border-left: 3px solid #4caf50;
+    background: linear-gradient(135deg, #f1f8e9 0%, #ffffff 100%);
+  }
+
+  &.slot-medium {
+    border-left: 3px solid #1a73e8;
+    background: linear-gradient(135deg, #e8f0fe 0%, #ffffff 100%);
+  }
+
+  &.slot-long {
+    border-left: 3px solid #9c27b0;
+    background: linear-gradient(135deg, #f3e5f5 0%, #ffffff 100%);
   }
 }
 
-// ─── Responsive ─────────────────────────────────────────────────────────────────
+.slot-time {
+  font-size: 11px;
+  font-weight: 600;
+  color: $text-primary;
+  margin-bottom: 2px;
+}
 
-@media (max-width: 900px) {
+.slot-duration {
+  font-size: 10px;
+  color: $text-secondary;
+  margin-bottom: 2px;
+}
+
+.slot-service {
+  font-size: 10px;
+  color: $text-muted;
+  font-style: italic;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.slot-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+}
+
+// Toggle Switch
+.btn-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px;
+
+  .toggle-track {
+    display: block;
+    width: 28px;
+    height: 14px;
+    border-radius: 7px;
+    background: #d1d5db;
+    position: relative;
+    transition: background 0.2s ease;
+  }
+
+  .toggle-thumb {
+    display: block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: white;
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    transition: left 0.2s ease;
+  }
+
+  &.active .toggle-track {
+    background: #4caf50;
+  }
+
+  &.active .toggle-thumb {
+    left: 16px;
+  }
+}
+
+.btn-delete {
+  background: none;
+  border: none;
+  color: #ef4444;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+  line-height: 1;
+  transition: background 0.15s;
+
+  &:hover {
+    background: #fef2f2;
+  }
+}
+
+// Empty day placeholder
+.empty-day {
+  border: 1px dashed $border;
+  border-radius: 8px;
+  padding: 16px 8px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.empty-icon {
+  font-size: 16px;
+  color: $text-muted;
+}
+
+.empty-text {
+  font-size: 11px;
+  color: $text-muted;
+}
+
+// ─── Right Panel ──────────────────────────────────────────────────────────────
+.right-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+// ─── Form Card ────────────────────────────────────────────────────────────────
+.form-card {
+  background: $bg;
+  border: 1px solid $border;
+  border-radius: $radius-lg;
+  padding: 20px;
+  box-shadow: $shadow;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: $text-secondary;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.form-select,
+.form-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid $border;
+  border-radius: 8px;
+  font-size: 14px;
+  color: $text-primary;
+  background: $bg;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+
+  &:focus {
+    outline: none;
+    border-color: #1a73e8;
+    box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
+  }
+
+  &.readonly {
+    background: #f3f4f6;
+    color: $text-muted;
+    cursor: not-allowed;
+  }
+
+  &.compact {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+}
+
+.form-hint {
+  display: block;
+  margin-top: 4px;
+  font-size: 11px;
+  color: $text-muted;
+  font-style: italic;
+}
+
+// End time wrapper with lock icon
+.end-time-wrapper {
+  position: relative;
+
+  .lock-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 14px;
+    pointer-events: none;
+  }
+}
+
+// Day Pills
+.day-pills {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.day-pill {
+  padding: 6px 12px;
+  border: 1px solid $border;
+  border-radius: 20px;
+  background: $bg;
+  font-size: 12px;
+  font-weight: 500;
+  color: $text-secondary;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    border-color: #1a73e8;
+    color: #1a73e8;
+  }
+
+  &.selected {
+    background: #1a73e8;
+    border-color: #1a73e8;
+    color: white;
+  }
+}
+
+// Add Slot Button
+.btn-add-slot {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #1a73e8 0%, #7c3aed 100%);
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s;
+  margin-top: 4px;
+
+  &:hover:not(:disabled) {
+    opacity: 0.9;
+    transform: translateY(-1px);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// ─── Blocked Dates Card ───────────────────────────────────────────────────────
+.blocked-dates-card {
+  background: $bg;
+  border: 1px solid $border;
+  border-radius: $radius-lg;
+  padding: 20px;
+  box-shadow: $shadow;
+}
+
+.blocked-add-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  align-items: center;
+
+  .form-input {
+    flex: 1;
+  }
+}
+
+.btn-add-blocked {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 8px;
+  background: #1a73e8;
+  color: white;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:hover:not(:disabled) {
+    background: #1557b0;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.blocked-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.blocked-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  background: #fef3c7;
+  border: 1px solid #f59e0b;
+  border-radius: 16px;
+  font-size: 12px;
+}
+
+.chip-date {
+  font-weight: 600;
+  color: #92400e;
+}
+
+.chip-reason {
+  color: #b45309;
+}
+
+.chip-dismiss {
+  background: none;
+  border: none;
+  color: #dc2626;
+  font-size: 11px;
+  cursor: pointer;
+  padding: 0 2px;
+  margin-left: 2px;
+  line-height: 1;
+  border-radius: 50%;
+
+  &:hover {
+    background: #fecaca;
+  }
+}
+
+.empty-blocked {
+  font-size: 13px;
+  color: $text-muted;
+  font-style: italic;
+}
+
+// ─── Responsive ───────────────────────────────────────────────────────────────
+@media (max-width: 1024px) {
+  .main-layout {
+    grid-template-columns: 1fr;
+  }
+
   .weekly-grid {
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  }
-
-  .form-row {
-    flex-direction: column;
-  }
-
-  .form-group.form-action {
-    align-self: flex-start;
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
   .timetable-container {
-    padding: 1rem;
+    padding: 16px;
   }
 
-  .card {
-    padding: 1rem;
+  .stats-bar {
+    flex-direction: column;
+    gap: 8px;
   }
 
   .weekly-grid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .blocked-add-row {
+    flex-wrap: wrap;
+
+    .form-input {
+      flex: 1 1 100%;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .weekly-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .day-pills {
+    gap: 4px;
+  }
+
+  .day-pill {
+    padding: 5px 8px;
+    font-size: 11px;
   }
 }

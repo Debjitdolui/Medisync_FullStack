@@ -30,8 +30,10 @@
             <th>Name</th>
             <th>Email</th>
             <th>Phone</th>
+            <th>License No.</th>
             <th>Qualification</th>
             <th>Specialization</th>
+            <th>Services</th>
             <th>Status</th>
             <th>Actions</th>
           </tr>
@@ -41,8 +43,15 @@
             <td class="name-cell">{{ n.fullName }}</td>
             <td class="email-cell">{{ n.email }}</td>
             <td>{{ n.phone }}</td>
+            <td class="license-cell"><span class="license-badge">{{ n.licenseNumber || '—' }}</span></td>
             <td>{{ n.qualification }}</td>
             <td><span class="spec-badge">{{ n.specialization }}</span></td>
+            <td class="services-cell">
+              <div class="services-tags" *ngIf="n.offeredServices && n.offeredServices.length > 0">
+                <span class="service-tag" *ngFor="let svc of n.offeredServices">{{ svc.serviceName }}</span>
+              </div>
+              <span class="no-services" *ngIf="!n.offeredServices || n.offeredServices.length === 0">—</span>
+            </td>
             <td><span class="status-badge" [ngClass]="n.approvalStatus">{{ n.approvalStatus }}</span></td>
             <td class="actions-cell">
               <button class="btn-approve" *ngIf="n.approvalStatus === 'pending'" (click)="approve(n.nurseId)">
@@ -64,7 +73,7 @@
             </td>
           </tr>
           <tr *ngIf="filteredNurses.length === 0">
-            <td colspan="7" class="empty-row"><i class="ti ti-nurse-off"></i> No nurses found</td>
+            <td colspan="9" class="empty-row"><i class="ti ti-nurse-off"></i> No nurses found</td>
           </tr>
         </tbody>
       </table>

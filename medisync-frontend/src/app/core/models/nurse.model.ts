@@ -30,4 +30,5 @@ export interface NurseService {
   serviceName: string;
   description: string;
   basePrice: number;
+  durationMinutes?: number;
 }

@@ -18,8 +18,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class NurseModuleService {
 
-    private static final int BUFFER_MINUTES = 30;
-
     private final NurseRepository nurseRepository;
     private final NurseServiceRepository nurseServiceRepository;
     private final NurseRequestRepository nurseRequestRepository;
@@ -82,18 +80,25 @@ public class NurseModuleService {
 
     // ─── Slot Availability Logic ─────────────────────────────────────────────────
 
+    private static final int MAX_DAILY_WORK_MINUTES = 480; // 8 hours
+
     /**
-     * Get available time slots for a nurse on a specific date.
-     * Considers: weekly schedule, blocked dates, existing bookings (pending/accepted/in_progress).
+     * Get available time slots for a nurse on a specific date for a given service.
+     * Considers: weekly schedule, blocked dates, existing bookings, service duration, 8hr daily limit.
      */
-    public List<String> getAvailableSlots(Long nurseId, LocalDate date) {
+    public List<String> getAvailableSlots(Long nurseId, LocalDate date, Long serviceId) {
         // 1. Check if date is blocked
         if (nurseBlockedDateRepository.existsByNurseNurseIdAndBlockedDate(nurseId, date)) {
             return Collections.emptyList();
         }
 
-        // 2. Get nurse's schedule for that day of week
-        String dayOfWeek = date.getDayOfWeek().name(); // MONDAY, TUESDAY, etc.
+        // 2. Get service duration
+        NurseService service = nurseServiceRepository.findById(serviceId)
+                .orElseThrow(() -> new RuntimeException("Service not found"));
+        int durationMinutes = service.getDurationMinutes() != null ? service.getDurationMinutes() : 60;
+
+        // 3. Get nurse's schedule for that day of week
+        String dayOfWeek = date.getDayOfWeek().name();
         List<NurseSchedule> schedules = nurseScheduleRepository.findByNurseNurseIdAndDayOfWeek(nurseId, dayOfWeek);
         schedules = schedules.stream().filter(s -> Boolean.TRUE.equals(s.getIsActive())).toList();
 
@@ -101,31 +106,91 @@ public class NurseModuleService {
             return Collections.emptyList();
         }
 
-        // 3. Use the exact slots nurse has defined (not split into 1-hour chunks)
-        List<String> allSlots = new ArrayList<>();
-        for (NurseSchedule schedule : schedules) {
-            allSlots.add(schedule.getStartTime().toString() + "-" + schedule.getEndTime().toString());
+        // 4. Get existing bookings (pending/accepted/in_progress) for this date
+        List<NurseRequest> activeBookings = nurseRequestRepository.findActiveBookingsForNurseOnDate(nurseId, date);
+
+        // 5. Calculate total booked minutes for the day
+        int bookedMinutes = 0;
+        for (NurseRequest booking : activeBookings) {
+            if (booking.getService() != null && booking.getService().getDurationMinutes() != null) {
+                bookedMinutes += booking.getService().getDurationMinutes();
+            } else {
+                bookedMinutes += 60; // default 1 hour if unknown
+            }
         }
 
-        // 4. Remove slots that are already booked (pending/accepted/in_progress)
-        List<NurseRequest> activeBookings = nurseRequestRepository.findActiveBookingsForNurseOnDate(nurseId, date);
-        Set<String> bookedSlots = activeBookings.stream()
-                .map(NurseRequest::getTimeSlot)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
+        // 6. Check if adding this service would exceed daily limit
+        if (bookedMinutes + durationMinutes > MAX_DAILY_WORK_MINUTES) {
+            return Collections.emptyList(); // Day is full
+        }
 
-        allSlots.removeIf(bookedSlots::contains);
+        // 7. Get booked time ranges
+        List<long[]> bookedRanges = new ArrayList<>();
+        for (NurseRequest booking : activeBookings) {
+            if (booking.getTimeSlot() != null && booking.getTimeSlot().contains("-")) {
+                String[] parts = booking.getTimeSlot().split("-");
+                LocalTime bStart = LocalTime.parse(parts[0].trim());
+                LocalTime bEnd = LocalTime.parse(parts[1].trim());
+                bookedRanges.add(new long[]{bStart.toSecondOfDay(), bEnd.toSecondOfDay()});
+            }
+        }
 
-        // 5. If today, remove past slots (must be at least 2 hours from now)
+        // 8. Generate duration-based slots from nurse's windows
+        List<String> allSlots = new ArrayList<>();
+        for (NurseSchedule schedule : schedules) {
+            LocalTime windowStart = schedule.getStartTime();
+            LocalTime windowEnd = schedule.getEndTime();
+
+            // Generate slots of serviceDuration length within this window
+            LocalTime slotStart = windowStart;
+            while (true) {
+                LocalTime slotEnd = slotStart.plusMinutes(durationMinutes);
+
+                // Check if slot fits within window
+                if (slotEnd.isAfter(windowEnd)) break;
+
+                // Check if slot overlaps with any booked range
+                long sStart = slotStart.toSecondOfDay();
+                long sEnd = slotEnd.toSecondOfDay();
+                boolean overlaps = bookedRanges.stream().anyMatch(range ->
+                        sStart < range[1] && range[0] < sEnd
+                );
+
+                if (!overlaps) {
+                    allSlots.add(slotStart.toString() + "-" + slotEnd.toString());
+                }
+
+                // Move to next possible slot start (step by duration)
+                slotStart = slotStart.plusMinutes(durationMinutes);
+            }
+        }
+
+        // 9. If today, remove past slots (must be at least 1 hour from now)
         if (date.equals(LocalDate.now())) {
-            LocalTime minTime = LocalTime.now().plusHours(2);
+            LocalTime minTime = LocalTime.now().plusHours(1);
             allSlots.removeIf(slot -> {
-                LocalTime slotStart = LocalTime.parse(slot.split("-")[0]);
-                return slotStart.isBefore(minTime);
+                LocalTime slotStart2 = LocalTime.parse(slot.split("-")[0]);
+                return slotStart2.isBefore(minTime);
             });
         }
 
         return allSlots;
+    }
+
+    // Keep backward compatible version (without serviceId)
+    public List<String> getAvailableSlots(Long nurseId, LocalDate date) {
+        // Default to 60 min slots if no service specified
+        if (nurseBlockedDateRepository.existsByNurseNurseIdAndBlockedDate(nurseId, date)) {
+            return Collections.emptyList();
+        }
+        String dayOfWeek = date.getDayOfWeek().name();
+        List<NurseSchedule> schedules = nurseScheduleRepository.findByNurseNurseIdAndDayOfWeek(nurseId, dayOfWeek);
+        schedules = schedules.stream().filter(s -> Boolean.TRUE.equals(s.getIsActive())).toList();
+        List<String> slots = new ArrayList<>();
+        for (NurseSchedule schedule : schedules) {
+            slots.add(schedule.getStartTime().toString() + "-" + schedule.getEndTime().toString());
+        }
+        return slots;
     }
 
     // ─── Create Booking Request with Buffer ──────────────────────────────────────
@@ -157,18 +222,20 @@ public class NurseModuleService {
         request.setTimeSlot(dto.getTimeSlot());
         request.setBookingGroupId(dto.getBookingGroupId());
 
-        // Set buffer expiry time (30 minutes from now)
-        request.setExpiresAt(LocalDateTime.now().plusMinutes(BUFFER_MINUTES));
+        // Set dynamic buffer expiry time based on urgency
+        int bufferMinutes = calculateBufferMinutes(dto.getRequestDate(), dto.getTimeSlot());
+        request.setExpiresAt(LocalDateTime.now().plusMinutes(bufferMinutes));
 
         NurseRequest saved = nurseRequestRepository.save(request);
 
         // Notify the nurse about new booking request
+        int notifyBuffer = calculateBufferMinutes(dto.getRequestDate(), dto.getTimeSlot());
         notificationService.notifyNurse(nurse.getEmail(), "NEW_REQUEST",
                 "New Booking Request",
                 "You have a new " + service.getServiceName() + " request from " + patient.getUsername()
                         + " for " + dto.getRequestDate()
                         + (dto.getTimeSlot() != null ? " (" + dto.getTimeSlot() + ")" : "")
-                        + ". Please respond within 30 minutes.");
+                        + ". Please respond within " + notifyBuffer + " minutes.");
 
         return saved;
     }
@@ -248,7 +315,7 @@ public class NurseModuleService {
     private void validateStatusTransition(String current, String next) {
         Map<String, Set<String>> allowed = Map.of(
                 "pending", Set.of("accepted", "rejected", "expired", "cancelled"),
-                "accepted", Set.of("in_progress", "cancelled"),
+                "accepted", Set.of("in_progress", "completed", "cancelled"),
                 "in_progress", Set.of("completed")
         );
 
@@ -256,6 +323,30 @@ public class NurseModuleService {
         if (!allowedNext.contains(next)) {
             throw new RuntimeException("Cannot change status from '" + current + "' to '" + next + "'");
         }
+    }
+
+    /**
+     * Calculate dynamic buffer time based on booking urgency.
+     * - Urgent (same day, slot within 4 hours): 10 minutes
+     * - Today (same day, slot 4+ hours away): 20 minutes
+     * - Tomorrow+ (future dates): 60 minutes
+     */
+    private int calculateBufferMinutes(LocalDate requestDate, String timeSlot) {
+        LocalDate today = LocalDate.now();
+
+        if (requestDate.equals(today)) {
+            // Same day booking
+            if (timeSlot != null && timeSlot.contains("-")) {
+                LocalTime slotStart = LocalTime.parse(timeSlot.split("-")[0].trim());
+                long hoursUntilSlot = java.time.Duration.between(LocalTime.now(), slotStart).toHours();
+                if (hoursUntilSlot < 4) {
+                    return 10; // Urgent
+                }
+            }
+            return 20; // Today, not urgent
+        }
+
+        return 60; // Tomorrow or later
     }
 
     public Nurse getProfile(String email) {

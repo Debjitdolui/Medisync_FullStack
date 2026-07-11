@@ -41,8 +41,9 @@
   .nurse-count {
     margin-left: auto;
     font-size: 13px;
-    color: var(--text-muted);
-    background: var(--bg);
+    font-weight: 600;
+    color: var(--primary);
+    background: var(--primary-light, #e8f0fe);
     padding: 4px 12px;
     border-radius: 12px;
   }
@@ -62,10 +63,10 @@
   flex-shrink: 0;
 }
 
-// ─── Services Row ─────────────────────────────────────────────────────────────
-.services-row {
+// ─── Services Grid ────────────────────────────────────────────────────────────
+.services-slider {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 16px;
 }
 
@@ -240,7 +241,7 @@
 // ─── Nurses Grid ──────────────────────────────────────────────────────────────
 .nurses-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 16px;
 }
 
@@ -251,6 +252,9 @@
   padding: 20px;
   box-shadow: var(--shadow);
   transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 
   &:hover {
     border-color: var(--primary);
@@ -264,6 +268,7 @@
   align-items: center;
   gap: 12px;
   margin-bottom: 14px;
+  flex: 1;
 }
 
 .nurse-avatar {
@@ -318,6 +323,8 @@
   justify-content: space-between;
   padding-top: 14px;
   border-top: 1px solid #f1f5f9;
+  margin-top: auto;
+  flex-shrink: 0;
 }
 
 .nurse-tags {
@@ -1269,12 +1276,16 @@
 // ─── Responsive ───────────────────────────────────────────────────────────────
 @media (max-width: 1024px) {
   .nurses-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   }
 }
 
 @media (max-width: 768px) {
-  .services-row {
+  .services-slider {
+    grid-template-columns: 1fr;
+  }
+
+  .nurses-grid {
     grid-template-columns: 1fr;
   }
 
@@ -1323,5 +1334,104 @@
 
   .payment-methods {
     grid-template-columns: 1fr;
+  }
+}
+
+// Service Duration Badge
+.service-duration {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 4px;
+
+  i { font-size: 12px; }
+}
+
+// Nurse Pagination
+.nurse-pagination {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-top: 24px;
+  padding: 16px;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+
+  .pagination-summary {
+    font-size: 13px;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+
+  .pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .page-btn {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: #fff;
+    cursor: pointer;
+    font-size: 16px;
+    color: var(--text-secondary);
+    transition: all 0.2s;
+
+    &:hover:not(:disabled) {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+      transform: translateY(-1px);
+    }
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+  }
+
+  .page-num-btn {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: #fff;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    transition: all 0.2s;
+
+    &:hover:not(.active) {
+      background: var(--primary-light, #e8f0fe);
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    &.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+      box-shadow: 0 2px 8px rgba(26, 115, 232, 0.25);
+    }
+  }
+
+  .page-info {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
   }
 }
