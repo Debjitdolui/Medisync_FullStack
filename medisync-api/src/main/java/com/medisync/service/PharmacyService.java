@@ -4,7 +4,9 @@ import com.medisync.dto.PharmacyRegisterRequest;
 import com.medisync.dto.PharmacyUpdateRequest;
 import com.medisync.entity.Pharmacy;
 import com.medisync.repository.MedicineRepository;
+import com.medisync.repository.NurseRepository;
 import com.medisync.repository.PharmacyRepository;
+import com.medisync.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,11 +21,17 @@ public class PharmacyService {
 
     private final PharmacyRepository pharmacyRepository;
     private final MedicineRepository medicineRepository;
+    private final UserRepository userRepository;
+    private final NurseRepository nurseRepository;
     private final PasswordEncoder passwordEncoder;
     private final PincodeCoordinateService pincodeCoordinateService;
 
     public Pharmacy register(PharmacyRegisterRequest req) {
         if (pharmacyRepository.existsByEmail(req.getEmail()))
+            throw new RuntimeException("Email already registered");
+        if (userRepository.existsByEmail(req.getEmail()))
+            throw new RuntimeException("Email already registered");
+        if (nurseRepository.existsByEmail(req.getEmail()))
             throw new RuntimeException("Email already registered");
         if (pharmacyRepository.existsByLicenseNumber(req.getLicenseNumber()))
             throw new RuntimeException("License number already registered");

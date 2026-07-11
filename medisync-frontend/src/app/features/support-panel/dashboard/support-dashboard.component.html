@@ -1,0 +1,93 @@
+<div class="dashboard-container">
+  <h2 class="page-title">Support Dashboard</h2>
+
+  <!-- Metric Cards -->
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <div class="metric-icon open">
+        <i class="ti ti-folder-open"></i>
+      </div>
+      <div class="metric-info">
+        <span class="metric-value">{{openCount}}</span>
+        <span class="metric-label">Open Tickets</span>
+      </div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-icon assigned">
+        <i class="ti ti-user-check"></i>
+      </div>
+      <div class="metric-info">
+        <span class="metric-value">{{assignedToMeCount}}</span>
+        <span class="metric-label">Assigned to Me</span>
+      </div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-icon escalated">
+        <i class="ti ti-alert-triangle"></i>
+      </div>
+      <div class="metric-info">
+        <span class="metric-value">{{escalatedCount}}</span>
+        <span class="metric-label">Escalated</span>
+      </div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-icon resolved">
+        <i class="ti ti-circle-check"></i>
+      </div>
+      <div class="metric-info">
+        <span class="metric-value">{{resolvedTodayCount}}</span>
+        <span class="metric-label">Resolved Today</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Tickets -->
+  <div class="recent-section">
+    <div class="section-header">
+      <h3>Recent Tickets</h3>
+      <a routerLink="/support/tickets" class="view-all-link">View All <i class="ti ti-arrow-right"></i></a>
+    </div>
+
+    <div class="tickets-table-wrapper" *ngIf="!loading">
+      <table class="tickets-table" *ngIf="recentTickets.length > 0">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Subject</th>
+            <th>Raised By</th>
+            <th>Priority</th>
+            <th>Status</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let ticket of recentTickets">
+            <td class="ticket-id">#{{ticket.ticketId}}</td>
+            <td class="ticket-subject">{{ticket.subject}}</td>
+            <td>{{ticket.raisedByUsername || 'N/A'}}</td>
+            <td>
+              <span class="badge" [ngClass]="getPriorityClass(ticket.priority)">{{ticket.priority}}</span>
+            </td>
+            <td>
+              <span class="badge" [ngClass]="getStatusClass(ticket.status)">{{ticket.status}}</span>
+            </td>
+            <td class="ticket-date">{{ticket.createdAt | date:'short'}}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="empty-state" *ngIf="recentTickets.length === 0">
+        <i class="ti ti-ticket-off"></i>
+        <p>No tickets found</p>
+      </div>
+    </div>
+
+    <div class="loading-state" *ngIf="loading">
+      <i class="ti ti-loader-2 spin"></i>
+      <p>Loading dashboard...</p>
+    </div>
+  </div>
+</div>

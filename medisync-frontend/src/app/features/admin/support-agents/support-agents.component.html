@@ -1,0 +1,124 @@
+<div class="support-agents">
+  <div class="page-header">
+    <div>
+      <h1><i class="ti ti-headset"></i> Support Agents</h1>
+      <p class="subtitle">Manage support agent accounts</p>
+    </div>
+    <button class="btn-add" (click)="openAddModal()">
+      <i class="ti ti-plus"></i> Add Agent
+    </button>
+  </div>
+
+  <!-- Agents Table -->
+  <div class="table-card">
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Status</th>
+            <th>Created</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let agent of paginatedAgents">
+            <td class="name-cell">{{ agent.username }}</td>
+            <td class="email-cell">{{ agent.email }}</td>
+            <td>{{ agent.phone }}</td>
+            <td>
+              <span class="status-badge" [ngClass]="agent.status === 'blocked' ? 'blocked' : 'active'">
+                {{ agent.status === 'blocked' ? 'Blocked' : 'Active' }}
+              </span>
+            </td>
+            <td>{{ agent.createdAt | date:'mediumDate' }}</td>
+            <td class="actions-cell">
+              <button class="btn-block" *ngIf="agent.status !== 'blocked'" (click)="openBlockModal(agent)">
+                <i class="ti ti-ban"></i> Block
+              </button>
+              <button class="btn-unblock" *ngIf="agent.status === 'blocked'" (click)="openUnblockModal(agent)">
+                <i class="ti ti-lock-open"></i> Unblock
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="agents.length === 0 && !isLoading">
+            <td colspan="6" class="empty-row">
+              <i class="ti ti-users-minus"></i> No support agents found
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <app-pagination
+      *ngIf="agents.length > pageSize"
+      [totalItems]="agents.length"
+      [pageSize]="pageSize"
+      [currentPage]="currentPage"
+      (pageChange)="onPageChange($event)">
+    </app-pagination>
+  </div>
+
+  <!-- Add Agent Modal -->
+  <div class="modal-overlay" *ngIf="showAddModal" (click)="closeAddModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Add Support Agent</h3>
+        <button class="btn-close" (click)="closeAddModal()"><i class="ti ti-x"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="agentName">Full Name</label>
+          <input type="text" id="agentName" [(ngModel)]="newAgent.fullName" placeholder="Enter full name" />
+        </div>
+        <div class="form-group">
+          <label for="agentEmail">Email</label>
+          <input type="email" id="agentEmail" [(ngModel)]="newAgent.email" placeholder="Enter email" />
+        </div>
+        <div class="form-group">
+          <label for="agentPassword">Password</label>
+          <input type="password" id="agentPassword" [(ngModel)]="newAgent.password" placeholder="Enter password" />
+        </div>
+        <div class="form-group">
+          <label for="agentPhone">Phone</label>
+          <input type="tel" id="agentPhone" [(ngModel)]="newAgent.phone" placeholder="Enter phone number" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="closeAddModal()">Cancel</button>
+        <button class="btn-submit" (click)="createAgent()" [disabled]="isCreating">
+          {{ isCreating ? 'Creating...' : 'Create Agent' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm Modal -->
+  <div class="modal-overlay" *ngIf="showConfirmModal" (click)="closeConfirmModal()">
+    <div class="modal-content small" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{ confirmAction === 'block' ? 'Block' : 'Unblock' }} Agent</h3>
+        <button class="btn-close" (click)="closeConfirmModal()"><i class="ti ti-x"></i></button>
+      </div>
+      <div class="modal-body">
+        <p class="confirm-text">
+          Are you sure you want to {{ confirmAction }} <strong>{{ confirmTarget?.username }}</strong>?
+          <span *ngIf="confirmAction === 'block'">They will no longer be able to access the support panel.</span>
+          <span *ngIf="confirmAction === 'unblock'">They will regain access to the support panel.</span>
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="closeConfirmModal()">Cancel</button>
+        <button
+          class="btn-confirm"
+          [ngClass]="confirmAction === 'block' ? 'danger' : 'success'"
+          (click)="confirmActionExecute()"
+          [disabled]="isProcessing">
+          {{ isProcessing ? 'Processing...' : (confirmAction === 'block' ? 'Block' : 'Unblock') }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

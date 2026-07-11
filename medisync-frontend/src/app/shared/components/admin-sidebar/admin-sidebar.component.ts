@@ -33,12 +33,15 @@ export class AdminSidebarComponent {
           { label: 'User Management', icon: 'ti-users', route: '/admin/users' },
           { label: 'Reports', icon: 'ti-report-analytics', route: '/admin/reports' },
           { label: 'Activity Logs', icon: 'ti-list-details', route: '/admin/logs' },
+          { label: 'Support Agents', icon: 'ti-headset', route: '/admin/support-agents' },
+          { label: 'Escalations', icon: 'ti-alert-circle', route: '/admin/escalated-tickets' },
         ];
       case 'pharmacy':
         return [
           { label: 'Dashboard', icon: 'ti-dashboard', route: '/pharmacy/dashboard' },
           { label: 'Inventory', icon: 'ti-packages', route: '/pharmacy/inventory' },
           { label: 'Settings', icon: 'ti-settings', route: '/pharmacy/settings' },
+          { label: 'Help & Support', icon: 'ti-help-circle', route: '/pharmacy/help-support' },
         ];
       case 'nurse':
         return [
@@ -47,6 +50,7 @@ export class AdminSidebarComponent {
           { label: 'Timetable', icon: 'ti-calendar-time', route: '/nurse/timetable' },
           { label: 'Calendar', icon: 'ti-calendar-event', route: '/nurse/calendar' },
           { label: 'Availability', icon: 'ti-clock', route: '/nurse/availability' },
+          { label: 'Help & Support', icon: 'ti-help-circle', route: '/nurse/help-support' },
         ];
       default:
         return [];

@@ -45,9 +45,13 @@ public class SecurityConfig {
                     "/api/search/**",
                     "/uploads/**"
                 ).permitAll()
-                // Admin endpoints
+                // Admin endpoints (includes /api/admin/support-agents/** and /api/admin/escalated-tickets/**)
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                // All other endpoints require authentication
+                // Support agent-only endpoints
+                .requestMatchers("/api/support/tickets/*/assign").hasRole("SUPPORT_AGENT")
+                .requestMatchers("/api/support/tickets/*/escalate").hasRole("SUPPORT_AGENT")
+                .requestMatchers("/api/support/tickets/*/status").hasRole("SUPPORT_AGENT")
+                // All other endpoints require authentication (including /api/support/**)
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

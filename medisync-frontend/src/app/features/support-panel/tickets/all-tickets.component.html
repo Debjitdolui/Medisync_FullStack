@@ -1,0 +1,95 @@
+<div class="tickets-container">
+  <div class="page-header">
+    <h2 class="page-title">{{pageTitle}}</h2>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-bar" *ngIf="!myOnly">
+    <div class="filter-group">
+      <label>Status</label>
+      <select [(ngModel)]="statusFilter" (change)="onFilterChange()" [disabled]="escalatedOnly">
+        <option value="">All Statuses</option>
+        <option *ngFor="let s of statuses.slice(1)" [value]="s">{{s}}</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label>Category</label>
+      <select [(ngModel)]="categoryFilter" (change)="onFilterChange()">
+        <option value="">All Categories</option>
+        <option *ngFor="let c of categories.slice(1)" [value]="c">{{c}}</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label>Priority</label>
+      <select [(ngModel)]="priorityFilter" (change)="onFilterChange()">
+        <option value="">All Priorities</option>
+        <option *ngFor="let p of priorities.slice(1)" [value]="p">{{p}}</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Tickets Table -->
+  <div class="table-card" *ngIf="!loading">
+    <div class="table-wrapper" *ngIf="tickets.length > 0">
+      <table class="tickets-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Subject</th>
+            <th>Raised By</th>
+            <th>Category</th>
+            <th>Priority</th>
+            <th>Status</th>
+            <th>Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let ticket of tickets">
+            <td class="ticket-id">#{{ticket.ticketId}}</td>
+            <td class="ticket-subject">{{ticket.subject}}</td>
+            <td>{{ticket.raisedByUsername || 'N/A'}} <span class="role-tag">{{ticket.raisedByRole}}</span></td>
+            <td>
+              <span class="category-tag">{{ticket.category}}</span>
+            </td>
+            <td>
+              <span class="badge" [ngClass]="getPriorityClass(ticket.priority)">{{ticket.priority}}</span>
+            </td>
+            <td>
+              <span class="badge" [ngClass]="getStatusClass(ticket.status)">{{ticket.status}}</span>
+            </td>
+            <td class="ticket-date">{{ticket.createdAt | date:'mediumDate'}}</td>
+            <td>
+              <button class="view-btn" (click)="viewTicket(ticket.ticketId)">
+                <i class="ti ti-eye"></i> View
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="empty-state" *ngIf="tickets.length === 0">
+      <i class="ti ti-ticket-off"></i>
+      <p>No tickets found</p>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-state" *ngIf="loading">
+    <i class="ti ti-loader-2 spin"></i>
+    <p>Loading tickets...</p>
+  </div>
+
+  <!-- Pagination -->
+  <app-pagination
+    *ngIf="!loading && tickets.length > 0"
+    [totalItems]="totalItems"
+    [pageSize]="pageSize"
+    [currentPage]="currentPage"
+    (pageChange)="onPageChange($event)"
+    (pageSizeChange)="onPageSizeChange($event)">
+  </app-pagination>
+</div>

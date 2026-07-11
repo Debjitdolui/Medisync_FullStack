@@ -24,11 +24,16 @@ public class NurseModuleService {
     private final NurseScheduleRepository nurseScheduleRepository;
     private final NurseBlockedDateRepository nurseBlockedDateRepository;
     private final UserRepository userRepository;
+    private final PharmacyRepository pharmacyRepository;
     private final PasswordEncoder passwordEncoder;
     private final NotificationService notificationService;
 
     public Nurse register(NurseRegisterRequest req) {
         if (nurseRepository.existsByEmail(req.getEmail()))
+            throw new RuntimeException("Email already exists");
+        if (userRepository.existsByEmail(req.getEmail()))
+            throw new RuntimeException("Email already exists");
+        if (pharmacyRepository.existsByEmail(req.getEmail()))
             throw new RuntimeException("Email already exists");
         if (nurseRepository.existsByLicenseNumber(req.getLicenseNumber()))
             throw new RuntimeException("License number already exists");

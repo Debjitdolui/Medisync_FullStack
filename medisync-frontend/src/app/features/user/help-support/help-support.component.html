@@ -1,56 +1,136 @@
 <div class="support-page">
+  <div class="page-header">
+    <h1><i class="ti ti-help-circle"></i> Help & Support</h1>
+    <p class="subtitle">Need assistance? Submit a ticket or browse FAQs below.</p>
+  </div>
+
   <div class="support-grid">
-    <!-- Left: Categories -->
-    <aside class="categories">
-      <h2>How can we help you?</h2>
-      <div class="category-list">
-        <div *ngFor="let cat of categories"
-             class="category-card"
-             [class.active]="selectedCategory === cat.title"
-             (click)="selectedCategory = cat.title">
-          <div class="cat-icon" [style.background]="cat.color + '15'">
-            <i class="ti {{ cat.icon }}" [style.color]="cat.color"></i>
-          </div>
-          <div class="cat-text">
-            <h4>{{ cat.title }}</h4>
-            <p>{{ cat.subtitle }}</p>
-          </div>
-          <i class="ti ti-chevron-right cat-arrow"></i>
-        </div>
-      </div>
-    </aside>
-
-    <!-- Right: Contact + FAQs -->
+    <!-- Left: Create Ticket + My Tickets -->
     <main class="support-main">
-      <!-- Contact Section -->
-      <section class="contact-section">
-        <h2>Still need help?</h2>
-        <p class="section-desc">We are here for you. Reach out to our support team.</p>
-
-        <div class="contact-cards">
-          <div class="contact-card">
-            <div class="contact-icon call"><i class="ti ti-phone"></i></div>
-            <div class="contact-info">
-              <h4>Call Support</h4>
-              <p>+91 xxxxx xxxxx</p>
-            </div>
-            <button class="contact-btn call">Call Now</button>
+      <!-- Create Ticket -->
+      <section class="panel-card">
+        <div class="panel-header">
+          <h3><i class="ti ti-ticket"></i> Submit a Support Ticket</h3>
+        </div>
+        <div class="ticket-form">
+          <div class="form-group">
+            <label for="subject">Subject</label>
+            <input type="text" id="subject" [(ngModel)]="subject" placeholder="Brief description of your issue" />
           </div>
-
-          <div class="contact-card">
-            <div class="contact-icon email"><i class="ti ti-mail"></i></div>
-            <div class="contact-info">
-              <h4>Email Us</h4>
-              <p>support&#64;medisync.com</p>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="category">Category</label>
+              <select id="category" [(ngModel)]="category">
+                <option value="">Select Category</option>
+                <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+              </select>
             </div>
-            <button class="contact-btn email">Send Email</button>
+            <div class="form-group">
+              <label for="priority">Priority</label>
+              <select id="priority" [(ngModel)]="priority">
+                <option *ngFor="let p of priorities" [value]="p">{{ p }}</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" [(ngModel)]="description" rows="4" placeholder="Describe your issue in detail..."></textarea>
+          </div>
+          <div class="form-actions">
+            <button class="btn-submit" (click)="submitTicket()" [disabled]="isSubmitting">
+              <i class="ti ti-send"></i>
+              {{ isSubmitting ? 'Submitting...' : 'Submit Ticket' }}
+            </button>
           </div>
         </div>
       </section>
 
-      <!-- FAQ Section -->
-      <section class="faq-section">
-        <h3>Faq Support</h3>
+      <!-- My Tickets -->
+      <section class="panel-card">
+        <div class="panel-header">
+          <h3><i class="ti ti-list-check"></i> My Tickets</h3>
+          <span class="ticket-count" *ngIf="tickets.length > 0">{{ tickets.length }}</span>
+        </div>
+
+        <div class="tickets-list" *ngIf="!isLoading">
+          <div class="ticket-item" *ngFor="let ticket of tickets" [class.expanded]="expandedTicketId === ticket.ticketId">
+            <div class="ticket-row" (click)="toggleTicket(ticket.ticketId)">
+              <div class="ticket-info">
+                <span class="ticket-id">#{{ ticket.ticketId }}</span>
+                <span class="ticket-subject">{{ ticket.subject }}</span>
+              </div>
+              <div class="ticket-badges">
+                <span class="badge priority" [ngClass]="getPriorityClass(ticket.priority)">{{ ticket.priority }}</span>
+                <span class="badge status" [ngClass]="getStatusClass(ticket.status)">{{ ticket.status }}</span>
+                <span class="ticket-date">{{ ticket.createdAt | date:'mediumDate' }}</span>
+                <i class="ti" [ngClass]="expandedTicketId === ticket.ticketId ? 'ti-chevron-up' : 'ti-chevron-down'"></i>
+              </div>
+            </div>
+
+            <!-- Expanded -->
+            <div class="ticket-expanded" *ngIf="expandedTicketId === ticket.ticketId">
+              <div class="ticket-desc">
+                <strong>Description:</strong>
+                <p>{{ ticket.description }}</p>
+              </div>
+
+              <div class="messages-section" *ngIf="ticketDetail">
+                <h4><i class="ti ti-messages"></i> Messages ({{ ticketDetail.messages.length }})</h4>
+                <div class="messages-list">
+                  <div class="message-item" *ngFor="let msg of ticketDetail.messages"
+                       [class.agent]="msg.senderRole === 'SUPPORT_AGENT' || msg.senderRole === 'ADMIN'"
+                       [class.own]="msg.senderRole !== 'SUPPORT_AGENT' && msg.senderRole !== 'ADMIN'">
+                    <div class="msg-header">
+                      <span class="msg-sender">{{ msg.senderUsername }}</span>
+                      <span class="msg-role" [class.agent-role]="msg.senderRole === 'SUPPORT_AGENT'">{{ msg.senderRole === 'SUPPORT_AGENT' ? 'Support' : 'You' }}</span>
+                      <span class="msg-time">{{ msg.createdAt | date:'short' }}</span>
+                    </div>
+                    <div class="msg-body">{{ msg.message }}</div>
+                  </div>
+                  <div class="no-messages" *ngIf="ticketDetail.messages.length === 0">
+                    <i class="ti ti-message-off"></i>
+                    <p>No messages yet. Our team will respond soon.</p>
+                  </div>
+                </div>
+
+                <!-- Reply -->
+                <div class="reply-section" *ngIf="ticket.status !== 'CLOSED' && ticket.status !== 'RESOLVED'">
+                  <div class="reply-input">
+                    <textarea [(ngModel)]="replyMessage" rows="2" placeholder="Type your reply..."></textarea>
+                    <button class="btn-reply" (click)="sendReply()" [disabled]="isReplying || !replyMessage.trim()">
+                      <i class="ti ti-send"></i> {{ isReplying ? 'Sending...' : 'Reply' }}
+                    </button>
+                  </div>
+                </div>
+                <div class="resolved-notice" *ngIf="ticket.status === 'RESOLVED' || ticket.status === 'CLOSED'">
+                  <i class="ti ti-circle-check"></i> This ticket has been resolved.
+                </div>
+              </div>
+
+              <div class="loading-detail" *ngIf="!ticketDetail">
+                <i class="ti ti-loader"></i> Loading...
+              </div>
+            </div>
+          </div>
+
+          <div class="empty-tickets" *ngIf="tickets.length === 0">
+            <i class="ti ti-ticket-off"></i>
+            <p>No tickets yet. Submit one above if you need help!</p>
+          </div>
+        </div>
+
+        <div class="loading-state" *ngIf="isLoading">
+          <i class="ti ti-loader"></i> Loading tickets...
+        </div>
+      </section>
+    </main>
+
+    <!-- Right: FAQs -->
+    <aside class="faq-sidebar">
+      <div class="panel-card">
+        <div class="panel-header">
+          <h3><i class="ti ti-help-circle"></i> FAQs</h3>
+        </div>
         <div class="faq-list">
           <div *ngFor="let faq of faqs; let i = index" class="faq-item" [class.open]="faq.open">
             <button class="faq-question" (click)="toggleFaq(i)">
@@ -62,7 +142,7 @@
             </div>
           </div>
         </div>
-      </section>
-    </main>
+      </div>
+    </aside>
   </div>
 </div>

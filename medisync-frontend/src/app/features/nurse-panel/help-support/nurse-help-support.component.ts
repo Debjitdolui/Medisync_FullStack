@@ -6,38 +6,30 @@ import { SupportService } from '../../../core/services/support.service';
 import { SupportTicket, TicketDetail, CreateTicketRequest } from '../../../core/models/support.model';
 
 @Component({
-  selector: 'app-help-support',
+  selector: 'app-nurse-help-support',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './help-support.component.html',
-  styleUrl: './help-support.component.scss'
+  templateUrl: './nurse-help-support.component.html',
+  styleUrl: './nurse-help-support.component.scss'
 })
-export class HelpSupportComponent implements OnInit {
-  // Ticket form
+export class NurseHelpSupportComponent implements OnInit {
+  // Form fields
   subject = '';
   description = '';
   category = '';
-  priority = 'MEDIUM';
+  priority = '';
+
   categories = ['ACCOUNT', 'BOOKING', 'PAYMENT', 'TECHNICAL', 'OTHER'];
   priorities = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'];
-  isSubmitting = false;
 
-  // My Tickets
+  // Tickets
   tickets: SupportTicket[] = [];
   expandedTicketId: number | null = null;
   ticketDetail: TicketDetail | null = null;
   replyMessage = '';
+  isSubmitting = false;
   isReplying = false;
   isLoading = false;
-
-  // FAQs
-  faqs = [
-    { question: 'How can I search medicines?', answer: 'Go to Medicine Search from the dashboard. Enter the medicine name in the search bar and click Search. You can filter by distance and price.', open: false },
-    { question: 'Can I upload prescription?', answer: 'Currently, you can manually enter medicine names from your prescription. Image upload feature will be available soon.', open: false },
-    { question: 'How do I book a nurse?', answer: 'Go to Nurse Booking, select a service type, choose an available nurse, and fill in the booking details.', open: false },
-    { question: 'How to cancel a booking?', answer: 'Go to your Profile > My Bookings tab. Find the booking and click Cancel if it is still in pending status.', open: false },
-    { question: 'Is my data safe?', answer: 'Yes, MediSync uses encrypted storage for all sensitive data. Your personal information is protected.', open: false }
-  ];
 
   constructor(
     private supportService: SupportService,
@@ -56,14 +48,15 @@ export class HelpSupportComponent implements OnInit {
         this.isLoading = false;
       },
       error: () => {
+        this.toastr.error('Failed to load tickets', 'Error');
         this.isLoading = false;
       }
     });
   }
 
   submitTicket(): void {
-    if (!this.subject.trim() || !this.description.trim() || !this.category) {
-      this.toastr.warning('Please fill in subject, category and description', 'Validation');
+    if (!this.subject.trim() || !this.description.trim() || !this.category || !this.priority) {
+      this.toastr.warning('Please fill in all fields', 'Validation');
       return;
     }
 
@@ -77,16 +70,16 @@ export class HelpSupportComponent implements OnInit {
 
     this.supportService.createTicket(request).subscribe({
       next: () => {
-        this.toastr.success('Ticket submitted! Our team will respond shortly.', 'Ticket Created');
+        this.toastr.success('Ticket created successfully', 'Success');
         this.subject = '';
         this.description = '';
         this.category = '';
-        this.priority = 'MEDIUM';
+        this.priority = '';
         this.isSubmitting = false;
         this.loadTickets();
       },
       error: () => {
-        this.toastr.error('Failed to create ticket. Please try again.', 'Error');
+        this.toastr.error('Failed to create ticket', 'Error');
         this.isSubmitting = false;
       }
     });
@@ -132,10 +125,6 @@ export class HelpSupportComponent implements OnInit {
         this.isReplying = false;
       }
     });
-  }
-
-  toggleFaq(index: number): void {
-    this.faqs[index].open = !this.faqs[index].open;
   }
 
   getStatusClass(status: string): string {

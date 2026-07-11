@@ -1,0 +1,130 @@
+<div class="escalated-tickets">
+  <div class="page-header">
+    <div>
+      <h1><i class="ti ti-alert-circle"></i> Escalated Tickets</h1>
+      <p class="subtitle">Review and resolve escalated support tickets</p>
+    </div>
+    <span class="ticket-count">{{ tickets.length }} escalated ticket(s)</span>
+  </div>
+
+  <!-- Tickets Table -->
+  <div class="table-card">
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Subject</th>
+            <th>Raised By</th>
+            <th>Category</th>
+            <th>Priority</th>
+            <th>Escalation Reason</th>
+            <th>Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let ticket of paginatedTickets">
+            <td class="id-cell">#{{ ticket.ticketId }}</td>
+            <td class="subject-cell">{{ ticket.subject }}</td>
+            <td class="name-cell">{{ ticket.raisedByUsername }}</td>
+            <td><span class="category-badge">{{ ticket.category }}</span></td>
+            <td>
+              <span class="priority-badge" [ngClass]="getPriorityClass(ticket.priority)">{{ ticket.priority }}</span>
+            </td>
+            <td class="reason-cell">{{ ticket.escalationReason || '—' }}</td>
+            <td class="date-cell">{{ ticket.createdAt | date:'mediumDate' }}</td>
+            <td class="actions-cell">
+              <button class="btn-view" (click)="openViewModal(ticket)">
+                <i class="ti ti-eye"></i> View & Resolve
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="tickets.length === 0 && !isLoading">
+            <td colspan="8" class="empty-row">
+              <i class="ti ti-mood-happy"></i> No escalated tickets
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <app-pagination
+      *ngIf="tickets.length > pageSize"
+      [totalItems]="tickets.length"
+      [pageSize]="pageSize"
+      [currentPage]="currentPage"
+      (pageChange)="onPageChange($event)">
+    </app-pagination>
+  </div>
+
+  <!-- View & Resolve Modal -->
+  <div class="modal-overlay" *ngIf="showViewModal" (click)="closeViewModal()">
+    <div class="modal-content large" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Ticket #{{ selectedTicket?.ticketId }} — {{ selectedTicket?.subject }}</h3>
+        <button class="btn-close" (click)="closeViewModal()"><i class="ti ti-x"></i></button>
+      </div>
+      <div class="modal-body">
+        <!-- Ticket Info -->
+        <div class="ticket-info-grid" *ngIf="selectedTicket">
+          <div class="info-item">
+            <label>Raised By</label>
+            <span>{{ selectedTicket.raisedByUsername }} ({{ selectedTicket.raisedByRole }})</span>
+          </div>
+          <div class="info-item">
+            <label>Category</label>
+            <span class="category-badge">{{ selectedTicket.category }}</span>
+          </div>
+          <div class="info-item">
+            <label>Priority</label>
+            <span class="priority-badge" [ngClass]="getPriorityClass(selectedTicket.priority)">{{ selectedTicket.priority }}</span>
+          </div>
+          <div class="info-item">
+            <label>Status</label>
+            <span class="status-badge escalated">{{ selectedTicket.status }}</span>
+          </div>
+        </div>
+
+        <div class="ticket-description" *ngIf="selectedTicket">
+          <label>Description</label>
+          <p>{{ selectedTicket.description }}</p>
+        </div>
+
+        <div class="escalation-reason" *ngIf="selectedTicket?.escalationReason">
+          <label>Escalation Reason</label>
+          <p class="reason-text">{{ selectedTicket!.escalationReason }}</p>
+        </div>
+
+        <!-- Messages -->
+        <div class="messages-section" *ngIf="ticketDetail">
+          <label>Conversation ({{ ticketDetail.messages.length }} messages)</label>
+          <div class="messages-list">
+            <div class="message-item" *ngFor="let msg of ticketDetail.messages">
+              <div class="message-header">
+                <span class="sender-name">{{ msg.senderUsername }}</span>
+                <span class="sender-role">{{ msg.senderRole }}</span>
+                <span class="message-time">{{ msg.createdAt | date:'short' }}</span>
+              </div>
+              <div class="message-body">{{ msg.message }}</div>
+            </div>
+            <div class="no-messages" *ngIf="ticketDetail.messages.length === 0">
+              <p>No messages in this ticket.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="loading-state" *ngIf="!ticketDetail">
+          <i class="ti ti-loader"></i> Loading ticket details...
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="closeViewModal()">Close</button>
+        <button class="btn-resolve" (click)="resolveTicket()" [disabled]="isResolving || selectedTicket?.status === 'RESOLVED'">
+          <i class="ti ti-check"></i>
+          {{ isResolving ? 'Resolving...' : (selectedTicket?.status === 'RESOLVED' ? 'Already Resolved' : 'Mark as Resolved') }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

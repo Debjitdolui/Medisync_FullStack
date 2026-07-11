@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
@@ -25,8 +25,24 @@ export class AdminLayoutComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private notificationService: NotificationService,
-    private router: Router
+    private router: Router,
+    private elementRef: ElementRef
   ) {}
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    // Close if click is outside notification and profile areas
+    const notifWrapper = this.elementRef.nativeElement.querySelector('.notification-wrapper');
+    const profileArea = this.elementRef.nativeElement.querySelector('.profile-area');
+
+    if (notifWrapper && !notifWrapper.contains(target)) {
+      this.showNotifications = false;
+    }
+    if (profileArea && !profileArea.contains(target)) {
+      this.showProfileMenu = false;
+    }
+  }
 
   ngOnInit(): void {
     const storedRole = this.authService.getRole();
@@ -68,6 +84,8 @@ export class AdminLayoutComponent implements OnInit {
           { label: 'Medicines', icon: 'ti-pill', route: '/admin/medicines' },
           { label: 'Reports', icon: 'ti-report-analytics', route: '/admin/reports' },
           { label: 'Activity Logs', icon: 'ti-list-details', route: '/admin/logs' },
+          { label: 'Support Agents', icon: 'ti-headset', route: '/admin/support-agents' },
+          { label: 'Escalations', icon: 'ti-alert-circle', route: '/admin/escalated-tickets' },
         ];
       case 'pharmacy':
         return [
@@ -75,6 +93,7 @@ export class AdminLayoutComponent implements OnInit {
           { label: 'Inventory', icon: 'ti-packages', route: '/pharmacy/inventory' },
           { label: 'Reviews', icon: 'ti-star', route: '/pharmacy/reviews' },
           { label: 'Settings', icon: 'ti-settings', route: '/pharmacy/settings' },
+          { label: 'Help & Support', icon: 'ti-help-circle', route: '/pharmacy/help-support' },
         ];
       case 'nurse':
         return [
@@ -85,6 +104,7 @@ export class AdminLayoutComponent implements OnInit {
           { label: 'Reviews', icon: 'ti-star', route: '/nurse/reviews' },
           { label: 'Availability', icon: 'ti-clock', route: '/nurse/availability' },
           { label: 'My Profile', icon: 'ti-user', route: '/nurse/settings' },
+          { label: 'Help & Support', icon: 'ti-help-circle', route: '/nurse/help-support' },
         ];
       default:
         return [];

@@ -10,3 +10,4 @@ export * from './address.model';
 export * from './search.model';
 export * from './admin.model';
 export * from './pagination.model';
+export * from './support.model';

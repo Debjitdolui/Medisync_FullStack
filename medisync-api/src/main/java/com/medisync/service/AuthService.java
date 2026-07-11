@@ -26,6 +26,10 @@ public class AuthService {
     public AuthResponse register(RegisterRequest req) {
         if (userRepo.existsByEmail(req.getEmail()))
             throw new RuntimeException("Email already registered");
+        if (pharmacyRepo.existsByEmail(req.getEmail()))
+            throw new RuntimeException("Email already registered");
+        if (nurseRepo.existsByEmail(req.getEmail()))
+            throw new RuntimeException("Email already registered");
         if (userRepo.existsByUsername(req.getUsername()))
             throw new RuntimeException("Username already taken");
 
@@ -44,9 +48,9 @@ public class AuthService {
     }
 
     public AuthResponse login(LoginRequest req) {
-        // Check users table
+        // Check users table (skip nurse/pharmacy shadow users - they authenticate via their own tables)
         var user = userRepo.findByEmail(req.getEmail());
-        if (user.isPresent()) {
+        if (user.isPresent() && !"nurse".equals(user.get().getRole()) && !"pharmacy".equals(user.get().getRole())) {
             if (!encoder.matches(req.getPassword(), user.get().getPasswordHash()))
                 throw new RuntimeException("Invalid credentials");
             if (!user.get().getIsActive())

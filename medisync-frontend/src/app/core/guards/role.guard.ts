@@ -34,6 +34,9 @@ export const roleGuard: CanActivateFn = (route, state) => {
     case 'admin':
       targetUrl = '/admin/dashboard';
       break;
+    case 'support_agent':
+      targetUrl = '/support/dashboard';
+      break;
   }
 
   // Prevent infinite loop: don't redirect if we're already trying to go there

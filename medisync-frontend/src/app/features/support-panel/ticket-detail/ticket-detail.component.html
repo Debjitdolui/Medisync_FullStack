@@ -1,0 +1,141 @@
+<div class="ticket-detail-container" *ngIf="!loading && ticket">
+  <!-- Back Button -->
+  <button class="back-btn" (click)="goBack()">
+    <i class="ti ti-arrow-left"></i> Back to Tickets
+  </button>
+
+  <!-- Ticket Header -->
+  <div class="ticket-header-card">
+    <div class="ticket-header-top">
+      <h2 class="ticket-subject">{{ticket.subject}}</h2>
+      <span class="ticket-id-badge">#{{ticket.ticketId}}</span>
+    </div>
+
+    <div class="ticket-meta">
+      <span class="badge" [ngClass]="getStatusClass(ticket.status)">{{ticket.status}}</span>
+      <span class="badge" [ngClass]="getPriorityClass(ticket.priority)">{{ticket.priority}}</span>
+      <span class="category-tag">{{ticket.category}}</span>
+      <span class="meta-divider">|</span>
+      <span class="meta-item"><i class="ti ti-user"></i> {{ticket.raisedByUsername || 'N/A'}} ({{ticket.raisedByRole}})</span>
+      <span class="meta-divider">|</span>
+      <span class="meta-item"><i class="ti ti-calendar"></i> {{ticket.createdAt | date:'medium'}}</span>
+    </div>
+
+    <p class="ticket-description">{{ticket.description}}</p>
+
+    <!-- Assigned Info -->
+    <div class="assigned-info" *ngIf="ticket.assignedToUsername">
+      <i class="ti ti-user-check"></i>
+      Assigned to: <strong>{{ticket.assignedToUsername}}</strong>
+    </div>
+
+    <!-- Escalation Reason -->
+    <div class="escalation-info" *ngIf="ticket.escalationReason">
+      <i class="ti ti-alert-triangle"></i>
+      Escalation Reason: <strong>{{ticket.escalationReason}}</strong>
+    </div>
+
+    <!-- Actions -->
+    <div class="ticket-actions">
+      <button class="action-btn assign-btn" *ngIf="!ticket.assignedToUsername" (click)="assignToMe()">
+        <i class="ti ti-user-plus"></i> Assign to Me
+      </button>
+
+      <div class="status-dropdown-wrapper">
+        <button class="action-btn status-btn" (click)="showStatusDropdown = !showStatusDropdown">
+          <i class="ti ti-switch-horizontal"></i> Change Status
+          <i class="ti ti-chevron-down"></i>
+        </button>
+        <div class="status-dropdown" *ngIf="showStatusDropdown">
+          <button *ngFor="let s of allStatuses"
+                  class="status-option"
+                  [class.active]="ticket.status === s"
+                  (click)="changeStatus(s)">
+            {{s}}
+          </button>
+        </div>
+      </div>
+
+      <button class="action-btn escalate-btn" (click)="openEscalateModal()"
+              *ngIf="ticket.status !== 'ESCALATED' && ticket.status !== 'RESOLVED' && ticket.status !== 'CLOSED'">
+        <i class="ti ti-alert-triangle"></i> Escalate
+      </button>
+    </div>
+  </div>
+
+  <!-- Messages / Chat -->
+  <div class="chat-section">
+    <h3 class="chat-title"><i class="ti ti-messages"></i> Conversation</h3>
+
+    <div class="messages-list">
+      <div class="message-bubble"
+           *ngFor="let msg of messages"
+           [class.agent]="isAgentMessage(msg)"
+           [class.user]="!isAgentMessage(msg)"
+           [class.internal]="msg.isInternal">
+        <div class="bubble-header">
+          <span class="sender-name">{{msg.senderUsername}}</span>
+          <span class="sender-role">({{msg.senderRole}})</span>
+          <span class="internal-badge" *ngIf="msg.isInternal">Internal Note</span>
+        </div>
+        <div class="bubble-body">{{msg.message}}</div>
+        <div class="bubble-time">{{msg.createdAt | date:'short'}}</div>
+      </div>
+
+      <div class="no-messages" *ngIf="messages.length === 0">
+        <i class="ti ti-message-off"></i>
+        <p>No messages yet. Start the conversation below.</p>
+      </div>
+    </div>
+
+    <!-- Message Input -->
+    <div class="message-input-area">
+      <div class="input-row">
+        <textarea
+          [(ngModel)]="newMessage"
+          placeholder="Type your message..."
+          rows="3"
+          class="message-textarea"
+          (keydown.ctrl.enter)="sendMessage()">
+        </textarea>
+      </div>
+      <div class="input-actions">
+        <label class="internal-checkbox">
+          <input type="checkbox" [(ngModel)]="isInternal">
+          <span>Internal Note</span>
+        </label>
+        <button class="send-btn" (click)="sendMessage()" [disabled]="sendingMessage || !newMessage.trim()">
+          <i class="ti ti-send"></i> {{sendingMessage ? 'Sending...' : 'Send'}}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Loading State -->
+<div class="loading-state" *ngIf="loading">
+  <i class="ti ti-loader-2 spin"></i>
+  <p>Loading ticket details...</p>
+</div>
+
+<!-- Escalate Modal -->
+<div class="modal-overlay" *ngIf="showEscalateModal" (click)="closeEscalateModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3><i class="ti ti-alert-triangle"></i> Escalate Ticket</h3>
+      <button class="modal-close" (click)="closeEscalateModal()">
+        <i class="ti ti-x"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <label>Reason for Escalation</label>
+      <textarea [(ngModel)]="escalationReason" rows="4" placeholder="Describe why this ticket needs escalation..."></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="cancel-btn" (click)="closeEscalateModal()">Cancel</button>
+      <button class="confirm-btn" (click)="confirmEscalate()" [disabled]="escalating || !escalationReason.trim()">
+        <i class="ti ti-alert-triangle"></i> {{escalating ? 'Escalating...' : 'Confirm Escalation'}}
+      </button>
+    </div>
+  </div>
+</div>

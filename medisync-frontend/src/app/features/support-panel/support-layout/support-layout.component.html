@@ -1,0 +1,85 @@
+<div class="support-wrapper">
+  <!-- Mobile Sidebar Overlay -->
+  <div class="sidebar-overlay" [class.open]="sidebarOpen" (click)="sidebarOpen = false"></div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" [class.open]="sidebarOpen">
+    <div class="sidebar-logo">
+      <div class="logo-icon">
+        <i class="ti ti-headset"></i>
+      </div>
+      <div>
+        <span class="logo-name">MediSync</span>
+        <span class="logo-tag">Support Panel</span>
+      </div>
+      <button class="sidebar-close" (click)="sidebarOpen = false">
+        <i class="ti ti-x"></i>
+      </button>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a *ngFor="let item of navItems"
+         [routerLink]="item.route"
+         routerLinkActive="active"
+         class="nav-item"
+         (click)="sidebarOpen = false">
+        <i class="ti {{item.icon}}"></i>
+        <span>{{item.label}}</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-row">
+        <div class="avatar">{{userName.charAt(0).toUpperCase()}}</div>
+        <div>
+          <div class="u-name">{{userName}}</div>
+          <div class="u-role">Support Agent</div>
+        </div>
+      </div>
+      <button class="logout-btn" (click)="logout()">
+        <i class="ti ti-logout"></i>
+        <span>Log Out</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Area -->
+  <div class="main-area">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="hamburger-btn" (click)="toggleSidebar()">
+          <i class="ti ti-menu-2"></i>
+        </button>
+        <span class="topbar-date">{{today}}</span>
+      </div>
+      <div class="topbar-actions">
+        <!-- Profile Dropdown -->
+        <div class="profile-area">
+          <div class="topbar-user" (click)="toggleProfileMenu()">
+            <i class="ti ti-user-circle"></i>
+            <span>{{userName}}</span>
+            <i class="ti ti-chevron-down chevron"></i>
+          </div>
+          <div class="profile-dropdown" *ngIf="showProfileMenu">
+            <button class="dropdown-item danger" (click)="logout()">
+              <i class="ti ti-logout"></i> Logout
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="content-area">
+      <router-outlet></router-outlet>
+    </main>
+
+    <footer class="support-footer">
+      <div class="footer-left">
+        <span>&copy; 2026 <strong>MediSync</strong>. All rights reserved.</span>
+      </div>
+      <div class="footer-right">
+        <span>Made with <i class="ti ti-heart-filled"></i> for better healthcare</span>
+      </div>
+    </footer>
+  </div>
+</div>

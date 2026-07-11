@@ -1,0 +1,125 @@
+<div class="help-support">
+  <!-- Page Header -->
+  <div class="page-header">
+    <h1><i class="ti ti-help-circle"></i> Help & Support</h1>
+    <p class="subtitle">Create a support ticket or check existing ones</p>
+  </div>
+
+  <!-- Create Ticket Form -->
+  <div class="panel-card">
+    <div class="panel-header">
+      <h3><i class="ti ti-plus"></i> Create New Ticket</h3>
+    </div>
+    <div class="ticket-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="subject">Subject</label>
+          <input type="text" id="subject" [(ngModel)]="subject" placeholder="Brief description of your issue" />
+        </div>
+      </div>
+      <div class="form-row two-col">
+        <div class="form-group">
+          <label for="category">Category</label>
+          <select id="category" [(ngModel)]="category">
+            <option value="">Select Category</option>
+            <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="priority">Priority</label>
+          <select id="priority" [(ngModel)]="priority">
+            <option value="">Select Priority</option>
+            <option *ngFor="let p of priorities" [value]="p">{{ p }}</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="description">Description</label>
+          <textarea id="description" [(ngModel)]="description" rows="4" placeholder="Describe your issue in detail..."></textarea>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn-submit" (click)="submitTicket()" [disabled]="isSubmitting">
+          <i class="ti ti-send"></i>
+          {{ isSubmitting ? 'Submitting...' : 'Submit Ticket' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- My Tickets -->
+  <div class="panel-card">
+    <div class="panel-header">
+      <h3><i class="ti ti-ticket"></i> My Tickets</h3>
+      <span class="ticket-count">{{ tickets.length }} ticket(s)</span>
+    </div>
+
+    <div class="tickets-list" *ngIf="!isLoading">
+      <div class="ticket-item" *ngFor="let ticket of tickets" [class.expanded]="expandedTicketId === ticket.ticketId">
+        <div class="ticket-header" (click)="toggleTicket(ticket.ticketId)">
+          <div class="ticket-info">
+            <span class="ticket-id">#{{ ticket.ticketId }}</span>
+            <span class="ticket-subject">{{ ticket.subject }}</span>
+          </div>
+          <div class="ticket-meta">
+            <span class="badge priority" [ngClass]="getPriorityClass(ticket.priority)">{{ ticket.priority }}</span>
+            <span class="badge status" [ngClass]="getStatusClass(ticket.status)">{{ ticket.status }}</span>
+            <span class="ticket-date">{{ ticket.createdAt | date:'mediumDate' }}</span>
+            <i class="ti" [ngClass]="expandedTicketId === ticket.ticketId ? 'ti-chevron-up' : 'ti-chevron-down'"></i>
+          </div>
+        </div>
+
+        <!-- Expanded Detail -->
+        <div class="ticket-detail" *ngIf="expandedTicketId === ticket.ticketId">
+          <div class="ticket-description">
+            <strong>Description:</strong>
+            <p>{{ ticket.description }}</p>
+          </div>
+
+          <!-- Messages -->
+          <div class="messages-section" *ngIf="ticketDetail">
+            <h4>Messages ({{ ticketDetail.messages.length }})</h4>
+            <div class="messages-list">
+              <div class="message-item" *ngFor="let msg of ticketDetail.messages" [class.own]="msg.senderRole !== 'SUPPORT_AGENT'">
+                <div class="message-header">
+                  <span class="sender-name">{{ msg.senderUsername }}</span>
+                  <span class="sender-role">{{ msg.senderRole }}</span>
+                  <span class="message-time">{{ msg.createdAt | date:'short' }}</span>
+                </div>
+                <div class="message-body">{{ msg.message }}</div>
+              </div>
+              <div class="no-messages" *ngIf="ticketDetail.messages.length === 0">
+                <p>No messages yet.</p>
+              </div>
+            </div>
+
+            <!-- Reply Input -->
+            <div class="reply-section" *ngIf="ticket.status !== 'CLOSED' && ticket.status !== 'RESOLVED'">
+              <div class="reply-input">
+                <textarea [(ngModel)]="replyMessage" rows="2" placeholder="Type your reply..."></textarea>
+                <button class="btn-reply" (click)="sendReply()" [disabled]="isReplying || !replyMessage.trim()">
+                  <i class="ti ti-send"></i> {{ isReplying ? 'Sending...' : 'Send' }}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="loading-detail" *ngIf="!ticketDetail">
+            <i class="ti ti-loader"></i> Loading details...
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="tickets.length === 0">
+        <i class="ti ti-ticket-off"></i>
+        <p>No tickets yet. Create one above if you need help!</p>
+      </div>
+    </div>
+
+    <div class="loading-state" *ngIf="isLoading">
+      <i class="ti ti-loader"></i> Loading tickets...
+    </div>
+  </div>
+</div>
