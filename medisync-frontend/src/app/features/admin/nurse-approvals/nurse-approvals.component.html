@@ -124,6 +124,7 @@
           <input type="text" class="form-input" [(ngModel)]="newService.serviceName" placeholder="Service name (e.g., IV Drip)" />
           <input type="text" class="form-input" [(ngModel)]="newService.description" placeholder="Description" />
           <input type="number" class="form-input small" [(ngModel)]="newService.basePrice" placeholder="Base Price (₹)" min="0" />
+          <input type="number" class="form-input small" [(ngModel)]="newService.durationMinutes" placeholder="Duration (mins)" min="15" step="15" />
           <button class="btn-add-service" (click)="addService()">
             <i class="ti ti-plus"></i> Add
           </button>
@@ -136,6 +137,9 @@
               <span class="service-name">{{ svc.serviceName }}</span>
               <span class="service-desc">{{ svc.description }}</span>
               <span class="service-price">₹{{ svc.basePrice }}</span>
+              <span class="service-duration" *ngIf="svc.durationMinutes">
+                <i class="ti ti-clock"></i> {{ svc.durationMinutes >= 60 ? (svc.durationMinutes / 60) + 'h' : svc.durationMinutes + ' min' }}
+              </span>
             </div>
             <button class="btn-delete-service" (click)="deleteService(svc.serviceId)">
               <i class="ti ti-trash"></i>

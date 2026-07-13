@@ -31,7 +31,7 @@ export class NurseApprovalsComponent implements OnInit {
   // Services modal
   showServicesModal = false;
   nurseServices: NurseService[] = [];
-  newService = { serviceName: '', description: '', basePrice: 0 };
+  newService = { serviceName: '', description: '', basePrice: 0, durationMinutes: 60 };
 
   constructor(
     private adminService: AdminService,
@@ -55,7 +55,7 @@ export class NurseApprovalsComponent implements OnInit {
     this.http.post<NurseService>(`${environment.apiUrl}/admin/nurse-services`, this.newService).subscribe({
       next: (s) => {
         this.nurseServices.push(s);
-        this.newService = { serviceName: '', description: '', basePrice: 0 };
+        this.newService = { serviceName: '', description: '', basePrice: 0, durationMinutes: 60 };
         this.toastr.success('Service added successfully', 'Service Added');
       },
       error: () => {
