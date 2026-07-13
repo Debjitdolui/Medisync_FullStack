@@ -28,11 +28,11 @@
       <input type="text" placeholder="Search medicines..." [(ngModel)]="searchTerm" (input)="filterMedicines()" />
     </div>
     <div class="filter-group">
-      <select class="filter-select" [(ngModel)]="selectedCategory" (change)="filterMedicines()">
+      <select class="filter-select" [(ngModel)]="selectedCategory" (ngModelChange)="filterMedicines()">
         <option value="">All Categories</option>
         <option *ngFor="let cat of categories" [value]="cat.categoryId">{{ cat.categoryName }}</option>
       </select>
-      <select class="filter-select" [(ngModel)]="stockFilter" (change)="filterMedicines()">
+      <select class="filter-select" [(ngModel)]="stockFilter" (ngModelChange)="filterMedicines()">
         <option value="">All Stock</option>
         <option value="low">Low Stock (&lt; 10)</option>
         <option value="out">Out of Stock</option>

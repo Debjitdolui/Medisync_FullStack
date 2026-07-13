@@ -114,9 +114,11 @@ export class InventoryComponent implements OnInit {
       );
     }
 
-    if (this.selectedCategory) {
+    if (this.selectedCategory && this.selectedCategory !== '') {
       const catId = Number(this.selectedCategory);
-      result = result.filter(m => m.category?.categoryId === catId);
+      if (!isNaN(catId) && catId > 0) {
+        result = result.filter(m => m.category?.categoryId === catId);
+      }
     }
 
     if (this.stockFilter) {
